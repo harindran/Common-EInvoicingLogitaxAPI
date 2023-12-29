@@ -2902,7 +2902,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
                                     if (Getdate(columnFind(einvDT, "EwbValidTill", 0).Substring(0, 10), "yyyy-MM-dd") != new DateTime(1900, 01, 01))
                                     {
-                                        objsalesinvoice.EWayBillDetails.EWayBillDate = Getdate(columnFind(einvDT, "EwbValidTill", 0).Substring(0, 10), "yyyy-MM-dd");
+                                        objsalesinvoice.EWayBillDetails.EWayBillExpirationDate = Getdate(columnFind(einvDT, "EwbValidTill", 0).Substring(0, 10), "yyyy-MM-dd");
                                     }
                                 }
 
@@ -3365,6 +3365,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
                     {
                         if (!string.IsNullOrEmpty(einvDT.Rows[0]["Irn"].ToString()))
                         {
+
+                            clsModule.objaddon.objglobalmethods.WriteErrorLog(InvDocEntry);
+
                             objsalesinvoice.GetByKey(Convert.ToInt32(InvDocEntry));
                             objsalesinvoice.UserFields.Fields.Item("U_IRNNo").Value = columnFind(einvDT, "Irn", 0);
                             objsalesinvoice.UserFields.Fields.Item("U_QRCode").Value = columnFind(einvDT, "SignedQRCode", 0);
@@ -3386,7 +3389,14 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                 }
                             }
 
-                            objsalesinvoice.Update();
+                            int iErrCode = objsalesinvoice.Update();
+                            string strerr = "";
+                            if (iErrCode != 0)
+                            {
+                                clsModule.objaddon.objcompany.GetLastError(out iErrCode, out strerr);                                     
+                                clsModule.objaddon.objapplication.MessageBox(strerr);
+                            }
+                            clsModule.objaddon.objglobalmethods.WriteErrorLog("E invoice Update Successfully");
                             blnRefresh = true;
                         }
 
@@ -3556,7 +3566,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                         {                                           
                                             if (Getdate(columnFind(einvDT, "EwbValidTill", 0).Substring(0, 10), "yyyy-MM-dd") != new DateTime(1900, 01, 01))
                                             {
-                                                objsalesinvoice.EWayBillDetails.EWayBillDate = Getdate(columnFind(einvDT, "EwbValidTill", 0).Substring(0, 10), "yyyy-MM-dd");
+                                                objsalesinvoice.EWayBillDetails.EWayBillExpirationDate = Getdate(columnFind(einvDT, "EwbValidTill", 0).Substring(0, 10), "yyyy-MM-dd");
                                             }
                                         }
                                         objsalesinvoice.Update();

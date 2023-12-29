@@ -356,23 +356,44 @@ namespace EInvoicing_Logitax_API.Business_Objects
             retstring = retstring + " Case when a.\"DocType\"='S' then (Select Case when LEft(\"ServCode\",2) like '0%' then Replace(\"ServCode\",'0','') Else \"ServCode\" End from OSAC where b.\"SacEntry\"= \"AbsEntry\") Else Left(Replace(o.\"ChapterID\",'.','')," + HSNLength + ") End \"HSN\",Case when a.\"DocType\"='S' then 1 Else b.\"Quantity\" End \"Quantity\",COALESCE(b.\"unitMsr\",b.\"UomCode\") \"Unit\",";
 
 
-            retstring = retstring + " Case when a.\"DocType\"='S' then b.\"Price\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end  else b.\"PriceBefDi\" * a.\"DocRate\" end \"UnitPrice\",";
-            retstring = retstring + " Case when a.\"DocType\"='S' then b.\"LineTotal\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end Else IFNULL(b.\"PriceBefDi\" * a.\"DocRate\",0)*b.\"Quantity\" End \"Tot Amt\",";
-            retstring = retstring + " Case when a.\"DocType\"='S' then b.\"LineTotal\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end Else IFNULL(b.\"INMPrice\" * a.\"DocRate\",0)*b.\"Quantity\" End \"Tot Amt1\",";
-            retstring = retstring + " Case when a.\"DocType\"='S' then b.\"LineTotal\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end Else IFNULL(b.\"INMPrice\" * a.\"DocRate\",0)*b.\"Quantity\" End \"AssAmt\",";
-             
-            retstring = retstring + " (Select Sum(X.\"TaxRate\") From WTR4 X Where X.\"DocEntry\"=A.\"DocEntry\" And  X.\"LineNum\"=B.\"LineNum\" and X.\"ExpnsCode\"='-1' ) \"GSTRATE\",IFNULL((select sum(\"TaxSum\") from WTR4 where \"DocEntry\"=a.\"DocEntry\"and \"staType\"=-100),0) as \"CGSTVal\",";
-            retstring = retstring + " IFNULL((select sum(\"TaxSum\") from WTR4 where \"DocEntry\"=a.\"DocEntry\" and \"staType\"=-110),0) as \"SGSTVal\", IFNULL((select sum(\"TaxSum\") from WTR4 where \"DocEntry\"=a.\"DocEntry\" and \"staType\"=-120),0) as \"IGSTVal\",";
-            retstring = retstring + " IFNULL((select sum(\"TaxSum\") from WTR4 where \"DocEntry\"=a.\"DocEntry\" and \"LineNum\"=b.\"LineNum\" and \"staType\"=-100 and \"ExpnsCode\"='-1'),0) as \"CGSTAmt\", IFNULL((select sum(\"TaxSum\") from WTR4 where \"DocEntry\"=a.\"DocEntry\" and \"LineNum\"=b.\"LineNum\" and \"staType\"=-110 and \"ExpnsCode\"='-1'),0) as \"SGSTAmt\",";
-            retstring = retstring + " IFNULL((select sum(\"TaxSum\") from WTR4 where \"DocEntry\"=a.\"DocEntry\" and \"LineNum\"=b.\"LineNum\" and \"staType\"=-120 and \"ExpnsCode\"='-1'),0) as \"IGSTAmt\",";
+            //retstring = retstring + " Case when a.\"DocType\"='S' then b.\"Price\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end  else b.\"PriceBefDi\" * a.\"DocRate\" end \"UnitPrice\",";
+            //retstring = retstring + " Case when a.\"DocType\"='S' then b.\"LineTotal\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end Else IFNULL(b.\"PriceBefDi\" * a.\"DocRate\",0)*b.\"Quantity\" End \"Tot Amt\",";
+            //retstring = retstring + " Case when a.\"DocType\"='S' then b.\"LineTotal\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end Else IFNULL(b.\"INMPrice\" * a.\"DocRate\",0)*b.\"Quantity\" End \"Tot Amt1\",";
+            //retstring = retstring + " Case when a.\"DocType\"='S' then b.\"LineTotal\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end Else IFNULL(b.\"INMPrice\" * a.\"DocRate\",0)*b.\"Quantity\" End \"AssAmt\",";
+
+            //retstring = retstring + " (Select Sum(X.\"TaxRate\") From WTR4 X Where X.\"DocEntry\"=A.\"DocEntry\" And  X.\"LineNum\"=B.\"LineNum\" and X.\"ExpnsCode\"='-1' ) \"GSTRATE\",IFNULL((select sum(\"TaxSum\") from WTR4 where \"DocEntry\"=a.\"DocEntry\"and \"staType\"=-100),0) as \"CGSTVal\",";
+            //retstring = retstring + " IFNULL((select sum(\"TaxSum\") from WTR4 where \"DocEntry\"=a.\"DocEntry\" and \"staType\"=-110),0) as \"SGSTVal\", IFNULL((select sum(\"TaxSum\") from WTR4 where \"DocEntry\"=a.\"DocEntry\" and \"staType\"=-120),0) as \"IGSTVal\",";
+            //retstring = retstring + " IFNULL((select sum(\"TaxSum\") from WTR4 where \"DocEntry\"=a.\"DocEntry\" and \"LineNum\"=b.\"LineNum\" and \"staType\"=-100 and \"ExpnsCode\"='-1'),0) as \"CGSTAmt\", IFNULL((select sum(\"TaxSum\") from WTR4 where \"DocEntry\"=a.\"DocEntry\" and \"LineNum\"=b.\"LineNum\" and \"staType\"=-110 and \"ExpnsCode\"='-1'),0) as \"SGSTAmt\",";
+            //retstring = retstring + " IFNULL((select sum(\"TaxSum\") from WTR4 where \"DocEntry\"=a.\"DocEntry\" and \"LineNum\"=b.\"LineNum\" and \"staType\"=-120 and \"ExpnsCode\"='-1'),0) as \"IGSTAmt\",";
+
+
+
+            retstring = retstring + "  b.\"PriceBefDi\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end  \"UnitPrice\",";
+            retstring = retstring + "  COALESCE(b.\"PriceBefDi\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end,0)*b.\"Quantity\"  \"Tot Amt\",";
+            retstring = retstring + "  COALESCE(b.\"INMPrice\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end,0)*b.\"Quantity\"  \"Tot Amt1\",";
+            retstring = retstring + "  COALESCE(b.\"INMPrice\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end,0)*b.\"Quantity\"  \"AssAmt\",";
+
+
+            retstring = retstring + " U_UTL_ST_CGST+U_UTL_ST_SGST+U_UTL_ST_IGST as \"GSTRATE\",";
+            retstring = retstring + " (select sum(\"U_UTL_ST_CGAMT\") from WTR1 where \"DocEntry\"=a.\"DocEntry\") as \"CGSTVal\",  ";
+            retstring = retstring + " (select sum(\"U_UTL_ST_SGAMT\") from WTR1 where \"DocEntry\"=a.\"DocEntry\") as \"SGSTVal\",  ";
+            retstring = retstring + " (select sum(\"U_UTL_ST_IGAMT\") from WTR1 where \"DocEntry\"=a.\"DocEntry\") as \"IGSTVal\",  ";
+            retstring = retstring + " U_UTL_ST_CGAMT as  \"CGSTAmt\", U_UTL_ST_SGAMT as  \"SGSTAmt\", U_UTL_ST_IGAMT as  \"IGSTAmt\",";
+
+
+
             retstring = retstring + " (SELECT MAX(\"BatchNum\") from IBT1 where \"ItemCode\"=b.\"ItemCode\" and \"WhsCode\"=b.\"WhsCode\" and";
             retstring = retstring + " \"BaseType\" in ('67') and \"BaseEntry\"= CASE WHEN  b.\"BaseType\" =-1 THEN b.\"DocEntry\" ELSE b.\"BaseEntry\"  end  ) AS \"BatchNum\",";
 
-            //retstring = retstring + " Case when a.\"DocType\"='S' then b.\"LineTotal\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end Else (Select Sum(IFNULL(\"INMPrice\",0)*\"Quantity\")* case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end from WTR1 where \"DocEntry\"=b.\"DocEntry\") End \"AssVal\",";
-            retstring = retstring + " Case when a.\"DocType\"='S' then  (Select Sum(IFNULL(\"LineTotal\",0))* case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end from WTR1 where \"DocEntry\"=b.\"DocEntry\") " +
-                                                           "Else (Select Sum(IFNULL(\"INMPrice\",0)*\"Quantity\")* case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end from WTR1 where \"DocEntry\"=b.\"DocEntry\") End \"AssVal\",";
 
-            retstring = retstring + " (a.\"DocTotal\" +a.\"DpmAmnt\") - COALESCE((Select Sum(WTR5.\"WTAmnt\") from WTR5 where WTR5.\"AbsEntry\"=a.\"DocEntry\"),0.0) \"Doc Total\" ,";
+            //retstring = retstring + " Case when a.\"DocType\"='S' then  (Select Sum(IFNULL(\"LineTotal\",0))* case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end from WTR1 where \"DocEntry\"=b.\"DocEntry\") " +
+            //                       "Else (Select Sum(IFNULL(\"INMPrice\",0)*\"Quantity\")* case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end from WTR1 where \"DocEntry\"=b.\"DocEntry\") End \"AssVal\",";
+
+            // retstring = retstring + " (a.\"DocTotal\" +a.\"DpmAmnt\") - COALESCE((Select Sum(WTR5.\"WTAmnt\") from WTR5 where WTR5.\"AbsEntry\"=a.\"DocEntry\"),0.0) \"Doc Total\" ,";
+
+            retstring = retstring + " (Select Sum(COALESCE(\"INMPrice\",0)*\"Quantity\")* case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end from WTR1 where \"DocEntry\"=b.\"DocEntry\")  \"AssVal\",";
+            
+            retstring = retstring + " ((select sum(\"U_UTL_ST_LINETOTAL\") from WTR1 where \"DocEntry\"=a.\"DocEntry\") +a.\"DpmAmnt\") - COALESCE((Select Sum(WTR5.\"WTAmnt\") from WTR5 where WTR5.\"AbsEntry\"=a.\"DocEntry\"),0.0) \"Doc Total\" ,";
 
           
             retstring = retstring + " a.\"DocDueDate\" \"Inv Due Date\", a.\"NumAtCard\", a.\"Printed\",a.\"PayToCode\", a.\"ShipToCode\", a.\"Comments\" ,Left(Replace(o.\"ChapterID\",'.','')," + HSNLength + ") \"ChapterID\" , A.\"DiscSum\", A.\"RoundDif\",";

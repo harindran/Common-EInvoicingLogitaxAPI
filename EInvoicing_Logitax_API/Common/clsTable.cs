@@ -46,8 +46,23 @@ namespace EInvoicing_Logitax_API.Common
             AddFields("OINV", "IRNStatus", "IRNStatus", SAPbobsCOM.BoFieldTypes.db_Alpha, 100);            
             AddFields("OINV", "EwayStatus", "EwayStatus", SAPbobsCOM.BoFieldTypes.db_Alpha, 100);            
             AddFields("OINV", "Ewaypdf", "EwayPdf", SAPbobsCOM.BoFieldTypes.db_Alpha, 200);            
-            AddFields("OINV", "EwayDetpdf", "Eway detailed Pdf", SAPbobsCOM.BoFieldTypes.db_Alpha, 200);            
-           
+            AddFields("OINV", "EwayDetpdf", "Eway detailed Pdf", SAPbobsCOM.BoFieldTypes.db_Alpha, 200);
+
+
+
+
+            AddFields("WTR1", "UTL_ST_TAXCD", "Tax Code", SAPbobsCOM.BoFieldTypes.db_Alpha, 100);
+            AddFields("WTR1", "UTL_ST_CGST", "CGST Rate", SAPbobsCOM.BoFieldTypes.db_Float, 10, SAPbobsCOM.BoFldSubTypes.st_Percentage);
+            AddFields("WTR1", "UTL_ST_SGST", "SGST Rate", SAPbobsCOM.BoFieldTypes.db_Float, 10, SAPbobsCOM.BoFldSubTypes.st_Percentage);
+            AddFields("WTR1", "UTL_ST_IGST", "IGST Rate", SAPbobsCOM.BoFieldTypes.db_Float, 10, SAPbobsCOM.BoFldSubTypes.st_Percentage);
+            AddFields("WTR1", "UTL_ST_CGAMT", "CGST Amount", SAPbobsCOM.BoFieldTypes.db_Float, 10, SAPbobsCOM.BoFldSubTypes.st_Percentage);
+            AddFields("WTR1", "UTL_ST_SGAMT", "SGST Amount", SAPbobsCOM.BoFieldTypes.db_Float, 10, SAPbobsCOM.BoFldSubTypes.st_Percentage);
+            AddFields("WTR1", "UTL_ST_IGAMT", "IGST Amount", SAPbobsCOM.BoFieldTypes.db_Float, 10, SAPbobsCOM.BoFldSubTypes.st_Percentage);
+            AddFields("WTR1", "UTL_ST_LINETOTAL", "Line Total", SAPbobsCOM.BoFieldTypes.db_Float, 10, SAPbobsCOM.BoFldSubTypes.st_Percentage);
+
+
+
+
 
             AddTables("ATEICFG", "E-Invoice Config Header", SAPbobsCOM.BoUTBTableType.bott_MasterData);
             AddTables("ATEICFG1", "E-Invoice Config Lines", SAPbobsCOM.BoUTBTableType.bott_MasterDataLines);

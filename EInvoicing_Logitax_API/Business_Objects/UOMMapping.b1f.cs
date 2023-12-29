@@ -45,8 +45,8 @@ namespace EInvoicing_Logitax_API.Business_Objects
             clsModule.objaddon.objglobalmethods.Matrix_Addrow(Matrix0, "UOM", "#");            
             Application.SBO_Application.SetStatusBarMessage("Loading...", SAPbouiCOM.BoMessageTime.bmt_Short,false);
             GetMappedjson();
-            
 
+            objform.ClientHeight = Button0.Item.Top + 25;
         }
 
         private enum column

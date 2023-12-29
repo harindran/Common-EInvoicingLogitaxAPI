@@ -344,9 +344,56 @@ namespace EInvoicing_Logitax_API.Common
             return dtformate;
         }
 
-      
 
+        public decimal CtoD(object Pstring)
+        {
+            decimal CtoD = 0;
+            try
+            {
+                decimal LdblResult;
+                if (Pstring == null)
+                    return CtoD;
+                string Lstr = System.Convert.ToString(Pstring);
 
+                if (decimal.TryParse(Lstr, out LdblResult))
+                    CtoD = LdblResult;
+                return CtoD;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public decimal GetDecimalVal(object Pstring)
+        {
+
+            string value = objtostring(Pstring, "[a-zA-Z]");
+            return CtoD(value);
+        }
+
+        public string objtostring(object Value,string Removepattern="")
+        {
+            string Returnstring = "";
+            try
+            {
+               
+                if (Value == null)
+                    return Returnstring;
+
+                Returnstring = Convert.ToString(Value);
+
+                if (!string.IsNullOrEmpty(Removepattern))
+                {
+                    Returnstring = Regex.Replace(Returnstring, Removepattern, "");
+                }
+                return Returnstring;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
 
 
         public string DateFormat(string Inv_Doc_Date, string Actualformat,string returnformat)
