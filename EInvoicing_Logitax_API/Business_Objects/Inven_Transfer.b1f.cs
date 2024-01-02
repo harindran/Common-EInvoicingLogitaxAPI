@@ -14,7 +14,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
        
         private string FormName = "940";
         private string strSQL;
-        public static SAPbouiCOM.Form oForm;
+        public  SAPbouiCOM.Form oForm;
         SAPbouiCOM.ISBOChooseFromListEventArg pCFL;
         public SAPbouiCOM.DBDataSource Matrix1DB;
         public Inven_Transfer()
@@ -88,14 +88,13 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
         private void OnCustomInitialize()
         {
-            oForm = clsModule.objaddon.objapplication.Forms.GetForm("940",1);
+            
             this.Folder0.GroupWith("1320000081");
 
             Matrix0.Columns.Item("U_UTL_ST_TAXCD").ChooseFromListUID = "CFLTax";
             Matrix0.Columns.Item("U_UTL_ST_TAXCD").ChooseFromListAlias = "Code";
 
-            Matrix1DB = oForm.DataSources.DBDataSources.Item("WTR1");
-
+         
 
 
         }
@@ -109,12 +108,15 @@ namespace EInvoicing_Logitax_API.Business_Objects
             int offset = oForm.DataSources.DBDataSources.Item(0).Offset;
             string DocEntry = oForm.DataSources.DBDataSources.Item(0).GetValue("DocEntry", offset);
 
-            string cnnt = clsModule.objaddon.objglobalmethods.getSingleValue("select 1 from wtr26 where \"DocEntry\" ='" + DocEntry + "'");
-
-            if (cnnt != "1")
+            if (!string.IsNullOrEmpty(DocEntry))
             {
-                clsModule.objaddon.objglobalmethods.ExecuteQuery("  INSERT INTO WTR26 (\"DocEntry\") VALUES('" + DocEntry + "'); ");
+                string cnnt = clsModule.objaddon.objglobalmethods.getSingleValue("select 1 from wtr26 where \"DocEntry\" ='" + DocEntry + "'");
 
+                if (cnnt != "1")
+                {
+                    clsModule.objaddon.objglobalmethods.ExecuteQuery("  INSERT INTO WTR26 (\"DocEntry\") VALUES('" + DocEntry + "'); ");
+
+                }
             }
             //strSQL = "SELECT \"SubID\" ,\"SubType\" FROM OEST o  ;";
             //clsModule.objaddon.objglobalmethods.Load_Combo(oForm.UniqueID, ((SAPbouiCOM.ComboBox)oForm.Items.Item("ET0002").Specific), strSQL, new[] { "-,-" });
@@ -187,6 +189,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             strSQL = "SELECT  \"TypeCode\",\"TypeName\" FROM OEVT o;";
             clsModule.objaddon.objglobalmethods.Load_Combo(oForm.UniqueID, ((SAPbouiCOM.ComboBox)oForm.Items.Item("ET00013").Specific), strSQL, new[] { "-,-" });
+
+
+            Matrix1DB = oForm.DataSources.DBDataSources.Item("WTR1");
 
         }
 

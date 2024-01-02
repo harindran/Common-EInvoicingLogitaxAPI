@@ -491,8 +491,18 @@ namespace EInvoicing_Logitax_API.Business_Objects
             retstring = retstring + " LEFT JOIN OWHS FrmAdd ON FrmAdd.\"WhsCode\" =a.\"Filler\"";
             retstring = retstring + " LEFT JOIN OWHS ToAdd ON ToAdd.\"WhsCode\" =a.\"ToWhsCode\"";
             retstring = retstring + " LEFT JOIN OLCT FrmLoc ON FrmLoc.\"Code\" =FrmAdd.\"Location\"";
-            retstring = retstring + " LEFT JOIN OLCT ToLoc ON ToLoc.\"Code\" =ToAdd.\"Location\"";
+            if ( clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_InvTranGetcusAdd\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01'; ")=="Y")
+            {
+                retstring = retstring + " LEFT JOIN CRD1 ToLoc on ToLoc.\"CardCode\" =a.\"CardCode\" and ToLoc.\"Address\" =A.\"ShipToCode\" and ToLoc.\"AdresType\"='S'";
+            }
+            else
+            {
+                retstring = retstring + " LEFT JOIN OLCT ToLoc ON ToLoc.\"Code\" =ToAdd.\"Location\"";
+            }
 
+            
+
+            
 
             retstring = retstring + " LEFT JOIN(SELECT \"BankName\" \"CBankName\",Y.\"BankCode\" \"CBankCode\",\"Branch\" \"CBranch\", \"Account\" \"CAccount\",\"AcctName\" \"CAcctName\",";
             retstring = retstring + " X.\"SwiftNum\" \"CIFSCNo\" FROM DSC1 X,ODSC Y Where X.\"AbsEntry\"=Y.\"AbsEntry\" ) B2 On B2.\"CBankCode\"=B1.\"DflBnkCode\"";

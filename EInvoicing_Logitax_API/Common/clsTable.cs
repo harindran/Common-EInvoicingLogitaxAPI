@@ -75,6 +75,7 @@ namespace EInvoicing_Logitax_API.Common
             AddFields("@ATEICFG", "HSNL", "HSN LENGTH", SAPbobsCOM.BoFieldTypes.db_Numeric);
             AddFields("@ATEICFG", "SERCONFIG", "Series Configuration", SAPbobsCOM.BoFieldTypes.db_Memo);
             AddFields("@ATEICFG", "GetCompAdd", "Get Company Address", SAPbobsCOM.BoFieldTypes.db_Alpha,100);
+            AddFields("@ATEICFG", "InvTranGetcusAdd", "Inventory Transfer Get Customer Address", SAPbobsCOM.BoFieldTypes.db_Alpha,100);
          
 
             AddFields("@ATEICFG", "DBType", "SQL Or HANA", SAPbobsCOM.BoFieldTypes.db_Alpha, 5);

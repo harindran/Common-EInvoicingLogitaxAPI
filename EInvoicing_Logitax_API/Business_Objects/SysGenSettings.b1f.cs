@@ -77,6 +77,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             this.Matrix3.PressedAfter += new SAPbouiCOM._IMatrixEvents_PressedAfterEventHandler(this.Matrix3_PressedAfter);
             this.Matrix3.ValidateAfter += new SAPbouiCOM._IMatrixEvents_ValidateAfterEventHandler(this.Matrix3_ValidateAfter);
             this.CheckBox0 = ((SAPbouiCOM.CheckBox)(this.GetItem("Chkgetcmp").Specific));
+            this.CheckBox1 = ((SAPbouiCOM.CheckBox)(this.GetItem("ChkGetBP").Specific));
             this.OnCustomInitialize();
 
         }
@@ -229,7 +230,13 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         {
                         CheckBox0.Checked = true;
                         }
-                     
+
+                    strSQL = clsModule.objaddon.objglobalmethods.getSingleValue("Select \"U_InvTranGetcusAdd\" from \"@ATEICFG\" where \"Code\"='01'");
+                    if (strSQL == "Y")
+                    {
+                        CheckBox1.Checked = true;
+                    }
+
 
                     if (!(OptionBtn4.Selected == true | OptionBtn5.Selected == true))
                     {
@@ -297,6 +304,13 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 if (strSQL == "Y")
                 {
                     CheckBox0.Checked = true;
+                }
+
+
+                strSQL = clsModule.objaddon.objglobalmethods.getSingleValue("Select \"U_InvTranGetcusAdd\" from \"@ATEICFG\" where \"Code\"='01'");
+                if (strSQL == "Y")
+                {
+                    CheckBox1.Checked = true;
                 }
 
                 Matrix0.AutoResizeColumns();
@@ -377,6 +391,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 oGeneralData.SetProperty("U_HSNL", oForm.DataSources.UserDataSources.Item("UD_HSNL").Value);
                 oGeneralData.SetProperty("U_SERCONFIG", oForm.DataSources.UserDataSources.Item("UD_SERCON").Value);
                 oGeneralData.SetProperty("U_GetCompAdd", Convert.ToString(((CheckBox0.Checked == true) ? 'Y' : 'N'))); 
+                oGeneralData.SetProperty("U_InvTranGetcusAdd", Convert.ToString(((CheckBox1.Checked == true) ? 'Y' : 'N'))); 
 
                 oGeneralData.SetProperty("U_DBType", Convert.ToString(((OptionBtn4.Selected == true) ? 'Y' : 'N')));
                 oGeneralData.SetProperty("U_EwayNo", oForm.DataSources.UserDataSources.Item("EwayNo").Value);
@@ -560,6 +575,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
         }
 
         private SAPbouiCOM.CheckBox CheckBox0;
+        private SAPbouiCOM.CheckBox CheckBox1;
     }
 }
  
