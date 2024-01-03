@@ -13,6 +13,8 @@ using EInvoicing_Logitax_API.Common;
 using Newtonsoft.Json;
 using SAPbouiCOM.Framework;
 
+using static EInvoicing_Logitax_API.Common.clsGlobalMethods;
+
 namespace EInvoicing_Logitax_API.Business_Objects
 {
     [FormAttribute("GSTUPLOAD", "Business_Objects/GST_Upload.b1f")]
@@ -513,7 +515,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         string jsonstring = "";
                         MultipartFormDataContent formContent = new MultipartFormDataContent();
                         string lstrdocentry = Grid0.DataTable.Columns.Item("DocEntry").Cells.Item(i).Value.ToString();
-                        clsModule.objaddon.objInvoice.Generate_Cancel_IRN(ClsARInvoice.EinvoiceMethod.CreateIRN, lstrdocentry, TransType, "E-invoice", ref dtjson, true, ref jsonstring);
+                        clsModule.objaddon.objInvoice.Generate_Cancel_IRN(ClsARInvoice.EinvoiceMethod.CreateIRN, lstrdocentry, TransType, "E-invoice", ref dtjson, true, ref jsonstring,false);
 
                         formContent.Add(new StringContent(clientcode), "clientCode");
                         formContent.Add(new StringContent(username), "userCode");
@@ -716,7 +718,15 @@ namespace EInvoicing_Logitax_API.Business_Objects
                     string remarks = "";
                     if (datatable.Rows.Count > 0)
                     {
-                        switch(datatable.Rows[0][0].ToString())
+                        string status = "";
+                        status = columnFind(datatable, "statusCode", 0);
+                        if (string.IsNullOrEmpty(status))
+                        {
+                            status = (columnFind(datatable, "Status_Code", 0));
+
+                        }
+                        
+                        switch (status)
                         {
                             case "P":
                                 ss = 1;
@@ -733,7 +743,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             default:
                                 remarks = datatable.Rows[0][3].ToString();
                                 break;
-                        }
+                        }                        
                         clsModule.objaddon.objglobalmethods.getSingleValue("update " + table + " set \"U_GST_status\" = '" + ss + "',\"U_GST_Remarks\"='"+ remarks + "' where \"DocEntry\"='" + lstrdocentry + "'");
                     }
 

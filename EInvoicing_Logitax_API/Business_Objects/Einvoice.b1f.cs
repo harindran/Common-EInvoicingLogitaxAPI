@@ -60,8 +60,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
 
         private void OnCustomInitialize()
-        {
-            objform = clsModule.objaddon.objapplication.Forms.ActiveForm;
+        {            
             objform.Freeze(true);
             ((SAPbouiCOM.ComboBox)objform.Items.Item("EBType").Specific).Select(0, SAPbouiCOM.BoSearchKey.psk_Index);
             ((SAPbouiCOM.ComboBox)objform.Items.Item("EBTrnType").Specific).Select(0, SAPbouiCOM.BoSearchKey.psk_Index);
@@ -69,7 +68,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
             ((SAPbouiCOM.EditText)objform.Items.Item("EBToDt").Specific).Value = DateTime.Today.ToString("yyyyMMdd");
             objform.Items.Item("EDFrmDt").Click();
             ((SAPbouiCOM.Grid)(objform.Items.Item("GRDet").Specific)).Columns.Item("DocEntry").Visible = true;
+            objform.ClientHeight = Button3.Item.Top + 30;            
             objform.Freeze(false);
+            Loaddata();
         }
 
         private SAPbouiCOM.ComboBox ComboBox0;
@@ -89,6 +90,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
                 throw ex;
             }
+            
 
         }
 
@@ -108,6 +110,11 @@ namespace EInvoicing_Logitax_API.Business_Objects
         private SAPbouiCOM.Button Button1;
 
         private void Button0_ClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            Loaddata();
+        }
+
+        private void Loaddata()
         {
             DataTable dt = new DataTable();
 
@@ -184,8 +191,8 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         {
                             lstrquery += @"And isnull(i.EWayBillNo,'')=''";
                         }
-                    }                  
-                     else
+                    }
+                    else
                     {
                         lstrquery = lstrquery + "AND (IFNULL(t1.\"" + clsModule.EwayUDF + @""",'')<>''";
                         lstrquery = lstrquery + " OR IFNULL(t1.\"" + clsModule.EwayTransportId + @""",'')<>'')";
@@ -273,10 +280,13 @@ namespace EInvoicing_Logitax_API.Business_Objects
         private void Button2_ClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             //throw new System.NotImplementedException();
-
-            if (Grid0.Rows.Count > 0)
+            try
             {
 
+          
+            if (Grid0.Rows.Count > 0)
+            {
+                objform.Freeze(true);
                 for (int i = 0; i < Grid0.Rows.Count; i++)
                 {
                     string lstrdocentry = ((SAPbouiCOM.Grid)(objform.Items.Item("GRDet").Specific)).DataTable.Columns.Item("DocEntry").Cells.Item(i).Value.ToString();
@@ -284,22 +294,37 @@ namespace EInvoicing_Logitax_API.Business_Objects
                     string TransType = ((SAPbouiCOM.ComboBox)objform.Items.Item("EBTrnType").Specific).Selected.Value;
                     string Type = ((SAPbouiCOM.ComboBox)objform.Items.Item("EBType").Specific).Selected.Value;
                     DataTable dt = new DataTable();
+
+                    clsModule.objaddon.objapplication.StatusBar.SetText("Progress...." + (i + 1) + "/" + Grid0.Rows.Count, SAPbouiCOM.BoMessageTime.bmt_Medium, SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+
                     string jsonstring = "";
                     if (lstrcheckbox == "Y")
                     {
                         switch (Type)
                         {
                             case "E-Invoice":
-                                clsModule.objaddon.objInvoice.Generate_Cancel_IRN(ClsARInvoice.EinvoiceMethod.CreateIRN, lstrdocentry, TransType,Type, ref dt,false,ref jsonstring);
+                                clsModule.objaddon.objInvoice.Generate_Cancel_IRN(ClsARInvoice.EinvoiceMethod.CreateIRN, lstrdocentry, TransType,Type, ref dt,false,ref jsonstring,true);
                                 break;
                             case "E-way":
-                                clsModule.objaddon.objInvoice.Generate_Cancel_IRN(ClsARInvoice.EinvoiceMethod.CreateEway, lstrdocentry, TransType, Type, ref dt,false,ref jsonstring);
+                                clsModule.objaddon.objInvoice.Generate_Cancel_IRN(ClsARInvoice.EinvoiceMethod.CreateEway, lstrdocentry, TransType, Type, ref dt,false,ref jsonstring,true);
                                 break;
                         }
                     }
 
 
                 }
+            }
+            Loaddata();
+                clsModule.objaddon.objapplication.StatusBar.SetText("Operation Completed successfully....", SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Success);
+            }
+            catch (Exception)
+            {
+
+                
+            }
+            finally
+            {
+                objform.Freeze(false);
             }
 
         }
@@ -315,6 +340,12 @@ namespace EInvoicing_Logitax_API.Business_Objects
         private void Button3_ClickBefore(object sboObject, SAPbouiCOM.SBOItemEventArg pVal, out bool BubbleEvent)
         {
             BubbleEvent = true;
+            Display();
+
+        }
+
+        private void Display()
+        {
             string ObjType = ((SAPbouiCOM.ComboBox)objform.Items.Item("EBTrnType").Specific).Selected.Value;
             string tb = "";
             DataTable dt = new DataTable();
@@ -327,10 +358,10 @@ namespace EInvoicing_Logitax_API.Business_Objects
             }
             else
             {
-                lstrquery += @" ,t1."""+ clsModule.EwayNo + @""" EWayBillNo ,'' ""EwbDate"" ,'' ""ExpireDate"" ";
+                lstrquery += @" ,t1.""" + clsModule.EwayNo + @""" EWayBillNo ,'' ""EwbDate"" ,'' ""ExpireDate"" ";
             }
 
-            lstrquery+=" FROM ";
+            lstrquery += " FROM ";
             switch (((SAPbouiCOM.ComboBox)objform.Items.Item("EBTrnType").Specific).Selected.Value)
             {
                 case "INV":
@@ -442,14 +473,13 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
                     i++;
                 }
-              
+
                 ((SAPbouiCOM.Grid)(objform.Items.Item("GRDet").Specific)).Columns.Item("Checkbox").Visible = false;
                 ((SAPbouiCOM.Grid)(objform.Items.Item("GRDet").Specific)).Columns.Item("Remarks").Visible = false;
                 objform.Items.Item("BGenarate").Visible = false;
                 objform.Freeze(false);
                 this.Grid0.AutoResizeColumns();
             }
-
         }
 
         private void ComboBox1_ComboSelectAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)

@@ -393,7 +393,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring + " (Select Sum(COALESCE(\"INMPrice\",0)*\"Quantity\")* case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end from WTR1 where \"DocEntry\"=b.\"DocEntry\")  \"AssVal\",";
             
-            retstring = retstring + " ((select sum(\"U_UTL_ST_LINETOTAL\") from WTR1 where \"DocEntry\"=a.\"DocEntry\") +a.\"DpmAmnt\") - COALESCE((Select Sum(WTR5.\"WTAmnt\") from WTR5 where WTR5.\"AbsEntry\"=a.\"DocEntry\"),0.0) \"Doc Total\" ,";
+            retstring = retstring + " (case when (select sum(\"U_UTL_ST_LINETOTAL\") from WTR1 where \"DocEntry\"=a.\"DocEntry\") =0 then a.\"DocTotal\" else  (select sum(\"U_UTL_ST_LINETOTAL\") from WTR1 where \"DocEntry\"=a.\"DocEntry\") end  +a.\"DpmAmnt\") - COALESCE((Select Sum(WTR5.\"WTAmnt\") from WTR5 where WTR5.\"AbsEntry\"=a.\"DocEntry\"),0.0) \"Doc Total\" ,";
 
           
             retstring = retstring + " a.\"DocDueDate\" \"Inv Due Date\", a.\"NumAtCard\", a.\"Printed\",a.\"PayToCode\", a.\"ShipToCode\", a.\"Comments\" ,Left(Replace(o.\"ChapterID\",'.','')," + HSNLength + ") \"ChapterID\" , A.\"DiscSum\", A.\"RoundDif\",";

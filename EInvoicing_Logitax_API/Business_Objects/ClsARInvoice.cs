@@ -414,7 +414,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             {
                                 DataTable dt = new DataTable();
                                 string jsonstring = "";
-                                Generate_Cancel_IRN(einvoiceMethod, DocEntry, TransType, Type, ref dt,false,ref jsonstring);
+                                Generate_Cancel_IRN(einvoiceMethod, DocEntry, TransType, Type, ref dt,false,ref jsonstring,false);
                                 buttonCombo.Caption = "Generate E-invoice";
                                 if (dt.Rows.Count > 0)
                                 {
@@ -864,7 +864,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
 
         public bool Generate_Cancel_IRN(EinvoiceMethod Create_Cancel, string DocEntry, string TransType, string Type, ref DataTable datatable,
-            bool fromGst,ref string jsonstring)
+            bool fromGst,ref string jsonstring,bool frommul)
         {
             string requestParams;
             string SapMessage;
@@ -884,7 +884,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                     strSQL = GetInvoiceData(DocEntry, TransType);
                     invrecordset = (SAPbobsCOM.Recordset)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
 
-                    clsModule.objaddon.objapplication.StatusBar.SetText("Generating Einvoice. Please Wait....", SAPbouiCOM.BoMessageTime.bmt_Medium, !fromGst? SAPbouiCOM.BoStatusBarMessageType.smt_Warning:SAPbouiCOM.BoStatusBarMessageType.smt_None);
+                    clsModule.objaddon.objapplication.StatusBar.SetText("Generating Einvoice. Please Wait....", SAPbouiCOM.BoMessageTime.bmt_Medium, !(fromGst|| frommul )? SAPbouiCOM.BoStatusBarMessageType.smt_Warning:SAPbouiCOM.BoStatusBarMessageType.smt_None);
                     invrecordset.DoQuery(strSQL);
                     if (invrecordset.RecordCount > 0)
                     {
@@ -1045,46 +1045,49 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             GenerateIRNGetJson.json_data.SellerDtls.Pin = invrecordset.Fields.Item("CompnyPincode").Value.ToString();
                             GenerateIRNGetJson.json_data.SellerDtls.Stcd = invrecordset.Fields.Item("Compnystatecode").Value.ToString();
                         }
-
+                        /*
                         GenerateIRNGetJson.json_data.DispDtls.Nm = invrecordset.Fields.Item("Seller_Legal Name").Value.ToString();
                         GenerateIRNGetJson.json_data.DispDtls.Addr1 = sellerAddress1;
                         GenerateIRNGetJson.json_data.DispDtls.Addr2 = sellerAddress2;
                         GenerateIRNGetJson.json_data.DispDtls.Loc = invrecordset.Fields.Item("Seller Location Name").Value.ToString();
                         GenerateIRNGetJson.json_data.DispDtls.Pin = invrecordset.Fields.Item("Seller_PIN code").Value.ToString();
                         GenerateIRNGetJson.json_data.DispDtls.Stcd = invrecordset.Fields.Item("Seller_State_code").Value.ToString();
-
+                        */
                         if (String.IsNullOrEmpty(clsModule.EwayNo))
                         {
                             if (!(string.IsNullOrEmpty(invrecordset.Fields.Item("FrmGSTN").Value.ToString()) || string.IsNullOrEmpty(invrecordset.Fields.Item("FrmAddres1").Value.ToString())))
                             {
-
-                                string FRMAddress1 = "";
-                                string FRMAddress2 = "";
-
-                                string FRMconcatAddress = string.Concat(invrecordset.Fields.Item("FrmAddres1").Value.ToString(),
-                                                                    invrecordset.Fields.Item("FrmAddres2").Value.ToString());
-                                List<string> FRMsubstrings = clsModule.objaddon.objglobalmethods.SplitByLength(FRMconcatAddress, 70);
-
-                                foreach (string substring in FRMsubstrings)
+                                if (!(invrecordset.Fields.Item("TransType").Value.ToString() == "1" || invrecordset.Fields.Item("TransType").Value.ToString() == "2"))
                                 {
-                                    if (string.IsNullOrEmpty(FRMAddress1))
-                                    {
-                                        FRMAddress1 = substring;
-                                        continue;
-                                    }
-                                    if (string.IsNullOrEmpty(FRMAddress2))
-                                    {
-                                        FRMAddress2 = substring;
-                                        continue;
-                                    }
-                                }
 
-                                GenerateIRNGetJson.json_data.DispDtls.Nm = invrecordset.Fields.Item("FrmTraName").Value.ToString();
-                                GenerateIRNGetJson.json_data.DispDtls.Addr1 = FRMAddress1;
-                                GenerateIRNGetJson.json_data.DispDtls.Addr2 = FRMAddress2;
-                                GenerateIRNGetJson.json_data.DispDtls.Loc = invrecordset.Fields.Item("FrmPlace").Value.ToString();
-                                GenerateIRNGetJson.json_data.DispDtls.Pin = invrecordset.Fields.Item("FrmZipCode").Value.ToString();
-                                GenerateIRNGetJson.json_data.DispDtls.Stcd = invrecordset.Fields.Item("ActFrmStat").Value.ToString();
+                                    string FRMAddress1 = "";
+                                    string FRMAddress2 = "";
+
+                                    string FRMconcatAddress = string.Concat(invrecordset.Fields.Item("FrmAddres1").Value.ToString(),
+                                                                        invrecordset.Fields.Item("FrmAddres2").Value.ToString());
+                                    List<string> FRMsubstrings = clsModule.objaddon.objglobalmethods.SplitByLength(FRMconcatAddress, 70);
+
+                                    foreach (string substring in FRMsubstrings)
+                                    {
+                                        if (string.IsNullOrEmpty(FRMAddress1))
+                                        {
+                                            FRMAddress1 = substring;
+                                            continue;
+                                        }
+                                        if (string.IsNullOrEmpty(FRMAddress2))
+                                        {
+                                            FRMAddress2 = substring;
+                                            continue;
+                                        }
+                                    }
+
+                                    GenerateIRNGetJson.json_data.DispDtls.Nm = invrecordset.Fields.Item("FrmTraName").Value.ToString();
+                                    GenerateIRNGetJson.json_data.DispDtls.Addr1 = FRMAddress1;
+                                    GenerateIRNGetJson.json_data.DispDtls.Addr2 = FRMAddress2;
+                                    GenerateIRNGetJson.json_data.DispDtls.Loc = invrecordset.Fields.Item("FrmPlace").Value.ToString();
+                                    GenerateIRNGetJson.json_data.DispDtls.Pin = invrecordset.Fields.Item("FrmZipCode").Value.ToString();
+                                    GenerateIRNGetJson.json_data.DispDtls.Stcd = invrecordset.Fields.Item("ActFrmStat").Value.ToString();
+                                }
                             }
                         }
                         #endregion
@@ -1143,7 +1146,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                 continue;
                             }
                         }
-
+                        /*
                         GenerateIRNGetJson.json_data.ShipDtls.Gstin = invrecordset.Fields.Item("Buyer GSTN").Value.ToString();
                         GenerateIRNGetJson.json_data.ShipDtls.LglNm = invrecordset.Fields.Item("Buyer_Legal Name").Value.ToString();
                         GenerateIRNGetJson.json_data.ShipDtls.Addr1 = shipAddress1;
@@ -1151,44 +1154,47 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         GenerateIRNGetJson.json_data.ShipDtls.Loc = invrecordset.Fields.Item("SCity").Value.ToString();
                         GenerateIRNGetJson.json_data.ShipDtls.Pin = invrecordset.Fields.Item("SZipCode").Value.ToString();
                         GenerateIRNGetJson.json_data.ShipDtls.Stcd = invrecordset.Fields.Item("Shipp to State Code").Value.ToString();
-
+                        */
                         if (String.IsNullOrEmpty(clsModule.EwayNo))
                         {
                             if (!(string.IsNullOrEmpty(invrecordset.Fields.Item("ToGSTN").Value.ToString()) || string.IsNullOrEmpty(invrecordset.Fields.Item("ToAddres1").Value.ToString())))
                             {
-
-                                string TOAddress1 = "";
-                                string TOAddress2 = "";
-                                string TOconcatAddress = string.Concat(invrecordset.Fields.Item("ToAddres1").Value.ToString(),
-                                                                    invrecordset.Fields.Item("ToAddres2").Value.ToString());
-                                List<string> TOsubstrings = clsModule.objaddon.objglobalmethods.SplitByLength(TOconcatAddress, 70);
-                                foreach (string substring in TOsubstrings)
+                                if (!(invrecordset.Fields.Item("TransType").Value.ToString() == "1" || invrecordset.Fields.Item("TransType").Value.ToString() == "3"))
                                 {
-                                    if (string.IsNullOrEmpty(TOAddress1))
-                                    {
-                                        TOAddress1 = substring;
-                                        continue;
-                                    }
-                                    if (string.IsNullOrEmpty(TOAddress2))
-                                    {
-                                        TOAddress2 = substring;
-                                        continue;
-                                    }
-                                }
 
-                                GenerateIRNGetJson.json_data.ShipDtls.Gstin = invrecordset.Fields.Item("ToGSTN").Value.ToString();
-                                GenerateIRNGetJson.json_data.ShipDtls.LglNm = invrecordset.Fields.Item("ToTraName").Value.ToString();
-                                GenerateIRNGetJson.json_data.ShipDtls.Addr1 = TOAddress1;
-                                GenerateIRNGetJson.json_data.ShipDtls.Addr2 = TOAddress2;
-                                GenerateIRNGetJson.json_data.ShipDtls.Loc = invrecordset.Fields.Item("ToPlace").Value.ToString();
-                                GenerateIRNGetJson.json_data.ShipDtls.Pin = invrecordset.Fields.Item("ToZipCode").Value.ToString();
-                                GenerateIRNGetJson.json_data.ShipDtls.Stcd = invrecordset.Fields.Item("ActToState").Value.ToString();
+                                    string TOAddress1 = "";
+                                    string TOAddress2 = "";
+                                    string TOconcatAddress = string.Concat(invrecordset.Fields.Item("ToAddres1").Value.ToString(),
+                                                                        invrecordset.Fields.Item("ToAddres2").Value.ToString());
+                                    List<string> TOsubstrings = clsModule.objaddon.objglobalmethods.SplitByLength(TOconcatAddress, 70);
+                                    foreach (string substring in TOsubstrings)
+                                    {
+                                        if (string.IsNullOrEmpty(TOAddress1))
+                                        {
+                                            TOAddress1 = substring;
+                                            continue;
+                                        }
+                                        if (string.IsNullOrEmpty(TOAddress2))
+                                        {
+                                            TOAddress2 = substring;
+                                            continue;
+                                        }
+                                    }
+
+                                    GenerateIRNGetJson.json_data.ShipDtls.Gstin = invrecordset.Fields.Item("ToGSTN").Value.ToString();
+                                    GenerateIRNGetJson.json_data.ShipDtls.LglNm = invrecordset.Fields.Item("ToTraName").Value.ToString();
+                                    GenerateIRNGetJson.json_data.ShipDtls.Addr1 = TOAddress1;
+                                    GenerateIRNGetJson.json_data.ShipDtls.Addr2 = TOAddress2;
+                                    GenerateIRNGetJson.json_data.ShipDtls.Loc = invrecordset.Fields.Item("ToPlace").Value.ToString();
+                                    GenerateIRNGetJson.json_data.ShipDtls.Pin = invrecordset.Fields.Item("ToZipCode").Value.ToString();
+                                    GenerateIRNGetJson.json_data.ShipDtls.Stcd = invrecordset.Fields.Item("ActToState").Value.ToString();
+                                }
                             }
                         }
 
                         #endregion
 
-                        
+
                         for (int i = 0; i < invrecordset.RecordCount; i++)
                         {
                             GenerateIRNGetJson.json_data.ItemList.Add(new ItemList
