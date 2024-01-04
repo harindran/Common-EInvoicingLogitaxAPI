@@ -72,6 +72,7 @@ namespace EInvoicing_Logitax_API.Common
             AddFields("@ATEICFG", "Live", "Live", SAPbobsCOM.BoFieldTypes.db_Alpha, 5);
             AddFields("@ATEICFG", "UATUrl", "UAT Url", SAPbobsCOM.BoFieldTypes.db_Alpha, 100);
             AddFields("@ATEICFG", "LIVEUrl", "LIVE Url", SAPbobsCOM.BoFieldTypes.db_Alpha, 100);
+            AddFields("@ATEICFG", "ItemDesc", "Item Desc", SAPbobsCOM.BoFieldTypes.db_Alpha, 100);
             AddFields("@ATEICFG", "HSNL", "HSN LENGTH", SAPbobsCOM.BoFieldTypes.db_Numeric);
             AddFields("@ATEICFG", "SERCONFIG", "Series Configuration", SAPbobsCOM.BoFieldTypes.db_Memo);
             AddFields("@ATEICFG", "GetCompAdd", "Get Company Address", SAPbobsCOM.BoFieldTypes.db_Alpha,100);

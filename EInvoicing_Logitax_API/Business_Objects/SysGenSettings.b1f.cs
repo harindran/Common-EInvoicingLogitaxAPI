@@ -78,6 +78,8 @@ namespace EInvoicing_Logitax_API.Business_Objects
             this.Matrix3.ValidateAfter += new SAPbouiCOM._IMatrixEvents_ValidateAfterEventHandler(this.Matrix3_ValidateAfter);
             this.CheckBox0 = ((SAPbouiCOM.CheckBox)(this.GetItem("Chkgetcmp").Specific));
             this.CheckBox1 = ((SAPbouiCOM.CheckBox)(this.GetItem("ChkGetBP").Specific));
+            this.StaticText19 = ((SAPbouiCOM.StaticText)(this.GetItem("LItmDsc").Specific));
+            this.EditText18 = ((SAPbouiCOM.EditText)(this.GetItem("Item_2").Specific));
             this.OnCustomInitialize();
 
         }
@@ -139,7 +141,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 oForm.PaneLevel = 26;
                 strSQL = @"Select T0.""U_ClientCode"",T0.""U_UserCode"",T0.""U_Password"",T0.""U_Live"",T0.""U_UATUrl"",T0.""U_LIVEUrl"",
                               T1.""LineId"",T1.""U_URLType"",T1.""U_Type"",T1.""U_URL"",T0.""U_HSNL"",T0.""U_SERCONFIG"",";
-                strSQL += @" ""U_DBType"" ,""U_EwayNo"" ,""U_VehNo"" ,""U_TransID"" ,""U_Distance"",""U_TransName"",";
+                strSQL += @" ""U_DBType"" ,""U_EwayNo"" ,""U_VehNo"" ,""U_TransID"" ,""U_Distance"",""U_TransName"",""U_ItemDesc"",";
 
                 strSQL += " \"U_GST_ClientCode\",\"U_GST_UserCode\",\"U_GST_Password\",\"U_GST_Live\",\"U_GST_UATUrl\",\"U_GST_LIVEUrl\",\"U_GST_Token\"";
                 strSQL += @" from ""@ATEICFG"" T0 join ""@ATEICFG1"" T1 on T0.""Code""=T1.""Code"" where T0.""Code""='01'";
@@ -171,6 +173,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         oForm.DataSources.UserDataSources.Item("TransID").Value = Drow["U_TransID"].ToString();
                         oForm.DataSources.UserDataSources.Item("TransName").Value = Drow["U_TransName"].ToString();
                         oForm.DataSources.UserDataSources.Item("Distance").Value = Drow["U_Distance"].ToString();
+                        oForm.DataSources.UserDataSources.Item("ItemDesc").Value = Drow["U_ItemDesc"].ToString();
                 
 
                         oForm.DataSources.UserDataSources.Item("UD_GClcode").Value = Drow["U_GST_ClientCode"].ToString();
@@ -399,6 +402,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 oGeneralData.SetProperty("U_TransID", oForm.DataSources.UserDataSources.Item("TransID").Value);
                 oGeneralData.SetProperty("U_TransName", oForm.DataSources.UserDataSources.Item("TransName").Value);
                 oGeneralData.SetProperty("U_Distance", oForm.DataSources.UserDataSources.Item("Distance").Value);
+                oGeneralData.SetProperty("U_ItemDesc", oForm.DataSources.UserDataSources.Item("ItemDesc").Value);
 
 
 
@@ -576,6 +580,8 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
         private SAPbouiCOM.CheckBox CheckBox0;
         private SAPbouiCOM.CheckBox CheckBox1;
+        private SAPbouiCOM.StaticText StaticText19;
+        private SAPbouiCOM.EditText EditText18;
     }
 }
  

@@ -2422,7 +2422,8 @@ namespace EInvoicing_Logitax_API.Business_Objects
             }
             return true;
         }
-        private bool E_Invoice_Logs_old(string InvDocEntry, DataTable einvDT, string ObjType, string Type, string TranType, string requrl)
+
+        private bool Einvoicelogs_9(string InvDocEntry, DataTable einvDT, string ObjType, string Type, string TranType, string requrl)
         {
             try
             {
@@ -2473,7 +2474,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
                     if (TranType == "E-Invoice")
                     {
-                        
+
                         oGeneralData.SetProperty("U_IRNNo", einvDT.Rows[0]["Irn"].ToString());
                         oGeneralData.SetProperty("U_QRCode", einvDT.Rows[0]["SignedQRCode"].ToString());
                         oGeneralData.SetProperty("U_SgnInv", einvDT.Rows[0]["SignedInvoice"].ToString());
@@ -2493,7 +2494,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         oGeneralData.SetProperty("U_Ewaypdf", einvDT.Rows[0]["pdfUrl"].ToString());
                         oGeneralData.SetProperty("U_EwayDetpdf", einvDT.Rows[0]["detailedpdfUrl"].ToString());
                         oGeneralData.SetProperty("U_EwbDate", einvDT.Rows[0]["EwbDt"].ToString());
-                        oGeneralData.SetProperty("U_EwbValidTill", einvDT.Rows[0]["EwbValidTill"].ToString());                        
+                        oGeneralData.SetProperty("U_EwbValidTill", einvDT.Rows[0]["EwbValidTill"].ToString());
                     }
                     else if (TranType == "E-way")
                     {
@@ -2509,7 +2510,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         oGeneralData.SetProperty("U_Ewaypdf", einvDT.Rows[0]["pdfUrl"].ToString());
                         oGeneralData.SetProperty("U_EwayDetpdf", einvDT.Rows[0]["detailedpdfUrl"].ToString());
                         oGeneralData.SetProperty("U_EwbDate", einvDT.Rows[0]["ewayBillDate"].ToString());
-                        oGeneralData.SetProperty("U_EwbValidTill", einvDT.Rows[0]["validUpto"].ToString());                        
+                        oGeneralData.SetProperty("U_EwbValidTill", einvDT.Rows[0]["validUpto"].ToString());
                     }
                     else if (TranType == "E-way IRN")
                     {
@@ -2522,471 +2523,278 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         oGeneralData.SetProperty("U_EwayDetpdf", einvDT.Rows[0]["detailedpdfUrl"].ToString());
                         oGeneralData.SetProperty("U_EwbDate", einvDT.Rows[0]["EwbDt"].ToString());
                         oGeneralData.SetProperty("U_EwbValidTill", einvDT.Rows[0]["EwbValidTill"].ToString());
-                        
+
 
                     }
-
-
                     if (TranType == "E-Invoice")
                     {
-                        //    string tb = "";
-                        //    switch (ObjType)
-                        //    {
-                        //        case "INV":
-                        //            tb = "OINV";
-                        //            break;
-                        //        case "CRN":
-                        //            tb = "ORIN";
-                        //            break;
-                        //    }
-
-                        dynamic objsalesinvoice = null;
-                        switch (ObjType)
-                        {
-                            case "WTR":
-                                objsalesinvoice = (SAPbobsCOM.StockTransfer)objsalesinvoice;
-                                break;
-                            default:
-                                objsalesinvoice = (SAPbobsCOM.Documents)objsalesinvoice;
-                                break;
-                        }
+                        string tb = "";
                         switch (ObjType)
                         {
                             case "INV":
-                                objsalesinvoice = (SAPbobsCOM.Documents)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oInvoices);
-
+                                tb = "OINV";
                                 break;
                             case "CRN":
-                                objsalesinvoice = (SAPbobsCOM.Documents)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oCreditNotes);
-
+                                tb = "ORIN";
                                 break;
                         }
-
                         if (!string.IsNullOrEmpty(einvDT.Rows[0]["Irn"].ToString()))
                         {
-                            objsalesinvoice.GetByKey(Convert.ToInt32(InvDocEntry));
-                            objsalesinvoice.UserFields.Fields.Item("U_IRNNo").Value = columnFind(einvDT, "Irn", 0);
-                            objsalesinvoice.UserFields.Fields.Item("U_QRCode").Value = columnFind(einvDT, "SignedQRCode", 0);
-
-                            //lstrquery = @"Update " + tb + @" Set ""U_IRNNo""='" + einvDT.Rows[0]["Irn"].ToString() + "',";
-                            //lstrquery += @"""U_QRCode""='" + einvDT.Rows[0]["SignedQRCode"].ToString() + "',";
+                            lstrquery = @"Update " + tb + @" Set ""U_IRNNo""='" + einvDT.Rows[0]["Irn"].ToString() + "',";
+                            lstrquery += @"""U_QRCode""='" + einvDT.Rows[0]["SignedQRCode"].ToString() + "',";
 
                             if (String.IsNullOrEmpty(clsModule.EwayNo))
                             {
-                                //  lstrquery += @"""QRCodeSrc""='" + einvDT.Rows[0]["SignedQRCode"].ToString() + "',";
-                                objsalesinvoice.CreateQRCodeFrom = columnFind(einvDT, "SignedQRCode", 0);
+                                lstrquery += @"""QRCodeSrc""='" + einvDT.Rows[0]["SignedQRCode"].ToString() + "',";
                             }
 
-                            //lstrquery += @"""U_AckDate""='" + einvDT.Rows[0]["AckDt"].ToString() + "',";
-                            //lstrquery += @"""U_AckNo""='" + einvDT.Rows[0]["AckNo"].ToString() + "',";
-                            //lstrquery += @"""U_Ewaypdf""='" + einvDT.Rows[0]["pdfUrl"].ToString() + "',";
-                            //lstrquery += @"""U_EwayDetpdf""='" + einvDT.Rows[0]["detailedpdfUrl"].ToString() + "',";
-                            //lstrquery += @"""U_IRNStatus""='" + einvDT.Rows[0]["Status"].ToString() + "'";
-                            objsalesinvoice.UserFields.Fields.Item("U_AckDate").Value = columnFind(einvDT, "AckDt", 0);
-                            objsalesinvoice.UserFields.Fields.Item("U_AckNo").Value = columnFind(einvDT, "AckNo", 0);
-                            objsalesinvoice.UserFields.Fields.Item("U_Ewaypdf").Value = columnFind(einvDT, "pdfUrl", 0);
-                            objsalesinvoice.UserFields.Fields.Item("U_EwayDetpdf").Value = columnFind(einvDT, "detailedpdfUrl", 0);                            
-                            objsalesinvoice.UserFields.Fields.Item("U_IRNStatus").Value = columnFind(einvDT, "Status", 0);                            
+                            lstrquery += @"""U_AckDate""='" + einvDT.Rows[0]["AckDt"].ToString() + "',";
+                            lstrquery += @"""U_AckNo""='" + einvDT.Rows[0]["AckNo"].ToString() + "',";
+                            lstrquery += @"""U_Ewaypdf""='" + einvDT.Rows[0]["pdfUrl"].ToString() + "',";
+                            lstrquery += @"""U_EwayDetpdf""='" + einvDT.Rows[0]["detailedpdfUrl"].ToString() + "',";
+
+                            lstrquery += @"""U_IRNStatus""='" + einvDT.Rows[0]["Status"].ToString() + "'";
 
                             if (!string.IsNullOrEmpty(einvDT.Rows[0]["EwbNo"].ToString()))
                             {
                                 if (!String.IsNullOrEmpty(clsModule.EwayNo))
                                 {
-                                  //  lstrquery += @",""" + clsModule.EwayNo + @"""='" + einvDT.Rows[0]["EwbNo"].ToString() + "'";
-                                    objsalesinvoice.UserFields.Fields.Item(clsModule.EwayNo).Value = columnFind(einvDT, "EwbNo", 0);
-
+                                    lstrquery += @",""" + clsModule.EwayNo + @"""='" + einvDT.Rows[0]["EwbNo"].ToString() + "'";
                                 }
                             }
 
-                            // lstrquery += @"where ""DocEntry""='" + InvDocEntry + "'";
-                            //objRs.DoQuery(lstrquery);
-                            objsalesinvoice.Update();
+                            lstrquery += @"where ""DocEntry""='" + InvDocEntry + "'";
+                            objRs.DoQuery(lstrquery);
                             blnRefresh = true;
                         }
-
-                        //switch (ObjType)
-                        //{
-                        //    case "INV":
-                        //        tb = "INV26";
-                        //        break;
-                        //    case "CRN":
-                        //        tb = "RIN26";
-                        //        break;
-                        //    case "WTR":
-                        //        tb = "WTR26";
-                        //        break;
-                        //    case "DLN":
-                        //        tb = "DLN26";
-                        //        break;
-                        //    case "PCH":
-                        //        tb = "PCH26";
-                        //        break;
-                        //}
 
                         switch (ObjType)
                         {
                             case "INV":
-                                objsalesinvoice = (SAPbobsCOM.Documents)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oInvoices);
+                                tb = "INV26";
                                 break;
                             case "CRN":
-                                objsalesinvoice = (SAPbobsCOM.Documents)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oCreditNotes);
+                                tb = "RIN26";
                                 break;
                             case "WTR":
-                                objsalesinvoice = (SAPbobsCOM.StockTransfer)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oStockTransfer);
+                                tb = "WTR26";
                                 break;
                             case "DLN":
-                                objsalesinvoice = (SAPbobsCOM.Documents)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oDeliveryNotes);
+                                tb = "DLN26";
                                 break;
                             case "PCH":
-                                objsalesinvoice = (SAPbobsCOM.Documents)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oPurchaseInvoices);
+                                tb = "PCH26";
                                 break;
-                                
                         }
                         if (String.IsNullOrEmpty(clsModule.EwayNo))
                         {
                             if (!string.IsNullOrEmpty(einvDT.Rows[0]["EwbNo"].ToString()))
                             {
-                                objsalesinvoice.GetByKey(Convert.ToInt32(InvDocEntry));
 
-                                objsalesinvoice.EWayBillDetails.EWayBillNo = columnFind(einvDT, "EwbNo", 0);
-                             //   lstrquery = @"Update " + tb + @" set ""EWayBillNo""='" + einvDT.Rows[0]["EwbNo"].ToString() + "'";
+                                lstrquery = @"Update " + tb + @" set ""EWayBillNo""='" + einvDT.Rows[0]["EwbNo"].ToString() + "'";
                                 if (!string.IsNullOrEmpty(einvDT.Rows[0]["EwbDt"].ToString()))
                                 {
-                                    // lstrquery += @",""EwbDate""='" + clsModule.objaddon.objglobalmethods.Getdateformat(einvDT.Rows[0]["EwbDt"].ToString().Substring(0, 10), "yyyy-MM-dd") + "'";
-                                    if ( Getdate(columnFind(einvDT, "EwbDt", 0).Substring(0, 10), "yyyy-MM-dd")!= new DateTime(1900, 01, 01))
-                                    {
-                                        objsalesinvoice.EWayBillDetails.EWayBillDate = Getdate(columnFind(einvDT, "EwbDt", 0).Substring(0, 10), "yyyy-MM-dd");
-                                    }
-
+                                    lstrquery += @",""EwbDate""='" + clsModule.objaddon.objglobalmethods.Getdateformat(einvDT.Rows[0]["EwbDt"].ToString().Substring(0, 10), "yyyy-MM-dd") + "'";
                                 }
 
                                 if (!string.IsNullOrEmpty(einvDT.Rows[0]["EwbValidTill"].ToString()))
                                 {
-                                  //  lstrquery += @",""ExpireDate""='" + clsModule.objaddon.objglobalmethods.Getdateformat(einvDT.Rows[0]["EwbValidTill"].ToString().Substring(0, 10), "yyyy-MM-dd") + "'";
-
-                                    if (Getdate(columnFind(einvDT, "EwbValidTill", 0).Substring(0, 10), "yyyy-MM-dd") != new DateTime(1900, 01, 01))
-                                    {
-                                        objsalesinvoice.EWayBillDetails.EWayBillExpirationDate = Getdate(columnFind(einvDT, "EwbValidTill", 0).Substring(0, 10), "yyyy-MM-dd");
-                                    }
+                                    lstrquery += @",""ExpireDate""='" + clsModule.objaddon.objglobalmethods.Getdateformat(einvDT.Rows[0]["EwbValidTill"].ToString().Substring(0, 10), "yyyy-MM-dd") + "'";
                                 }
 
-                                // lstrquery += @" Where ""DocEntry""='" + InvDocEntry + "'";
-                                //objRs.DoQuery(lstrquery);
-                                objsalesinvoice.Update();
+                                lstrquery += @" Where ""DocEntry""='" + InvDocEntry + "'";
+                                objRs.DoQuery(lstrquery);
                                 blnRefresh = true;
                             }
                         }
                     }
                     else if (TranType == "E-way")
                     {
-                        //string tb = "";
-                        //switch (ObjType)
-                        //{
-                        //    case "INV":
-                        //        tb = "INV26";
-                        //        break;
-                        //    case "CRN":
-                        //        tb = "RIN26";
-                        //        break;
-                        //    case "WTR":
-                        //        tb = "WTR26";
-                        //        break;
-                        //    case "DLN":
-                        //        tb = "DLN26";
-                        //        break;
-                        //    case "PCH":
-                        //        tb = "PCH26";
-                        //        break;
-                        //}
-
-                      //  SAPbobsCOM.Documents objsalesinvoice = null;
-
-                        dynamic objsalesinvoice = null;
-                        switch (ObjType)
-                        {
-                            case "WTR":
-                                objsalesinvoice = (SAPbobsCOM.StockTransfer)objsalesinvoice;
-                                break;
-                            default:
-                                objsalesinvoice = (SAPbobsCOM.Documents)objsalesinvoice;
-                                break;
-                        }
-
+                        string tb = "";
                         switch (ObjType)
                         {
                             case "INV":
-                                objsalesinvoice = (SAPbobsCOM.Documents)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oInvoices);
+                                tb = "INV26";
                                 break;
                             case "CRN":
-                                objsalesinvoice = (SAPbobsCOM.Documents)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oCreditNotes);
+                                tb = "RIN26";
                                 break;
                             case "WTR":
-                                objsalesinvoice = (SAPbobsCOM.StockTransfer)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oStockTransfer);
+                                tb = "WTR26";
                                 break;
                             case "DLN":
-                                objsalesinvoice = (SAPbobsCOM.Documents)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oDeliveryNotes);
+                                tb = "DLN26";
                                 break;
                             case "PCH":
-                                objsalesinvoice = (SAPbobsCOM.Documents)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oPurchaseInvoices);
+                                tb = "PCH26";
                                 break;
-
                         }
-
-
 
                         if (!string.IsNullOrEmpty(einvDT.Rows[0]["ewayBillNo"].ToString()))
                         {
                             if (String.IsNullOrEmpty(clsModule.EwayNo))
                             {
-                                //  lstrquery = @"Update " + tb + @" set ""EWayBillNo""='" + einvDT.Rows[0]["ewayBillNo"].ToString() + "'";
-                                objsalesinvoice.GetByKey(Convert.ToInt32(InvDocEntry));
-                                objsalesinvoice.EWayBillDetails.EWayBillNo = columnFind(einvDT, "ewayBillNo", 0);
+                                lstrquery = @"Update " + tb + @" set ""EWayBillNo""='" + einvDT.Rows[0]["ewayBillNo"].ToString() + "'";
 
                                 if (!string.IsNullOrEmpty(einvDT.Rows[0]["ewayBillDate"].ToString()))
                                 {
-                                  //  lstrquery += @",""EwbDate""='" + clsModule.objaddon.objglobalmethods.Getdateformat(einvDT.Rows[0]["ewayBillDate"].ToString().Substring(0, 10), "dd/MM/yyyy") + "'";
-
-                                    if (Getdate(columnFind(einvDT, "ewayBillDate", 0).Substring(0, 10), "dd/MM/yyyy") != new DateTime(1900, 01, 01))
-                                    {
-                                        objsalesinvoice.EWayBillDetails.EWayBillDate = Getdate(columnFind(einvDT, "ewayBillDate", 0).Substring(0, 10), "dd/MM/yyyy");
-                                    }
+                                    lstrquery += @",""EwbDate""='" + clsModule.objaddon.objglobalmethods.Getdateformat(einvDT.Rows[0]["ewayBillDate"].ToString().Substring(0, 10), "dd/MM/yyyy") + "'";
                                 }
                                 if (!string.IsNullOrEmpty(einvDT.Rows[0]["validUpto"].ToString()))
                                 {
-                                    //  lstrquery += @",""ExpireDate""='" + clsModule.objaddon.objglobalmethods.Getdateformat(einvDT.Rows[0]["validUpto"].ToString().Substring(0, 10), "dd/MM/yyyy") + "'";
-
-                                    if (Getdate(columnFind(einvDT, "validUpto", 0).Substring(0, 10), "dd/MM/yyyy") != new DateTime(1900, 01, 01))
-                                    {
-                                        objsalesinvoice.EWayBillDetails.EWayBillExpirationDate = Getdate(columnFind(einvDT, "validUpto", 0).Substring(0, 10), "dd/MM/yyyy");
-                                    }
+                                    lstrquery += @",""ExpireDate""='" + clsModule.objaddon.objglobalmethods.Getdateformat(einvDT.Rows[0]["validUpto"].ToString().Substring(0, 10), "dd/MM/yyyy") + "'";
                                 }
 
-                                //  lstrquery += @" Where ""DocEntry""='" + InvDocEntry + "'";
-                                // objRs.DoQuery(lstrquery);
-                                objsalesinvoice.Update();
+                                lstrquery += @" Where ""DocEntry""='" + InvDocEntry + "'";
+                                objRs.DoQuery(lstrquery);
                                 blnRefresh = true;
                             }
                             else
                             {
-                                //switch (ObjType)
-                                //{
-                                //    case "INV":
-                                //        tb = "OINV";
-                                //        break;
-                                //    case "CRN":
-                                //        tb = "ORIN";
-                                //        break;
-                                //    case "WTR":
-                                //        tb = "OWTR";
-                                //        break;
-                                //    case "DLN":
-                                //        tb = "ODLN";
-                                //        break;
-                                //    case "PCH":
-                                //        tb = "OPCH";
-                                //        break;
-                                //}
-
-
-                                //   lstrquery = @"Update " + tb + @" Set ";
-                                //  lstrquery += @"""" + clsModule.EwayNo + @"""='" + einvDT.Rows[0]["EwbNo"].ToString() + "'";
-                                // lstrquery += @"Where ""DocEntry""='" + InvDocEntry + "'";
-                                //  objRs.DoQuery(lstrquery);
-                                objsalesinvoice.GetByKey(Convert.ToInt32(InvDocEntry));
-                                objsalesinvoice.UserFields.Fields.Item(clsModule.EwayNo).Value = columnFind(einvDT, "EwbNo", 0);
-                                objsalesinvoice.Update();
-                              
+                                switch (ObjType)
+                                {
+                                    case "INV":
+                                        tb = "OINV";
+                                        break;
+                                    case "CRN":
+                                        tb = "ORIN";
+                                        break;
+                                    case "WTR":
+                                        tb = "OWTR";
+                                        break;
+                                    case "DLN":
+                                        tb = "ODLN";
+                                        break;
+                                    case "PCH":
+                                        tb = "OPCH";
+                                        break;
+                                }
+                                lstrquery = @"Update " + tb + @" Set ";
+                                lstrquery += @"""" + clsModule.EwayNo + @"""='" + einvDT.Rows[0]["EwbNo"].ToString() + "'";
+                                lstrquery += @"Where ""DocEntry""='" + InvDocEntry + "'";
+                                objRs.DoQuery(lstrquery);
                                 blnRefresh = true;
                             }
 
-                            //switch (ObjType)
-                            //{
-                            //    case "INV":
-                            //        tb = "OINV";
-                            //        break;
-                            //    case "CRN":
-                            //        tb = "ORIN";
-                            //        break;
-                            //    case "WTR":
-                            //        tb = "OWTR";
-                            //        break;
-                            //    case "DLN":
-                            //        tb = "ODLN";
-                            //        break;
-                            //    case "PCH":
-                            //        tb = "OPCH";
-                            //        break;
-                            //}
-                            //lstrquery = @"Update " + tb + @" Set ";
-                            //lstrquery += @"""U_Ewaypdf""='" + einvDT.Rows[0]["pdfUrl"].ToString() + "',";
-                            //lstrquery += @"""U_EwayDetpdf""='" + einvDT.Rows[0]["detailedpdfUrl"].ToString() + "'";
-                            //lstrquery += @"Where ""DocEntry""='" + InvDocEntry + "'";
-                            //objRs.DoQuery(lstrquery);
-
-                            objsalesinvoice.GetByKey(Convert.ToInt32(InvDocEntry));
-                            objsalesinvoice.UserFields.Fields.Item("U_Ewaypdf").Value = columnFind(einvDT, "pdfUrl", 0);
-                            objsalesinvoice.UserFields.Fields.Item("U_EwayDetpdf").Value = columnFind(einvDT, "detailedpdfUrl", 0);
-                            objsalesinvoice.Update();
-
-
-                        
+                            switch (ObjType)
+                            {
+                                case "INV":
+                                    tb = "OINV";
+                                    break;
+                                case "CRN":
+                                    tb = "ORIN";
+                                    break;
+                                case "WTR":
+                                    tb = "OWTR";
+                                    break;
+                                case "DLN":
+                                    tb = "ODLN";
+                                    break;
+                                case "PCH":
+                                    tb = "OPCH";
+                                    break;
+                            }
+                            lstrquery = @"Update " + tb + @" Set ";
+                            lstrquery += @"""U_Ewaypdf""='" + einvDT.Rows[0]["pdfUrl"].ToString() + "',";
+                            lstrquery += @"""U_EwayDetpdf""='" + einvDT.Rows[0]["detailedpdfUrl"].ToString() + "'";
+                            lstrquery += @"Where ""DocEntry""='" + InvDocEntry + "'";
+                            objRs.DoQuery(lstrquery);
                         }
                     }
                     else if (TranType == "E-way IRN")
                     {
-                        //string tb = "";
-                        //switch (ObjType)
-                        //{
-                        //    case "INV":
-                        //        tb = "INV26";
-                        //        break;
-                        //    case "CRN":
-                        //        tb = "RIN26";
-                        //        break;
-                        //    case "WTR":
-                        //        tb = "WTR26";
-                        //        break;
-                        //    case "DLN":
-                        //        tb = "DLN26";
-                        //        break;
-                        //    case "PCH":
-                        //        tb = "PCH26";
-                        //        break;
-                        //}
-
-                        dynamic objsalesinvoice = null;
-                        switch (ObjType)
-                        {
-                            case "WTR":
-                                objsalesinvoice = (SAPbobsCOM.StockTransfer)objsalesinvoice;
-                                break;
-                            default:
-                                objsalesinvoice = (SAPbobsCOM.Documents)objsalesinvoice;
-                                break;
-                        }
-
+                        string tb = "";
                         switch (ObjType)
                         {
                             case "INV":
-                                objsalesinvoice = (SAPbobsCOM.Documents)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oInvoices);
+                                tb = "INV26";
                                 break;
                             case "CRN":
-                                objsalesinvoice = (SAPbobsCOM.Documents)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oCreditNotes);
+                                tb = "RIN26";
                                 break;
                             case "WTR":
-                                objsalesinvoice = (SAPbobsCOM.StockTransfer)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oStockTransfer);
+                                tb = "WTR26";
                                 break;
                             case "DLN":
-                                objsalesinvoice = (SAPbobsCOM.Documents)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oDeliveryNotes);
+                                tb = "DLN26";
                                 break;
                             case "PCH":
-                                objsalesinvoice = (SAPbobsCOM.Documents)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oPurchaseInvoices);
+                                tb = "PCH26";
                                 break;
-
                         }
                         if (!string.IsNullOrEmpty(einvDT.Rows[0]["EwbNo"].ToString()))
                         {
                             if (String.IsNullOrEmpty(clsModule.EwayNo))
                             {
-                                //lstrquery = @"Update " + tb + @" set ""EWayBillNo""='" + einvDT.Rows[0]["EwbNo"].ToString() + "'";
-                                objsalesinvoice.GetByKey(Convert.ToInt32(InvDocEntry));
-                                objsalesinvoice.EWayBillDetails.EWayBillNo = columnFind(einvDT, "EwbNo", 0);
-
-
+                                lstrquery = @"Update " + tb + @" set ""EWayBillNo""='" + einvDT.Rows[0]["EwbNo"].ToString() + "'";
                                 if (!string.IsNullOrEmpty(einvDT.Rows[0]["EwbDt"].ToString()))
                                 {
-                                    //  lstrquery += @",""EwbDate""='" + clsModule.objaddon.objglobalmethods.Getdateformat(einvDT.Rows[0]["EwbDt"].ToString().Substring(0, 10), "yyyy-MM-dd") + "'";
-
-                                    if (Getdate(columnFind(einvDT, "EwbDt", 0).Substring(0, 10), "yyyy-MM-dd") != new DateTime(1900, 01, 01))
-                                    {
-                                        objsalesinvoice.EWayBillDetails.EWayBillDate = Getdate(columnFind(einvDT, "EwbDt", 0).Substring(0, 10), "yyyy-MM-dd");
-                                    }
+                                    lstrquery += @",""EwbDate""='" + clsModule.objaddon.objglobalmethods.Getdateformat(einvDT.Rows[0]["EwbDt"].ToString().Substring(0, 10), "yyyy-MM-dd") + "'";
                                 }
                                 if (!string.IsNullOrEmpty(einvDT.Rows[0]["EwbValidTill"].ToString()))
                                 {
-                                    //   lstrquery += @",""ExpireDate""='" + clsModule.objaddon.objglobalmethods.Getdateformat(einvDT.Rows[0]["EwbValidTill"].ToString().Substring(0, 10), "yyyy-MM-dd") + "'";
-
-                                    if (Getdate(columnFind(einvDT, "EwbValidTill", 0).Substring(0, 10), "yyyy-MM-dd") != new DateTime(1900, 01, 01))
-                                    {
-                                        objsalesinvoice.EWayBillDetails.EWayBillExpirationDate = Getdate(columnFind(einvDT, "EwbValidTill", 0).Substring(0, 10), "yyyy-MM-dd");
-                                    }
+                                    lstrquery += @",""ExpireDate""='" + clsModule.objaddon.objglobalmethods.Getdateformat(einvDT.Rows[0]["EwbValidTill"].ToString().Substring(0, 10), "yyyy-MM-dd") + "'";
                                 }
 
-                                //  lstrquery += @" Where ""DocEntry""='" + InvDocEntry + "'";
-                                // objRs.DoQuery(lstrquery);
-                                objsalesinvoice.Update();
+                                lstrquery += @" Where ""DocEntry""='" + InvDocEntry + "'";
+                                objRs.DoQuery(lstrquery);
                                 blnRefresh = true;
                             }
                             else
                             {
-                                //switch (ObjType)
-                                //{
-                                //    case "INV":
-                                //        tb = "OINV";
-                                //        break;
-                                //    case "CRN":
-                                //        tb = "ORIN";
-                                //        break;
-                                //    case "WTR":
-                                //        tb = "OWTR";
-                                //        break;
-                                //    case "DLN":
-                                //        tb = "ODLN";
-                                //        break;
-                                //    case "PCH":
-                                //        tb = "OPCH";
-                                //        break;
-                                //}
-                                //lstrquery = @"Update " + tb + @" set """ + clsModule.EwayNo + @""" = '" + einvDT.Rows[0]["EwbNo"].ToString() + "' ";
-                                //lstrquery += @"Where ""DocEntry""='" + InvDocEntry + "'";
-                                //objRs.DoQuery(lstrquery);
-
-                                objsalesinvoice.GetByKey(Convert.ToInt32(InvDocEntry));
-                                objsalesinvoice.UserFields.Fields.Item(clsModule.EwayNo).Value = columnFind(einvDT, "EwbNo", 0);
-                                objsalesinvoice.Update();                                
+                                switch (ObjType)
+                                {
+                                    case "INV":
+                                        tb = "OINV";
+                                        break;
+                                    case "CRN":
+                                        tb = "ORIN";
+                                        break;
+                                    case "WTR":
+                                        tb = "OWTR";
+                                        break;
+                                    case "DLN":
+                                        tb = "ODLN";
+                                        break;
+                                    case "PCH":
+                                        tb = "OPCH";
+                                        break;
+                                }
+                                lstrquery = @"Update " + tb + @" set """ + clsModule.EwayNo + @""" = '" + einvDT.Rows[0]["EwbNo"].ToString() + "' ";
+                                lstrquery += @"Where ""DocEntry""='" + InvDocEntry + "'";
+                                objRs.DoQuery(lstrquery);
                                 blnRefresh = true;
                             }
-                            //switch (ObjType)
-                            //{
-                            //    case "INV":
-                            //        tb = "OINV";
-                            //        break;
-                            //    case "CRN":
-                            //        tb = "ORIN";
-                            //        break;
-                            //    case "WTR":
-                            //        tb = "OWTR";
-                            //        break;
-                            //    case "DLN":
-                            //        tb = "ODLN";
-                            //        break;
-                            //    case "PCH":
-                            //        tb = "OPCH";
-                            //        break;
-                            //}
-
-
-                            objsalesinvoice.GetByKey(Convert.ToInt32(InvDocEntry));
-                            objsalesinvoice.UserFields.Fields.Item("U_Ewaypdf").Value = columnFind(einvDT, "pdfUrl", 0);
-                            objsalesinvoice.UserFields.Fields.Item("U_EwayDetpdf").Value = columnFind(einvDT, "detailedpdfUrl", 0);
-                      
-
-
-                            //lstrquery = @"Update " + tb + @" Set ";
-                            //lstrquery += @"""U_Ewaypdf""='" + einvDT.Rows[0]["pdfUrl"].ToString() + "',";
-                            //lstrquery += @"""U_EwayDetpdf""='" + einvDT.Rows[0]["detailedpdfUrl"].ToString() + "'";
-
-                           if (!string.IsNullOrEmpty(columnFind(einvDT, "Status",0)))
+                            switch (ObjType)
                             {
-                                // lstrquery += @",""U_EwayStatus""='" + einvDT.Rows[0]["Status"].ToString() + "'";
-                                objsalesinvoice.UserFields.Fields.Item("U_EwayStatus").Value = columnFind(einvDT, "Status", 0);
+                                case "INV":
+                                    tb = "OINV";
+                                    break;
+                                case "CRN":
+                                    tb = "ORIN";
+                                    break;
+                                case "WTR":
+                                    tb = "OWTR";
+                                    break;
+                                case "DLN":
+                                    tb = "ODLN";
+                                    break;
+                                case "PCH":
+                                    tb = "OPCH";
+                                    break;
                             }
-                          
+                            lstrquery = @"Update " + tb + @" Set ";
+                            lstrquery += @"""U_Ewaypdf""='" + einvDT.Rows[0]["pdfUrl"].ToString() + "',";
+                            lstrquery += @"""U_EwayDetpdf""='" + einvDT.Rows[0]["detailedpdfUrl"].ToString() + "'";
 
-                          //  lstrquery += @"Where ""DocEntry""='" + InvDocEntry + "'";
-                          //  objRs.DoQuery(lstrquery);
+                            if (!string.IsNullOrEmpty(columnFind(einvDT, "Status",0)))
+                            {
+                                lstrquery += @",""U_EwayStatus""='" + einvDT.Rows[0]["Status"].ToString() + "'";
+                            }
 
-                            objsalesinvoice.Update();
+
+                            lstrquery += @"Where ""DocEntry""='" + InvDocEntry + "'";
+                            objRs.DoQuery(lstrquery);
                         }
                     }
                 }
@@ -2999,216 +2807,123 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
                     if (TranType == "E-Invoice")
                     {
-                        //string tb = "";
-                        //switch (ObjType)
-                        //{
-                        //    case "INV":
-                        //        tb = "OINV";
-                        //        break;
-                        //    case "CRN":
-                        //        tb = "ORIN";
-                        //        break;
-                        //    case "WTR":
-                        //        tb = "OWTR";
-                        //        break;
-                        //    case "DLN":
-                        //        tb = "ODLN";
-                        //        break;
-                        //    case "PCH":
-                        //        tb = "OPCH";
-                        //        break;
-                        //}
-
-                     dynamic objsalesinvoice = null;
-                        switch (ObjType)
-                        {
-                            case "WTR":
-                                objsalesinvoice = (SAPbobsCOM.StockTransfer)objsalesinvoice;
-                                  break;
-                            default:
-                                objsalesinvoice = (SAPbobsCOM.Documents)objsalesinvoice;
-                                break;
-                        }
-
+                        string tb = "";
                         switch (ObjType)
                         {
                             case "INV":
-                                objsalesinvoice = (SAPbobsCOM.Documents)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oInvoices);
+                                tb = "OINV";
                                 break;
                             case "CRN":
-                                objsalesinvoice = (SAPbobsCOM.Documents)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oCreditNotes);
+                                tb = "ORIN";
                                 break;
                             case "WTR":
-
-                                objsalesinvoice = (SAPbobsCOM.StockTransfer)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oStockTransfer);
+                                tb = "OWTR";
                                 break;
                             case "DLN":
-                                objsalesinvoice = (SAPbobsCOM.Documents)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oDeliveryNotes);
+                                tb = "ODLN";
                                 break;
                             case "PCH":
-                                objsalesinvoice = (SAPbobsCOM.Documents)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oPurchaseInvoices);
+                                tb = "OPCH";
                                 break;
-
                         }
                         if (einvDT.Rows[0]["flag"].ToString() == "True")
                         {
-
-                            //strSQL = @"Update " + tb + @" Set ""U_IRNNo""='',""U_QRCode""=''";
-                            objsalesinvoice.GetByKey(Convert.ToInt32(InvDocEntry));
-                            objsalesinvoice.UserFields.Fields.Item("U_IRNNo").Value = "";
-                            objsalesinvoice.UserFields.Fields.Item("U_QRCode").Value = "";                            
+                            strSQL = @"Update " + tb + @" Set ""U_IRNNo""='',""U_QRCode""=''";
                             if (String.IsNullOrEmpty(clsModule.EwayNo))
                             {
-                                //   strSQL += @",""QRCodeSrc""=''";
-                                objsalesinvoice.CreateQRCodeFrom ="";
+                                strSQL += @",""QRCodeSrc""=''";
                             }
-                            objsalesinvoice.UserFields.Fields.Item("U_AckDate").Value = "";
-                            objsalesinvoice.UserFields.Fields.Item("U_AckNo").Value ="";
-                            objsalesinvoice.UserFields.Fields.Item("U_Ewaypdf").Value ="";
-                            objsalesinvoice.UserFields.Fields.Item("U_EwayDetpdf").Value = "";                            
+                            strSQL += @",""U_AckDate""='',""U_AckNo""='',""U_EwayDetpdf""='',""U_Ewaypdf""='' where ""DocEntry""='" + InvDocEntry + "'";
 
-                            //  strSQL += @",""U_AckDate""='',""U_AckNo""='',""U_EwayDetpdf""='',""U_Ewaypdf""='' where ""DocEntry""='" + InvDocEntry + "'";
-
-                            //  objRs.DoQuery(strSQL);
-                            objsalesinvoice.Update();
+                            objRs.DoQuery(strSQL);
                             blnRefresh = true;
                         }
                     }
                     else if (TranType == "E-way")
                     {
-                        //string lstrquery = "";
-                        //string tb = "";
-                        //switch (ObjType)
-                        //{
-                        //    case "INV":
-                        //        tb = "INV26";
-                        //        break;
-                        //    case "CRN":
-                        //        tb = "RIN26";
-                        //        break;
-                        //    case "WTR":
-                        //        tb = "WTR26";
-                        //        break;
-                        //    case "DLN":
-                        //        tb = "DLN26";
-                        //        break;
-                        //    case "PCH":
-                        //        tb = "PCH26";
-                        //        break;
-                        //}
-
-                        dynamic objsalesinvoice = null;
-                        switch (ObjType)
-                        {
-                            case "WTR":
-                                objsalesinvoice = (SAPbobsCOM.StockTransfer)objsalesinvoice;
-                                break;
-                            default:
-                                objsalesinvoice = (SAPbobsCOM.Documents)objsalesinvoice;
-                                break;
-                        }
-
+                        string lstrquery = "";
+                        string tb = "";
                         switch (ObjType)
                         {
                             case "INV":
-                                objsalesinvoice = (SAPbobsCOM.Documents)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oInvoices);
+                                tb = "INV26";
                                 break;
                             case "CRN":
-                                objsalesinvoice = (SAPbobsCOM.Documents)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oCreditNotes);
+                                tb = "RIN26";
                                 break;
                             case "WTR":
-                                objsalesinvoice = (SAPbobsCOM.StockTransfer)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oStockTransfer);
+                                tb = "WTR26";
                                 break;
                             case "DLN":
-                                objsalesinvoice = (SAPbobsCOM.Documents)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oDeliveryNotes);
+                                tb = "DLN26";
                                 break;
                             case "PCH":
-                                objsalesinvoice = (SAPbobsCOM.Documents)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oPurchaseInvoices);
+                                tb = "PCH26";
                                 break;
-
                         }
                         if (!string.IsNullOrEmpty(einvDT.Rows[0]["ewayBillNo"].ToString()))
                         {
                             if (String.IsNullOrEmpty(clsModule.EwayNo))
                             {
-                                //lstrquery = @"Update " + tb + @" set ""EWayBillNo""='',";
-                                //lstrquery += @"""EwbDate""='',";
-                                //lstrquery += @"""ExpireDate""=''";
-                                //lstrquery += @"Where ""DocEntry""='" + InvDocEntry + "'";
-
-                                objsalesinvoice.GetByKey(Convert.ToInt32(InvDocEntry));
-                                objsalesinvoice.EWayBillDetails.EWayBillNo = "";
-                                objsalesinvoice.EWayBillDetails.EWayBillDate = new DateTime(1900, 01, 01); 
-                                objsalesinvoice.EWayBillDetails.EWayBillExpirationDate = new DateTime(1900,01,01);
-                                objsalesinvoice.Update();
-
+                                lstrquery = @"Update " + tb + @" set ""EWayBillNo""='',";
+                                lstrquery += @"""EwbDate""='',";
+                                lstrquery += @"""ExpireDate""=''";
+                                lstrquery += @"Where ""DocEntry""='" + InvDocEntry + "'";
                             }
                             else
                             {
-                                //switch (ObjType)
-                                //{
-                                //    case "INV":
-                                //        tb = "OINV";
-                                //        break;
-                                //    case "CRN":
-                                //        tb = "ORIN";
-                                //        break;
-                                //    case "WTR":
-                                //        tb = "OWTR";
-                                //        break;
-                                //    case "DLN":
-                                //        tb = "ODLN";
-                                //        break;
-                                //    case "PCH":
-                                //        tb = "OPCH";
-                                //        break;
-                                //}
-                                //lstrquery = @"Update " + tb + @" set """ + clsModule.EwayNo + @"""=''";
-                                //lstrquery += @"Where ""DocEntry""='" + InvDocEntry + "'";
-
-                                objsalesinvoice.GetByKey(Convert.ToInt32(InvDocEntry));
-                                objsalesinvoice.UserFields.Fields.Item(clsModule.EwayNo).Value ="";
-                                
-
+                                switch (ObjType)
+                                {
+                                    case "INV":
+                                        tb = "OINV";
+                                        break;
+                                    case "CRN":
+                                        tb = "ORIN";
+                                        break;
+                                    case "WTR":
+                                        tb = "OWTR";
+                                        break;
+                                    case "DLN":
+                                        tb = "ODLN";
+                                        break;
+                                    case "PCH":
+                                        tb = "OPCH";
+                                        break;
+                                }
+                                lstrquery = @"Update " + tb + @" set """ + clsModule.EwayNo + @"""=''";
+                                lstrquery += @"Where ""DocEntry""='" + InvDocEntry + "'";
                             }
                         }
 
                         if (einvDT.Rows[0]["flag"].ToString() == "True")
                         {
-                          //  objRs.DoQuery(lstrquery);
+                            objRs.DoQuery(lstrquery);
                             blnRefresh = true;
 
-                            //switch (ObjType)
-                            //{
-                            //    case "INV":
-                            //        tb = "OINV";
-                            //        break;
-                            //    case "CRN":
-                            //        tb = "ORIN";
-                            //        break;
-                            //    case "WTR":
-                            //        tb = "OWTR";
-                            //        break;
-                            //    case "DLN":
-                            //        tb = "ODLN";
-                            //        break;
-                            //    case "PCH":
-                            //        tb = "OPCH";
-                            //        break;
-                            //}
-                            //lstrquery = @"Update " + tb + @" Set ";
-                            //lstrquery += @"""U_Ewaypdf""='',";
-                            //lstrquery += @"""U_EwayDetpdf""='',";                            
-                            //lstrquery += @"""U_EwayStatus""='CNL'";
-                            //lstrquery += @"Where ""DocEntry""='" + InvDocEntry + "'";
-                            //  objRs.DoQuery(lstrquery);
-
-                
-                            objsalesinvoice.UserFields.Fields.Item("U_Ewaypdf").Value = "";
-                            objsalesinvoice.UserFields.Fields.Item("U_EwayDetpdf").Value = "";
-                            objsalesinvoice.UserFields.Fields.Item("U_EwayStatus").Value = "CNL";
-                            objsalesinvoice.Update();
-
+                            switch (ObjType)
+                            {
+                                case "INV":
+                                    tb = "OINV";
+                                    break;
+                                case "CRN":
+                                    tb = "ORIN";
+                                    break;
+                                case "WTR":
+                                    tb = "OWTR";
+                                    break;
+                                case "DLN":
+                                    tb = "ODLN";
+                                    break;
+                                case "PCH":
+                                    tb = "OPCH";
+                                    break;
+                            }
+                            lstrquery = @"Update " + tb + @" Set ";
+                            lstrquery += @"""U_Ewaypdf""='',";
+                            lstrquery += @"""U_EwayDetpdf""='',";
+                            lstrquery += @"""U_EwayStatus""='CNL'";
+                            lstrquery += @"Where ""DocEntry""='" + InvDocEntry + "'";
+                            objRs.DoQuery(lstrquery);
 
                         }
                     }
@@ -3232,11 +2947,26 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 clsModule.objaddon.objapplication.StatusBar.SetText("E_Invoice_Logs: " + ex.Message, SAPbouiCOM.BoMessageTime.bmt_Long, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
                 return false;
             }
-         
         }
+
+  
 
 
         private bool E_Invoice_Logs(string InvDocEntry, DataTable einvDT, string ObjType, string Type, string TranType, string requrl)
+        {
+            
+            if (String.IsNullOrEmpty(clsModule.EwayNo))
+            {
+                return Einvoicelog_10(InvDocEntry, einvDT, ObjType, Type, TranType, requrl);
+            }
+            else
+            {
+                return Einvoicelogs_9(InvDocEntry, einvDT, ObjType, Type, TranType, requrl);
+            }
+
+        }
+
+        private bool Einvoicelog_10(string InvDocEntry, DataTable einvDT, string ObjType, string Type, string TranType, string requrl)
         {
             try
             {
@@ -3275,7 +3005,8 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         maintb = "OPCH";
                         break;
                 }
-               SAPbobsCOM.Documents objsalesinvoice = null;              
+                clsModule.objaddon.objglobalmethods.WriteErrorLog("Transaction Connection Open before");
+                SAPbobsCOM.Documents objsalesinvoice = null;
                 switch (ObjType)
                 {
                     case "INV":
@@ -3292,6 +3023,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         break;
 
                 }
+                clsModule.objaddon.objglobalmethods.WriteErrorLog("Transaction Connection Open");
 
                 SAPbobsCOM.GeneralService oGeneralService;
                 SAPbobsCOM.GeneralData oGeneralData;
@@ -3399,7 +3131,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             string strerr = "";
                             if (iErrCode != 0)
                             {
-                                clsModule.objaddon.objcompany.GetLastError(out iErrCode, out strerr);                                     
+                                clsModule.objaddon.objcompany.GetLastError(out iErrCode, out strerr);
                                 clsModule.objaddon.objapplication.MessageBox(strerr);
                             }
                             clsModule.objaddon.objglobalmethods.WriteErrorLog("E invoice Update Successfully");
@@ -3409,6 +3141,8 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
                         if (String.IsNullOrEmpty(clsModule.EwayNo))
                         {
+                            clsModule.objaddon.objglobalmethods.WriteErrorLog("Eway Details");
+
                             if (!string.IsNullOrEmpty(einvDT.Rows[0]["EwbNo"].ToString()))
                             {
                                 switch (ObjType)
@@ -3522,7 +3256,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             switch (ObjType)
                             {
                                 case "WTR":
-                                    lstrquery = @"Update " + maintb  + @" Set ";
+                                    lstrquery = @"Update " + maintb + @" Set ";
                                     lstrquery += @"""U_Ewaypdf""='" + einvDT.Rows[0]["pdfUrl"].ToString() + "',";
                                     lstrquery += @"""U_EwayDetpdf""='" + einvDT.Rows[0]["detailedpdfUrl"].ToString() + "'";
                                     lstrquery += @"Where ""DocEntry""='" + InvDocEntry + "'";
@@ -3538,7 +3272,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         }
                     }
                     else if (TranType == "E-way IRN")
-                    {                                              
+                    {
                         if (!string.IsNullOrEmpty(einvDT.Rows[0]["EwbNo"].ToString()))
                         {
                             if (String.IsNullOrEmpty(clsModule.EwayNo))
@@ -3549,11 +3283,11 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                         lstrquery = @"Update " + tb + @" set ""EWayBillNo""='" + einvDT.Rows[0]["EwbNo"].ToString() + "'";
                                         if (!string.IsNullOrEmpty(einvDT.Rows[0]["EwbDt"].ToString()))
                                         {
-                                              lstrquery += @",""EwbDate""='" + clsModule.objaddon.objglobalmethods.Getdateformat(einvDT.Rows[0]["EwbDt"].ToString().Substring(0, 10), "yyyy-MM-dd") + "'";                                           
+                                            lstrquery += @",""EwbDate""='" + clsModule.objaddon.objglobalmethods.Getdateformat(einvDT.Rows[0]["EwbDt"].ToString().Substring(0, 10), "yyyy-MM-dd") + "'";
                                         }
                                         if (!string.IsNullOrEmpty(einvDT.Rows[0]["EwbValidTill"].ToString()))
                                         {
-                                               lstrquery += @",""ExpireDate""='" + clsModule.objaddon.objglobalmethods.Getdateformat(einvDT.Rows[0]["EwbValidTill"].ToString().Substring(0, 10), "yyyy-MM-dd") + "'";
+                                            lstrquery += @",""ExpireDate""='" + clsModule.objaddon.objglobalmethods.Getdateformat(einvDT.Rows[0]["EwbValidTill"].ToString().Substring(0, 10), "yyyy-MM-dd") + "'";
                                         }
                                         lstrquery += @" Where ""DocEntry""='" + InvDocEntry + "'";
                                         objRs.DoQuery(lstrquery);
@@ -3562,14 +3296,14 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                         objsalesinvoice.GetByKey(Convert.ToInt32(InvDocEntry));
                                         objsalesinvoice.EWayBillDetails.EWayBillNo = columnFind(einvDT, "EwbNo", 0);
                                         if (!string.IsNullOrEmpty(einvDT.Rows[0]["EwbDt"].ToString()))
-                                        {                                            
+                                        {
                                             if (Getdate(columnFind(einvDT, "EwbDt", 0).Substring(0, 10), "yyyy-MM-dd") != new DateTime(1900, 01, 01))
                                             {
                                                 objsalesinvoice.EWayBillDetails.EWayBillDate = Getdate(columnFind(einvDT, "EwbDt", 0).Substring(0, 10), "yyyy-MM-dd");
                                             }
                                         }
                                         if (!string.IsNullOrEmpty(einvDT.Rows[0]["EwbValidTill"].ToString()))
-                                        {                                           
+                                        {
                                             if (Getdate(columnFind(einvDT, "EwbValidTill", 0).Substring(0, 10), "yyyy-MM-dd") != new DateTime(1900, 01, 01))
                                             {
                                                 objsalesinvoice.EWayBillDetails.EWayBillExpirationDate = Getdate(columnFind(einvDT, "EwbValidTill", 0).Substring(0, 10), "yyyy-MM-dd");
@@ -3577,7 +3311,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                         }
                                         objsalesinvoice.Update();
                                         break;
-                                }                                                                                                                                                                    
+                                }
                                 blnRefresh = true;
                             }
                             else
@@ -3601,16 +3335,16 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             switch (ObjType)
                             {
                                 case "WTR":
-                                    
+
                                     lstrquery = @"Update " + maintb + @" Set ";
                                     lstrquery += @"""U_Ewaypdf""='" + einvDT.Rows[0]["pdfUrl"].ToString() + "',";
                                     lstrquery += @"""U_EwayDetpdf""='" + einvDT.Rows[0]["detailedpdfUrl"].ToString() + "'";
                                     if (!string.IsNullOrEmpty(columnFind(einvDT, "Status", 0)))
                                     {
-                                       lstrquery += @",""U_EwayStatus""='" + einvDT.Rows[0]["Status"].ToString() + "'";                                       
+                                        lstrquery += @",""U_EwayStatus""='" + einvDT.Rows[0]["Status"].ToString() + "'";
                                     }
-                                      lstrquery += @"Where ""DocEntry""='" + InvDocEntry + "'";
-                                     objRs.DoQuery(lstrquery);                                    
+                                    lstrquery += @"Where ""DocEntry""='" + InvDocEntry + "'";
+                                    objRs.DoQuery(lstrquery);
                                     break;
                                 default:
                                     objsalesinvoice.GetByKey(Convert.ToInt32(InvDocEntry));
@@ -3622,7 +3356,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                     }
                                     objsalesinvoice.Update();
                                     break;
-                            }                                                                      
+                            }
                         }
                     }
                 }
@@ -3635,7 +3369,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
                     if (TranType == "E-Invoice")
                     {
-                       
+
                         if (einvDT.Rows[0]["flag"].ToString() == "True")
                         {
                             switch (ObjType)
@@ -3647,7 +3381,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                         strSQL += @",""QRCodeSrc""=''";
                                     }
                                     strSQL += @",""U_AckDate""='',""U_AckNo""='',""U_EwayDetpdf""='',""U_Ewaypdf""='' where ""DocEntry""='" + InvDocEntry + "'";
-                                     objRs.DoQuery(strSQL);
+                                    objRs.DoQuery(strSQL);
                                     break;
                                 default:
                                     objsalesinvoice.GetByKey(Convert.ToInt32(InvDocEntry));
@@ -3663,17 +3397,17 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                     objsalesinvoice.UserFields.Fields.Item("U_EwayDetpdf").Value = "";
                                     objsalesinvoice.Update();
                                     break;
-                            }                                                                         
+                            }
                             blnRefresh = true;
                         }
                     }
                     else if (TranType == "E-way")
                     {
-                        
+
                         if (!string.IsNullOrEmpty(einvDT.Rows[0]["ewayBillNo"].ToString()))
                         {
                             if (String.IsNullOrEmpty(clsModule.EwayNo))
-                            {                                
+                            {
                                 switch (ObjType)
                                 {
                                     case "WTR":
@@ -3686,9 +3420,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                         objsalesinvoice.GetByKey(Convert.ToInt32(InvDocEntry));
                                         objsalesinvoice.EWayBillDetails.EWayBillNo = "";
                                         objsalesinvoice.EWayBillDetails.EWayBillDate = new DateTime(1900, 01, 01);
-                                        objsalesinvoice.EWayBillDetails.EWayBillExpirationDate = new DateTime(1900, 01, 01);                                        
+                                        objsalesinvoice.EWayBillDetails.EWayBillExpirationDate = new DateTime(1900, 01, 01);
                                         break;
-                                }                                       
+                                }
                             }
                             else
                             {
@@ -3700,9 +3434,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                         break;
                                     default:
                                         objsalesinvoice.GetByKey(Convert.ToInt32(InvDocEntry));
-                                        objsalesinvoice.UserFields.Fields.Item(clsModule.EwayNo).Value = "";                                        
+                                        objsalesinvoice.UserFields.Fields.Item(clsModule.EwayNo).Value = "";
                                         break;
-                                }                                       
+                                }
                             }
                         }
 
@@ -3728,7 +3462,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                     objsalesinvoice.UserFields.Fields.Item("U_EwayStatus").Value = "CNL";
                                     objsalesinvoice.Update();
                                     break;
-                            }                                                                                
+                            }
                         }
                     }
                 }
@@ -3751,7 +3485,6 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 clsModule.objaddon.objapplication.StatusBar.SetText("E_Invoice_Logs: " + ex.Message, SAPbouiCOM.BoMessageTime.bmt_Long, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
                 return false;
             }
-
         }
 
         public class login
