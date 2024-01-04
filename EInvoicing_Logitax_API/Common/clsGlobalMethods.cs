@@ -741,5 +741,26 @@ namespace EInvoicing_Logitax_API.Common
 
             return dateTime;
         }
+        public int Ctoint(object Pstring)
+        {
+            int Ctoint = 0;
+            try
+            {
+                int LdblResult;
+                if (Pstring == null)
+                    return Ctoint;
+                string Lstr = System.Convert.ToString(Pstring);
+
+                if (int.TryParse(Lstr, out LdblResult))
+                    Ctoint = LdblResult;
+                return Ctoint;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+
     }
 }

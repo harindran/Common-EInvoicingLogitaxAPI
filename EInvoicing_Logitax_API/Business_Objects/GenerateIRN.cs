@@ -108,7 +108,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
     {
         public string TransId { get; set; }
         public string TransName { get; set; }
-        public int Distance { get; set; }
+        public decimal Distance { get; set; }
         public string TransDocNo { get; set; }
         public string TransDocDt { get; set; }
         public string VehNo { get; set; }

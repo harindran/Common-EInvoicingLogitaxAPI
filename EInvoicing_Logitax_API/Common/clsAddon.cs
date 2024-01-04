@@ -50,7 +50,7 @@ namespace EInvoicing_Logitax_API.Common
                     objapplication.FormDataEvent += new SAPbouiCOM._IApplicationEvents_FormDataEventEventHandler(ref FormDataEvent);
                     objapplication.RightClickEvent += new SAPbouiCOM._IApplicationEvents_RightClickEventEventHandler(objapplication_RightClickEvent);
 
-                   string strSQL = @"Select  ""U_DBType"" ,""U_EwayNo"" ,""U_VehNo"" ,""U_TransID"" ,""U_TransName"",""U_Distance"" ";                    
+                   string strSQL = @"Select  ""U_DBType"" ,""U_EwayNo"" ,""U_VehNo"" ,""U_TransID"" ,""U_TransName"",""U_Distance"",""U_ItemDesc"" ";                    
                     strSQL += @" from ""@ATEICFG"" where ""Code""='01'";
 
                    DataTable dt= objglobalmethods.GetmultipleValue(strSQL);
@@ -62,6 +62,7 @@ namespace EInvoicing_Logitax_API.Common
                         clsModule.EwayTransportId = Convert.ToString( dt.Rows[0]["U_TransID"]);
                         clsModule.EwayTransportName = Convert.ToString(dt.Rows[0]["U_TransName"]);
                         clsModule.EwayDistance = Convert.ToString(dt.Rows[0]["U_Distance"]);
+                        clsModule.ItemDsc = Convert.ToString(dt.Rows[0]["U_ItemDesc"]);
 
                     }
 

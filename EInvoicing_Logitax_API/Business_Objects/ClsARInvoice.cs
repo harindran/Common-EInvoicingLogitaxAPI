@@ -530,7 +530,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             {
                 if (!String.IsNullOrEmpty(Convert.ToString(dt.Rows[0]["U_HSNL"])))
                 {
-                    qcls.HSNLength = Convert.ToInt32(dt.Rows[0]["U_HSNL"]);
+                    qcls.HSNLength = clsModule.objaddon.objglobalmethods.Ctoint(dt.Rows[0]["U_HSNL"]);
                 }
 
                 if (!String.IsNullOrEmpty(Convert.ToString(dt.Rows[0]["U_SERCONFIG"])))
@@ -735,8 +735,8 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
 
                 buttonCombo.ExpandType = SAPbouiCOM.BoExpandType.et_DescriptionOnly;
-                oForm.Items.Item("btneinv").SetAutoManagedAttribute(SAPbouiCOM.BoAutoManagedAttr.ama_Editable, Convert.ToInt32(SAPbouiCOM.BoAutoFormMode.afm_Add), SAPbouiCOM.BoModeVisualBehavior.mvb_False);
-                oForm.Items.Item("btneinv").SetAutoManagedAttribute(SAPbouiCOM.BoAutoManagedAttr.ama_Editable, Convert.ToInt32(SAPbouiCOM.BoAutoFormMode.afm_Find), SAPbouiCOM.BoModeVisualBehavior.mvb_False);
+                oForm.Items.Item("btneinv").SetAutoManagedAttribute(SAPbouiCOM.BoAutoManagedAttr.ama_Editable, clsModule.objaddon.objglobalmethods.Ctoint(SAPbouiCOM.BoAutoFormMode.afm_Add), SAPbouiCOM.BoModeVisualBehavior.mvb_False);
+                oForm.Items.Item("btneinv").SetAutoManagedAttribute(SAPbouiCOM.BoAutoManagedAttr.ama_Editable, clsModule.objaddon.objglobalmethods.Ctoint(SAPbouiCOM.BoAutoFormMode.afm_Find), SAPbouiCOM.BoModeVisualBehavior.mvb_False);
 
 
                 oItem = oForm.Items.Add("btneway", SAPbouiCOM.BoFormItemTypes.it_BUTTON_COMBO);
@@ -752,8 +752,8 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 buttonCombo.ValidValues.Add("Eway Detail", "Detail Eway");
 
                 buttonCombo.ExpandType = SAPbouiCOM.BoExpandType.et_DescriptionOnly;
-                oForm.Items.Item("btneway").SetAutoManagedAttribute(SAPbouiCOM.BoAutoManagedAttr.ama_Editable, Convert.ToInt32(SAPbouiCOM.BoAutoFormMode.afm_Add), SAPbouiCOM.BoModeVisualBehavior.mvb_False);
-                oForm.Items.Item("btneway").SetAutoManagedAttribute(SAPbouiCOM.BoAutoManagedAttr.ama_Editable, Convert.ToInt32(SAPbouiCOM.BoAutoFormMode.afm_Find), SAPbouiCOM.BoModeVisualBehavior.mvb_False);
+                oForm.Items.Item("btneway").SetAutoManagedAttribute(SAPbouiCOM.BoAutoManagedAttr.ama_Editable, clsModule.objaddon.objglobalmethods.Ctoint(SAPbouiCOM.BoAutoFormMode.afm_Add), SAPbouiCOM.BoModeVisualBehavior.mvb_False);
+                oForm.Items.Item("btneway").SetAutoManagedAttribute(SAPbouiCOM.BoAutoManagedAttr.ama_Editable, clsModule.objaddon.objglobalmethods.Ctoint(SAPbouiCOM.BoAutoFormMode.afm_Find), SAPbouiCOM.BoModeVisualBehavior.mvb_False);
 
 
                 SAPbouiCOM.Item newTextBox;
@@ -941,7 +941,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         if (String.IsNullOrEmpty(clsModule.EwayNo))
                         {
 
-                            if (Convert.ToDouble(invrecordset.Fields.Item("Distance").Value) > 0)
+                            if (clsModule.objaddon.objglobalmethods.CtoD(invrecordset.Fields.Item("Distance").Value) > 0)
                             {
                                 Generate_EWay distanceEway = new Generate_EWay();
                                 distanceEway.CLIENTCODE = objRs.Fields.Item("U_ClientCode").Value.ToString();
@@ -960,7 +960,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                 {
                                     Calcdistance = 1;
                                 }
-                                Calcdistance = Convert.ToInt32(invrecordset.Fields.Item("Distance").Value);
+                                Calcdistance = clsModule.objaddon.objglobalmethods.Ctoint(invrecordset.Fields.Item("Distance").Value);
                             }
                         }
 
@@ -1197,10 +1197,21 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
                         for (int i = 0; i < invrecordset.RecordCount; i++)
                         {
+                            string prdouctdesc = "";
+                            if (!string.IsNullOrEmpty(clsModule.ItemDsc))
+                            {                                
+                                prdouctdesc = invrecordset.Fields.Item(clsModule.ItemDsc).Value.ToString();
+                            }
+                            if (string.IsNullOrEmpty(prdouctdesc))
+                            {
+                                prdouctdesc = invrecordset.Fields.Item("Dscription").Value.ToString();
+                            }
+
+
                             GenerateIRNGetJson.json_data.ItemList.Add(new ItemList
                             {
                                 SlNo = invrecordset.Fields.Item("SINo").Value.ToString(),
-                                PrdDesc = invrecordset.Fields.Item("Dscription").Value.ToString(),
+                                PrdDesc = prdouctdesc,
                                 IsServc = Isservice,
                                 HsnCd = ServiceHSN,//"9965" for Service Invoice,
                                 Qty =invrecordset.Fields.Item("Quantity").Value.ToString(),
@@ -1313,7 +1324,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             {
                                 GenerateIRNGetJson.json_data.ExpDtls.RefClm = invrecordset.Fields.Item("ClaimRefun").Value.ToString();
 
-                                GenerateIRNGetJson.json_data.EwbDtls.Distance = Convert.ToInt32(Calcdistance);
+                                GenerateIRNGetJson.json_data.EwbDtls.Distance = clsModule.objaddon.objglobalmethods.Ctoint(Calcdistance);
                                 GenerateIRNGetJson.json_data.EwbDtls.TransDocDt = clsModule.objaddon.objglobalmethods.Getdateformat(invrecordset.Fields.Item("TransDate").Value.ToString());
                                 GenerateIRNGetJson.json_data.EwbDtls.TransDocNo = invrecordset.Fields.Item("TransDocNo").Value.ToString();
                                 GenerateIRNGetJson.json_data.EwbDtls.TransId = invrecordset.Fields.Item("TransID").Value.ToString();
@@ -1326,7 +1337,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         }
                         else
                         {
-                            int distance = 0;
+                            decimal distance = 0;
                             if (GenerateIRNGetJson.json_data.BuyerDtls.Pin.ToString() == GenerateIRNGetJson.json_data.SellerDtls.Pin.ToString())
                             {
                                 distance = 1;
@@ -1336,7 +1347,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             {
                                 if (!string.IsNullOrEmpty(invrecordset.Fields.Item(clsModule.EwayDistance).Value.ToString()))
                                 {
-                                    distance = Convert.ToInt32(invrecordset.Fields.Item(clsModule.EwayDistance).Value);
+                                    distance = clsModule.objaddon.objglobalmethods.CtoD(invrecordset.Fields.Item(clsModule.EwayDistance).Value);
                                 }
                             }
                             if (!string.IsNullOrEmpty(clsModule.EwayUDF))
@@ -1680,11 +1691,21 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
                         for (int i = 0; i < invrecordset.RecordCount; i++)
                         {
+                            string prdouctdesc = "";
+                            if (!string.IsNullOrEmpty(clsModule.ItemDsc))
+                            {
+                                prdouctdesc = invrecordset.Fields.Item(clsModule.ItemDsc).Value.ToString();
+                            }
+                            if (string.IsNullOrEmpty(prdouctdesc))
+                            {
+                                prdouctdesc = invrecordset.Fields.Item("Dscription").Value.ToString();
+                            }
+
                             GenerateIRNGetJson.billLists[0].itemList.Add(new Generate_EWay.Ewayitemlist
                             {
-                                itemNo = Convert.ToInt32(invrecordset.Fields.Item("SINo").Value),
-                                productName = invrecordset.Fields.Item("Dscription").Value.ToString(),
-                                productDesc = invrecordset.Fields.Item("Dscription").Value.ToString(),
+                                itemNo = clsModule.objaddon.objglobalmethods.Ctoint(invrecordset.Fields.Item("SINo").Value),
+                                productName = prdouctdesc,
+                                productDesc = prdouctdesc,
                                 hsnCode = invrecordset.Fields.Item("HSN").Value.ToString(),//"9965" for Service Invoice,
                                 quantity = invrecordset.Fields.Item("Quantity").Value.ToString(),
                                 qtyUnit = AssignEwayunit,
@@ -1994,7 +2015,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                 {
                                     distance = "1";
                                 }
-                                if (Convert.ToInt32(invrecordset.Fields.Item(clsModule.EwayDistance).Value.ToString()) > 0)
+                                if (clsModule.objaddon.objglobalmethods.Ctoint(invrecordset.Fields.Item(clsModule.EwayDistance).Value.ToString()) > 0)
                                 {
                                     distance = invrecordset.Fields.Item(clsModule.EwayDistance).Value.ToString();
                                 }
@@ -2020,7 +2041,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             }
                             else
                             {
-                                double CalcDistance = 0;
+                                decimal CalcDistance = 0;
                                 Generate_EWay distanceEway = new Generate_EWay();
                                 distanceEway.CLIENTCODE = objRs.Fields.Item("U_ClientCode").Value.ToString();
                                 distanceEway.USERCODE = objRs.Fields.Item("U_UserCode").Value.ToString();
@@ -2037,9 +2058,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                     CalcDistance = 1;
                                 }
 
-                                if (Convert.ToInt32(invrecordset.Fields.Item("Distance").Value.ToString()) > 0)
+                                if (clsModule.objaddon.objglobalmethods.Ctoint(invrecordset.Fields.Item("Distance").Value.ToString()) > 0)
                                 {
-                                    CalcDistance = Convert.ToInt32(invrecordset.Fields.Item("Distance").Value.ToString());
+                                    CalcDistance = clsModule.objaddon.objglobalmethods.CtoD(invrecordset.Fields.Item("Distance").Value.ToString());
                                 }
 
                                 clienCred_GetIRN_DocNum.ewbeinvoicelist.Add(new Ewbeinvoicelist
@@ -3106,7 +3127,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
                             clsModule.objaddon.objglobalmethods.WriteErrorLog(InvDocEntry);
 
-                            objsalesinvoice.GetByKey(Convert.ToInt32(InvDocEntry));
+                            objsalesinvoice.GetByKey(clsModule.objaddon.objglobalmethods.Ctoint(InvDocEntry));
                             objsalesinvoice.UserFields.Fields.Item("U_IRNNo").Value = columnFind(einvDT, "Irn", 0);
                             objsalesinvoice.UserFields.Fields.Item("U_QRCode").Value = columnFind(einvDT, "SignedQRCode", 0);
                             if (String.IsNullOrEmpty(clsModule.EwayNo))
@@ -3164,7 +3185,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                         objRs.DoQuery(lstrquery);
                                         break;
                                     default:
-                                        objsalesinvoice.GetByKey(Convert.ToInt32(InvDocEntry));
+                                        objsalesinvoice.GetByKey(clsModule.objaddon.objglobalmethods.Ctoint(InvDocEntry));
                                         objsalesinvoice.EWayBillDetails.EWayBillNo = columnFind(einvDT, "EwbNo", 0);
                                         if (!string.IsNullOrEmpty(einvDT.Rows[0]["EwbDt"].ToString()))
                                         {
@@ -3211,7 +3232,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                         break;
                                     default:
 
-                                        objsalesinvoice.GetByKey(Convert.ToInt32(InvDocEntry));
+                                        objsalesinvoice.GetByKey(clsModule.objaddon.objglobalmethods.Ctoint(InvDocEntry));
                                         objsalesinvoice.EWayBillDetails.EWayBillNo = columnFind(einvDT, "ewayBillNo", 0);
 
                                         if (!string.IsNullOrEmpty(einvDT.Rows[0]["ewayBillDate"].ToString()))
@@ -3245,7 +3266,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                         objRs.DoQuery(lstrquery);
                                         break;
                                     default:
-                                        objsalesinvoice.GetByKey(Convert.ToInt32(InvDocEntry));
+                                        objsalesinvoice.GetByKey(clsModule.objaddon.objglobalmethods.Ctoint(InvDocEntry));
                                         objsalesinvoice.UserFields.Fields.Item(clsModule.EwayNo).Value = columnFind(einvDT, "EwbNo", 0);
                                         objsalesinvoice.Update();
                                         break;
@@ -3263,7 +3284,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                     objRs.DoQuery(lstrquery);
                                     break;
                                 default:
-                                    objsalesinvoice.GetByKey(Convert.ToInt32(InvDocEntry));
+                                    objsalesinvoice.GetByKey(clsModule.objaddon.objglobalmethods.Ctoint(InvDocEntry));
                                     objsalesinvoice.UserFields.Fields.Item("U_Ewaypdf").Value = columnFind(einvDT, "pdfUrl", 0);
                                     objsalesinvoice.UserFields.Fields.Item("U_EwayDetpdf").Value = columnFind(einvDT, "detailedpdfUrl", 0);
                                     objsalesinvoice.Update();
@@ -3293,7 +3314,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                         objRs.DoQuery(lstrquery);
                                         break;
                                     default:
-                                        objsalesinvoice.GetByKey(Convert.ToInt32(InvDocEntry));
+                                        objsalesinvoice.GetByKey(clsModule.objaddon.objglobalmethods.Ctoint(InvDocEntry));
                                         objsalesinvoice.EWayBillDetails.EWayBillNo = columnFind(einvDT, "EwbNo", 0);
                                         if (!string.IsNullOrEmpty(einvDT.Rows[0]["EwbDt"].ToString()))
                                         {
@@ -3324,7 +3345,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                         objRs.DoQuery(lstrquery);
                                         break;
                                     default:
-                                        objsalesinvoice.GetByKey(Convert.ToInt32(InvDocEntry));
+                                        objsalesinvoice.GetByKey(clsModule.objaddon.objglobalmethods.Ctoint(InvDocEntry));
                                         objsalesinvoice.UserFields.Fields.Item(clsModule.EwayNo).Value = columnFind(einvDT, "EwbNo", 0);
                                         objsalesinvoice.Update();
                                         break;
@@ -3347,7 +3368,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                     objRs.DoQuery(lstrquery);
                                     break;
                                 default:
-                                    objsalesinvoice.GetByKey(Convert.ToInt32(InvDocEntry));
+                                    objsalesinvoice.GetByKey(clsModule.objaddon.objglobalmethods.Ctoint(InvDocEntry));
                                     objsalesinvoice.UserFields.Fields.Item("U_Ewaypdf").Value = columnFind(einvDT, "pdfUrl", 0);
                                     objsalesinvoice.UserFields.Fields.Item("U_EwayDetpdf").Value = columnFind(einvDT, "detailedpdfUrl", 0);
                                     if (!string.IsNullOrEmpty(columnFind(einvDT, "Status", 0)))
@@ -3384,7 +3405,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                     objRs.DoQuery(strSQL);
                                     break;
                                 default:
-                                    objsalesinvoice.GetByKey(Convert.ToInt32(InvDocEntry));
+                                    objsalesinvoice.GetByKey(clsModule.objaddon.objglobalmethods.Ctoint(InvDocEntry));
                                     objsalesinvoice.UserFields.Fields.Item("U_IRNNo").Value = "";
                                     objsalesinvoice.UserFields.Fields.Item("U_QRCode").Value = "";
                                     if (String.IsNullOrEmpty(clsModule.EwayNo))
@@ -3417,7 +3438,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                         strSQL += @"Where ""DocEntry""='" + InvDocEntry + "'";
                                         break;
                                     default:
-                                        objsalesinvoice.GetByKey(Convert.ToInt32(InvDocEntry));
+                                        objsalesinvoice.GetByKey(clsModule.objaddon.objglobalmethods.Ctoint(InvDocEntry));
                                         objsalesinvoice.EWayBillDetails.EWayBillNo = "";
                                         objsalesinvoice.EWayBillDetails.EWayBillDate = new DateTime(1900, 01, 01);
                                         objsalesinvoice.EWayBillDetails.EWayBillExpirationDate = new DateTime(1900, 01, 01);
@@ -3433,7 +3454,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                         strSQL += @"Where ""DocEntry""='" + InvDocEntry + "'";
                                         break;
                                     default:
-                                        objsalesinvoice.GetByKey(Convert.ToInt32(InvDocEntry));
+                                        objsalesinvoice.GetByKey(clsModule.objaddon.objglobalmethods.Ctoint(InvDocEntry));
                                         objsalesinvoice.UserFields.Fields.Item(clsModule.EwayNo).Value = "";
                                         break;
                                 }
@@ -3456,7 +3477,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                     break;
                                 default:
                                     objsalesinvoice.Update();
-                                    objsalesinvoice.GetByKey(Convert.ToInt32(InvDocEntry));
+                                    objsalesinvoice.GetByKey(clsModule.objaddon.objglobalmethods.Ctoint(InvDocEntry));
                                     objsalesinvoice.UserFields.Fields.Item("U_Ewaypdf").Value = "";
                                     objsalesinvoice.UserFields.Fields.Item("U_EwayDetpdf").Value = "";
                                     objsalesinvoice.UserFields.Fields.Item("U_EwayStatus").Value = "CNL";

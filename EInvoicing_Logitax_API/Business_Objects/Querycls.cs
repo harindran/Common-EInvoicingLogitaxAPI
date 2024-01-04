@@ -22,6 +22,10 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring += docseries + " \"Inv_No\",";
 
+            if (!string.IsNullOrEmpty(clsModule.ItemDsc))
+            {
+                retstring = retstring + "b.\"" + clsModule.ItemDsc + @""",";
+            }
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
 
@@ -56,9 +60,12 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=Crd11.\"State\" and \"Country\"=Crd11.\"Country\") \"Bill to State Code\"," +
                 "                       (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=crd1.\"State\" and \"Country\"=crd1.\"Country\")";
-            retstring = retstring + " \"Shipp to State Code\",b.\"ItemCode\", b.\"Dscription\",Case when a.\"DocType\"='S' then 'Y' Else 'N' End \"IsServc\",";
-            retstring = retstring + " Case when a.\"DocType\"='S' then (Select Case when LEft(\"ServCode\",2) like '0%' then Replace(\"ServCode\",'0','') Else \"ServCode\" End from OSAC where b.\"SacEntry\"= \"AbsEntry\") Else Left(Replace(o.\"ChapterID\",'.','')," + HSNLength + ") End \"HSN\",Case when a.\"DocType\"='S' then 1 Else b.\"Quantity\" End \"Quantity\",COALESCE(b.\"unitMsr\",b.\"UomCode\") \"Unit\",";
 
+            
+            retstring = retstring + " \"Shipp to State Code\",b.\"ItemCode\", b.\"Dscription\",Case when a.\"DocType\"='S' then 'Y' Else 'N' End \"IsServc\",";
+
+            retstring = retstring + " Case when a.\"DocType\"='S' then (Select Case when LEft(\"ServCode\",2) like '0%' then Replace(\"ServCode\",'0','') Else \"ServCode\" End from OSAC where b.\"SacEntry\"= \"AbsEntry\") Else Left(Replace(o.\"ChapterID\",'.','')," + HSNLength + ") End \"HSN\", ";
+            retstring = retstring + " Case when a.\"DocType\"='S' then 1 Else b.\"Quantity\" End \"Quantity\",COALESCE(b.\"unitMsr\",b.\"UomCode\") \"Unit\",";
             retstring = retstring + " Case when a.\"DocType\"='S' then b.\"Price\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end  else b.\"PriceBefDi\" * a.\"DocRate\" end \"UnitPrice\",";
             retstring = retstring + " Case when a.\"DocType\"='S' then b.\"LineTotal\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end Else IFNULL(b.\"PriceBefDi\" * a.\"DocRate\",0)*b.\"Quantity\" End \"Tot Amt\",";
             retstring = retstring + " Case when a.\"DocType\"='S' then b.\"LineTotal\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end Else IFNULL(b.\"INMPrice\" * a.\"DocRate\",0)*b.\"Quantity\" End \"Tot Amt1\",";
@@ -175,6 +182,10 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring += docseries + " \"Inv_No\",";
 
+            if (!string.IsNullOrEmpty(clsModule.ItemDsc))
+            {
+                retstring = retstring + "b.\"" + clsModule.ItemDsc + @""",";
+            }
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
 
@@ -318,6 +329,10 @@ namespace EInvoicing_Logitax_API.Business_Objects
             retstring = retstring += docseries + " \"Inv_No\",";
 
 
+            if (!string.IsNullOrEmpty(clsModule.ItemDsc))
+            {
+                retstring = retstring + "b.\"" + clsModule.ItemDsc + @""",";
+            }
             retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
 
             retstring = retstring + " '' as \"RegRev\",'INV' Type,a.\"DocEntry\",a.\"DocType\",a.\"DocDate\" \"Inv_Doc_Date\",ss.\"GSTRegnNo\" \"Seller GSTN\",";
@@ -524,6 +539,10 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring += docseries + " \"Inv_No\",";
 
+            if (!string.IsNullOrEmpty(clsModule.ItemDsc))
+            {
+                retstring = retstring + "b.\"" + clsModule.ItemDsc + @""",";
+            }
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
 
@@ -673,6 +692,11 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring += docseries + " \"Inv_No\",";
 
+
+            if (!string.IsNullOrEmpty(clsModule.ItemDsc))
+            {
+                retstring = retstring + "b.\"" + clsModule.ItemDsc + @""",";
+            }
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
 
@@ -824,6 +848,10 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring += docseries + " \"Inv_No\",";
 
+            if (!string.IsNullOrEmpty(clsModule.ItemDsc))
+            {
+                retstring = retstring + "b.\"" + clsModule.ItemDsc + @""",";
+            }
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
 
@@ -977,6 +1005,10 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring += docseries + " \"Inv_No\",";
 
+            if (!string.IsNullOrEmpty(clsModule.ItemDsc))
+            {
+                retstring = retstring + "b.\"" + clsModule.ItemDsc + @""",";
+            }
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
 
@@ -1126,6 +1158,10 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring += docseries + " \"Inv_No\",";
 
+            if (!string.IsNullOrEmpty(clsModule.ItemDsc))
+            {
+                retstring = retstring + "b.\"" + clsModule.ItemDsc + @""",";
+            }
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
 
