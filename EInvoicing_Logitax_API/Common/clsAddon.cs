@@ -45,6 +45,26 @@ namespace EInvoicing_Logitax_API.Common
                     Create_DatabaseFields(); // UDF & UDO Creation Part    
                     Menu(); // Menu Creation Part
                     Create_Objects(); // Object Creation Part
+
+
+
+
+                    string strSQL = @"Select  ""U_DBType"" ,""U_EwayNo"" ,""U_VehNo"" ,""U_TransID"" ,""U_TransName"",""U_Distance"",""U_ItemDesc"" ";
+                    strSQL += @" from ""@ATEICFG"" where ""Code""='01'";
+
+                    DataTable dt = objglobalmethods.GetmultipleValue(strSQL);
+                    if (dt.Rows.Count > 0)
+                    {
+                        clsModule.HANA = Convert.ToString(dt.Rows[0]["U_DBType"]) == "Y" ? true : false;
+                        clsModule.EwayNo = Convert.ToString(dt.Rows[0]["U_EwayNo"]);
+                        clsModule.EwayUDF = Convert.ToString(dt.Rows[0]["U_VehNo"]);
+                        clsModule.EwayTransportId = Convert.ToString(dt.Rows[0]["U_TransID"]);
+                        clsModule.EwayTransportName = Convert.ToString(dt.Rows[0]["U_TransName"]);
+                        clsModule.EwayDistance = Convert.ToString(dt.Rows[0]["U_Distance"]);
+                        clsModule.ItemDsc = Convert.ToString(dt.Rows[0]["U_ItemDesc"]);
+
+                    }
+
                     SetFilters();
                     objapplication.AppEvent += new SAPbouiCOM._IApplicationEvents_AppEventEventHandler(objapplication_AppEvent);
                     objapplication.MenuEvent += new SAPbouiCOM._IApplicationEvents_MenuEventEventHandler(objapplication_MenuEvent);
@@ -52,21 +72,7 @@ namespace EInvoicing_Logitax_API.Common
                     objapplication.FormDataEvent += new SAPbouiCOM._IApplicationEvents_FormDataEventEventHandler(ref FormDataEvent);
                     objapplication.RightClickEvent += new SAPbouiCOM._IApplicationEvents_RightClickEventEventHandler(objapplication_RightClickEvent);
 
-                   string strSQL = @"Select  ""U_DBType"" ,""U_EwayNo"" ,""U_VehNo"" ,""U_TransID"" ,""U_TransName"",""U_Distance"",""U_ItemDesc"" ";                    
-                    strSQL += @" from ""@ATEICFG"" where ""Code""='01'";
-
-                   DataTable dt= objglobalmethods.GetmultipleValue(strSQL);
-                    if (dt.Rows.Count>0)
-                    {
-                        clsModule.HANA = Convert.ToString(dt.Rows[0]["U_DBType"])=="Y"?true:false;
-                        clsModule.EwayNo = Convert.ToString(dt.Rows[0]["U_EwayNo"]);
-                        clsModule.EwayUDF = Convert.ToString (dt.Rows[0]["U_VehNo"]);
-                        clsModule.EwayTransportId = Convert.ToString( dt.Rows[0]["U_TransID"]);
-                        clsModule.EwayTransportName = Convert.ToString(dt.Rows[0]["U_TransName"]);
-                        clsModule.EwayDistance = Convert.ToString(dt.Rows[0]["U_Distance"]);
-                        clsModule.ItemDsc = Convert.ToString(dt.Rows[0]["U_ItemDesc"]);
-
-                    }
+                  
 
                     objapplication.StatusBar.SetText("Addon Connected Successfully..!!!"+ (clsModule.HANA ?"HANA":"SQL"), SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Success);
                     oapplication.Run();
