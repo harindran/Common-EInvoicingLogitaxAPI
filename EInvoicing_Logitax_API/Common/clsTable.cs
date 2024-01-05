@@ -85,6 +85,7 @@ namespace EInvoicing_Logitax_API.Common
             AddFields("@ATEICFG", "TransID", "UDF TransPortID", SAPbobsCOM.BoFieldTypes.db_Alpha, 50);
             AddFields("@ATEICFG", "TransName", "UDF Transport Name", SAPbobsCOM.BoFieldTypes.db_Alpha, 50);
             AddFields("@ATEICFG", "Distance", "UDF Distance", SAPbobsCOM.BoFieldTypes.db_Alpha, 50);
+            AddFields("@ATEICFG", "BtnPos", "Button Position", SAPbobsCOM.BoFieldTypes.db_Numeric);
 
 
 

@@ -710,7 +710,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 oItem = oForm.Items.Add("btneinv", SAPbouiCOM.BoFormItemTypes.it_BUTTON_COMBO);
                 buttonCombo = (SAPbouiCOM.ButtonCombo)oItem.Specific;
                 buttonCombo.Caption = "Generate E-invoice";
-                oItem.Left = oForm.Items.Item("2").Left + oForm.Items.Item("2").Width + 5;
+                oItem.Left = oForm.Items.Item("2").Left + oForm.Items.Item("2").Width + clsModule.objaddon.objglobalmethods.Ctoint(clsModule.objaddon.objglobalmethods.getSingleValue("select \"U_BtnPos\" from \"@ATEICFG\" where \"Code\"=01" ));
                 oItem.Top = oForm.Items.Item("2").Top;
                 oItem.Height = oForm.Items.Item("2").Height;
                 oItem.LinkTo = "2";

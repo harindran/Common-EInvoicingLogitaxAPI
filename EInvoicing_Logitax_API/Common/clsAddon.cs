@@ -1,6 +1,7 @@
 ﻿using EInvoicing_Logitax_API.Business_Objects;
 using SAPbouiCOM.Framework;
 using System;
+using System.Collections.Generic;
 using System.Data;
 
 namespace EInvoicing_Logitax_API.Common
@@ -10,6 +11,7 @@ namespace EInvoicing_Logitax_API.Common
         public clsMenuEvent objmenuevent;
         public SAPbouiCOM.Application objapplication;
         public SAPbobsCOM.Company objcompany;
+        SAPbouiCOM.EventFilter oFilter;
         public clsRightClickEvent objrightclickevent;
         public clsGlobalMethods objglobalmethods;
         public ClsARInvoice objInvoice;              
@@ -43,7 +45,7 @@ namespace EInvoicing_Logitax_API.Common
                     Create_DatabaseFields(); // UDF & UDO Creation Part    
                     Menu(); // Menu Creation Part
                     Create_Objects(); // Object Creation Part
-
+                    SetFilters();
                     objapplication.AppEvent += new SAPbouiCOM._IApplicationEvents_AppEventEventHandler(objapplication_AppEvent);
                     objapplication.MenuEvent += new SAPbouiCOM._IApplicationEvents_MenuEventEventHandler(objapplication_MenuEvent);
                     objapplication.ItemEvent += new SAPbouiCOM._IApplicationEvents_ItemEventEventHandler(objapplication_ItemEvent);               
@@ -126,6 +128,49 @@ namespace EInvoicing_Logitax_API.Common
             return true;
         }
 
+        private void FilterForm(SAPbouiCOM.EventFilters oFilters,  SAPbouiCOM.BoEventTypes eventFilter, List<string> Forms)
+        {
+            oFilter= oFilters.Add(eventFilter);
+            foreach (string item in Forms)
+            {
+                oFilter.AddEx(item);
+            }
+        }
+        private void SetFilters()
+        {
+            SAPbouiCOM.EventFilters oFilters;                       
+            oFilters = new SAPbouiCOM.EventFilters();
+
+            List<string> array =new List<string>() ;
+
+            if (string.IsNullOrEmpty(clsModule.EwayNo))
+            {
+                array.AddRange(new[] { "133", "179", "940", "140", "141" } );            
+            }
+            else
+            {
+                array.AddRange(new[] { "133", "179",  "140", "141" });
+            }
+
+            List<string>  Allevent =new List<string> (new []{ "GSTUPLOAD", "EINV", "EINVDIS", "UOMMAP", "138" });
+            
+
+
+            FilterForm(oFilters,  SAPbouiCOM.BoEventTypes.et_CLICK, array);
+            FilterForm(oFilters,  SAPbouiCOM.BoEventTypes.et_FORM_DATA_LOAD, array);
+            FilterForm(oFilters,  SAPbouiCOM.BoEventTypes.et_FORM_DATA_UPDATE, array);
+            FilterForm(oFilters,  SAPbouiCOM.BoEventTypes.et_FORM_LOAD, array);
+            FilterForm(oFilters,  SAPbouiCOM.BoEventTypes.et_GOT_FOCUS, array);
+            FilterForm(oFilters,  SAPbouiCOM.BoEventTypes.et_FORM_CLOSE, array);
+            FilterForm(oFilters,  SAPbouiCOM.BoEventTypes.et_FORM_DRAW, array);
+            FilterForm(oFilters,  SAPbouiCOM.BoEventTypes.et_COMBO_SELECT, array);
+            FilterForm(oFilters,  SAPbouiCOM.BoEventTypes.et_FORM_ACTIVATE, array);            
+            FilterForm(oFilters,  SAPbouiCOM.BoEventTypes.et_FORM_DATA_ADD, array);                                    
+            FilterForm(oFilters,  SAPbouiCOM.BoEventTypes.et_ALL_EVENTS, Allevent);        
+            
+            objapplication.SetFilter(oFilters);
+
+        }
         public void Create_Objects()
         {
             objmenuevent = new clsMenuEvent();
@@ -313,7 +358,7 @@ namespace EInvoicing_Logitax_API.Common
         }
 
         #endregion
-
+        
         #region MenuEvent
         private void objapplication_MenuEvent(ref SAPbouiCOM.MenuEvent pVal, out bool BubbleEvent)
         {
