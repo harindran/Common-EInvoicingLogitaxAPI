@@ -40,7 +40,6 @@ namespace EInvoicing_Logitax_API.Business_Objects
             this.OptionBtn1 = ((SAPbouiCOM.OptionBtn)(this.GetItem("olive").Specific));
             this.StaticText3 = ((SAPbouiCOM.StaticText)(this.GetItem("LHSN").Specific));
             this.EditText3 = ((SAPbouiCOM.EditText)(this.GetItem("thsnL").Specific));
-            this.StaticText7 = ((SAPbouiCOM.StaticText)(this.GetItem("LSERCON").Specific));
             this.EditText7 = ((SAPbouiCOM.EditText)(this.GetItem("TSERCON").Specific));
             this.OptionBtn4 = ((SAPbouiCOM.OptionBtn)(this.GetItem("RHANA").Specific));
             this.OptionBtn5 = ((SAPbouiCOM.OptionBtn)(this.GetItem("RSQL").Specific));
@@ -53,7 +52,6 @@ namespace EInvoicing_Logitax_API.Business_Objects
             this.StaticText11 = ((SAPbouiCOM.StaticText)(this.GetItem("LTranNm").Specific));
             this.EditText11 = ((SAPbouiCOM.EditText)(this.GetItem("TUtransNM").Specific));
             this.EditText11.KeyDownAfter += new SAPbouiCOM._IEditTextEvents_KeyDownAfterEventHandler(this.EditText11_KeyDownAfter);
-            this.StaticText12 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_15").Specific));
             this.EditText10 = ((SAPbouiCOM.EditText)(this.GetItem("TDistance").Specific));
             this.StaticText10 = ((SAPbouiCOM.StaticText)(this.GetItem("LDistance").Specific));
             this.Folder2 = ((SAPbouiCOM.Folder)(this.GetItem("fgstcfg").Specific));
@@ -82,6 +80,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
             this.EditText18 = ((SAPbouiCOM.EditText)(this.GetItem("Item_2").Specific));
             this.EditText19 = ((SAPbouiCOM.EditText)(this.GetItem("TbtnPOS").Specific));
             this.StaticText20 = ((SAPbouiCOM.StaticText)(this.GetItem("LbtnPOS").Specific));
+            this.CheckBox2 = ((SAPbouiCOM.CheckBox)(this.GetItem("Gettran").Specific));
+            this.StaticText12 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_15").Specific));
+            this.StaticText21 = ((SAPbouiCOM.StaticText)(this.GetItem("LSERCON").Specific));
             this.OnCustomInitialize();
 
         }
@@ -218,44 +219,11 @@ namespace EInvoicing_Logitax_API.Business_Objects
                     {
                         clsModule.objaddon.objglobalmethods.Matrix_Addrow(Matrix0, "crurl", "#");
                     }
-                    if (!(OptionBtn0.Selected == true | OptionBtn1.Selected == true))
-                    {
-                        strSQL = clsModule.objaddon.objglobalmethods.getSingleValue("Select \"U_Live\" from \"@ATEICFG\" where \"Code\"='01'");
-                       if (strSQL == "Y")
-                        {
-                            OptionBtn1.Item.Click();
-                        }
-                        else
-                        {
-                            OptionBtn0.Selected = true;
-                        }
-                    }
+               
 
-                      strSQL = clsModule.objaddon.objglobalmethods.getSingleValue("Select \"U_GetCompAdd\" from \"@ATEICFG\" where \"Code\"='01'");
-                       if (strSQL == "Y")
-                        {
-                        CheckBox0.Checked = true;
-                        }
-
-                    strSQL = clsModule.objaddon.objglobalmethods.getSingleValue("Select \"U_InvTranGetcusAdd\" from \"@ATEICFG\" where \"Code\"='01'");
-                    if (strSQL == "Y")
-                    {
-                        CheckBox1.Checked = true;
-                    }
-
-
-                    if (!(OptionBtn4.Selected == true | OptionBtn5.Selected == true))
-                    {
-                        strSQL = clsModule.objaddon.objglobalmethods.getSingleValue("Select \"U_DBType\" from \"@ATEICFG\" where \"Code\"='01'");
-                        if (strSQL == "Y")
-                        {
-                            OptionBtn4.Item.Click();
-                        }
-                        else
-                        {
-                            OptionBtn5.Selected = true;
-                        }
-                    }
+                    LoadcheckBox();
+                 
+                                
                 }
                
                 oForm.PaneLevel = 7;
@@ -273,51 +241,66 @@ namespace EInvoicing_Logitax_API.Business_Objects
             }
         }
 
+        private void LoadcheckBox()
+        {
+
+
+
+            if (!(OptionBtn0.Selected == true | OptionBtn1.Selected == true))
+            {
+                strSQL = clsModule.objaddon.objglobalmethods.getSingleValue("Select \"U_Live\" from \"@ATEICFG\" where \"Code\"='01'");
+                if (strSQL == "Y")
+                {
+                    OptionBtn1.Item.Click();
+                }
+                else
+                {
+                    OptionBtn0.Selected = true;
+                }
+            }
+
+            if (!(OptionBtn4.Selected == true | OptionBtn5.Selected == true))
+            {
+                strSQL = clsModule.objaddon.objglobalmethods.getSingleValue("Select \"U_DBType\" from \"@ATEICFG\" where \"Code\"='01'");
+                if (strSQL == "Y")
+                {
+                    OptionBtn4.Item.Click();
+                }
+                else
+                {
+                    OptionBtn5.Selected = true;
+                }
+            }
+
+            strSQL = clsModule.objaddon.objglobalmethods.getSingleValue("Select \"U_GetCompAdd\" from \"@ATEICFG\" where \"Code\"='01'");
+            if (strSQL == "Y")
+            {
+                CheckBox0.Checked = true;
+            }
+
+
+            strSQL = clsModule.objaddon.objglobalmethods.getSingleValue("Select \"U_InvTranGetcusAdd\" from \"@ATEICFG\" where \"Code\"='01'");
+            if (strSQL == "Y")
+            {
+                CheckBox1.Checked = true;
+            }
+            strSQL = clsModule.objaddon.objglobalmethods.getSingleValue("Select \"U_Gettran\" from \"@ATEICFG\" where \"Code\"='01'");
+            if (strSQL == "Y")
+            {
+                CheckBox2.Checked = true;
+            }
+        }
+
         private void Folder0_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
             try
             {
                 oForm = clsModule.objaddon.objapplication.Forms.ActiveForm;                
                 oForm.PaneLevel = 26;
-                
-                if (!(OptionBtn0.Selected == true | OptionBtn1.Selected == true))
-                {
-                    strSQL = clsModule.objaddon.objglobalmethods.getSingleValue("Select \"U_Live\" from \"@ATEICFG\" where \"Code\"='01'");
-                    if (strSQL == "Y")
-                    {
-                        OptionBtn1.Item.Click();
-                    }
-                    else
-                    {
-                        OptionBtn0.Selected = true;
-                    }
-                }
-
-                if (!(OptionBtn4.Selected == true | OptionBtn5.Selected == true))
-                {
-                    strSQL = clsModule.objaddon.objglobalmethods.getSingleValue("Select \"U_DBType\" from \"@ATEICFG\" where \"Code\"='01'");
-                    if (strSQL == "Y")
-                    {
-                        OptionBtn4.Item.Click();
-                    }
-                    else
-                    {
-                        OptionBtn5.Selected = true;
-                    }
-                }
-
-                strSQL = clsModule.objaddon.objglobalmethods.getSingleValue("Select \"U_GetCompAdd\" from \"@ATEICFG\" where \"Code\"='01'");
-                if (strSQL == "Y")
-                {
-                    CheckBox0.Checked = true;
-                }
+              
+                LoadcheckBox();
 
 
-                strSQL = clsModule.objaddon.objglobalmethods.getSingleValue("Select \"U_InvTranGetcusAdd\" from \"@ATEICFG\" where \"Code\"='01'");
-                if (strSQL == "Y")
-                {
-                    CheckBox1.Checked = true;
-                }
 
                 Matrix0.AutoResizeColumns();
             
@@ -398,6 +381,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 oGeneralData.SetProperty("U_SERCONFIG", oForm.DataSources.UserDataSources.Item("UD_SERCON").Value);
                 oGeneralData.SetProperty("U_GetCompAdd", Convert.ToString(((CheckBox0.Checked == true) ? 'Y' : 'N'))); 
                 oGeneralData.SetProperty("U_InvTranGetcusAdd", Convert.ToString(((CheckBox1.Checked == true) ? 'Y' : 'N'))); 
+                oGeneralData.SetProperty("U_Gettran", Convert.ToString(((CheckBox2.Checked == true) ? 'Y' : 'N'))); 
 
                 oGeneralData.SetProperty("U_DBType", Convert.ToString(((OptionBtn4.Selected == true) ? 'Y' : 'N')));
                 oGeneralData.SetProperty("U_EwayNo", oForm.DataSources.UserDataSources.Item("EwayNo").Value);
@@ -482,8 +466,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
         }
 
         private SAPbouiCOM.StaticText StaticText3;
-        private SAPbouiCOM.EditText EditText3;
-        private SAPbouiCOM.StaticText StaticText7;
+        private SAPbouiCOM.EditText EditText3;        
         private SAPbouiCOM.EditText EditText7;
         private SAPbouiCOM.OptionBtn OptionBtn4;
         private SAPbouiCOM.OptionBtn OptionBtn5;
@@ -501,8 +484,6 @@ namespace EInvoicing_Logitax_API.Business_Objects
            
 
         }
-
-        private SAPbouiCOM.StaticText StaticText12;
         private SAPbouiCOM.EditText EditText10;
         private SAPbouiCOM.StaticText StaticText10;
         private SAPbouiCOM.Folder Folder2;
@@ -588,6 +569,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
         private SAPbouiCOM.EditText EditText18;
         private SAPbouiCOM.EditText EditText19;
         private SAPbouiCOM.StaticText StaticText20;
+        private SAPbouiCOM.CheckBox CheckBox2;
+        private SAPbouiCOM.StaticText StaticText12;
+        private SAPbouiCOM.StaticText StaticText21;
     }
 }
  

@@ -158,7 +158,7 @@ namespace EInvoicing_Logitax_API.Common
                 array.AddRange(new[] { "133", "179",  "140", "141" });
             }
 
-            List<string>  Allevent =new List<string> (new []{ "GSTUPLOAD", "EINV", "EINVDIS", "UOMMAP", "138" });
+            List<string>  Allevent =new List<string> (new []{ "GSTUPLOAD", "EINV", "EINVDIS", "UOMMAP", "138", "256000803", "FormSelect" });
             
 
 

@@ -18,6 +18,10 @@ namespace EInvoicing_Logitax_API.Business_Objects
         /// </summary>
         public override void OnInitializeComponent()
         {
+            this.CheckBox0 = ((SAPbouiCOM.CheckBox)(this.GetItem("LDis").Specific));
+            this.StaticText0 = ((SAPbouiCOM.StaticText)(this.GetItem("256000030").Specific));            
+            this.OnCustomInitialize();
+
         }
 
         /// <summary>
@@ -26,5 +30,19 @@ namespace EInvoicing_Logitax_API.Business_Objects
         public override void OnInitializeFormEvents()
         {
         }
+
+        private SAPbouiCOM.CheckBox CheckBox0;
+
+        private void OnCustomInitialize()
+        {
+            CheckBox0.Item.Top = StaticText0.Item.Top;
+            CheckBox0.Item.Left = StaticText0.Item.Left+ StaticText0.Item.Width+5;
+
+
+        }
+
+        private SAPbouiCOM.StaticText StaticText0;
+
+
     }
 }
