@@ -26,6 +26,10 @@ namespace EInvoicing_Logitax_API.Business_Objects
             {
                 retstring = retstring + "b.\"" + clsModule.ItemDsc + @""",";
             }
+            if (!string.IsNullOrEmpty(clsModule.GSTCol))
+            {
+                retstring = retstring + "a.\"" + clsModule.GSTCol + @""",";
+            }
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
 
@@ -109,6 +113,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 retstring = retstring + " i.\"ActToState\",i.\"SubSplyTyp\",ES.\"SubType\" \"SubtypeDescription\", i.\"DocType\" \"EDocType\" ,";
 
                 retstring += " i.\"U_Dispatch_Eway\" as \"DisEway\" ,";
+                retstring += " i.\"U_Dispatch_Name\" as \"DisName\" ,";
                 retstring = retstring + " i.\"EwbDate\" \"EwbDate\" ,i.\"EWayBillNo\" \"EwayNo\" ,";
                 retstring = retstring + " i.\"FrmState\" \"FrmState\" ,i.\"ToState\" \"ToState\" ,";
 
@@ -199,6 +204,11 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 retstring = retstring + "b.\"" + clsModule.ItemDsc + @""",";
             }
 
+            if (!string.IsNullOrEmpty(clsModule.GSTCol))
+            {
+                retstring = retstring + "a.\"" + clsModule.GSTCol + @""",";
+            }
+
             retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
 
             retstring = retstring + " '' as \"RegRev\",'CRN' Type,a.\"DocEntry\",a.\"DocType\",a.\"DocDate\" \"Inv_Doc_Date\",ss.\"GSTRegnNo\" \"Seller GSTN\",";
@@ -276,6 +286,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 retstring = retstring + " i.\"ActToState\",i.\"SubSplyTyp\",ES.\"SubType\" \"SubtypeDescription\" ,i.\"DocType\" \"EDocType\",";
 
                 retstring += " i.\"U_Dispatch_Eway\" as \"DisEway\" ,";
+                retstring += " i.\"U_Dispatch_Name\" as \"DisName\" ,";
                 retstring = retstring + " i.\"EwbDate\" \"EwbDate\" ,i.\"EWayBillNo\" \"EwayNo\" ,";
                 retstring = retstring + " i.\"FrmState\" \"FrmState\" ,i.\"ToState\" \"ToState\" ,";
 
@@ -355,6 +366,10 @@ namespace EInvoicing_Logitax_API.Business_Objects
             if (!string.IsNullOrEmpty(clsModule.ItemDsc))
             {
                 retstring = retstring + "b.\"" + clsModule.ItemDsc + @""",";
+            }
+            if (!string.IsNullOrEmpty(clsModule.GSTCol))
+            {
+                retstring = retstring + "a.\"" + clsModule.GSTCol + @""",";
             }
             retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
 
@@ -476,6 +491,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 retstring = retstring + " i.\"SubSplyTyp\",ES.\"SubType\" \"SubtypeDescription\", i.\"DocType\" \"EDocType\" ,";
 
                 retstring += " i.\"U_Dispatch_Eway\" as \"DisEway\" ,";
+                retstring += " i.\"U_Dispatch_Name\" as \"DisName\" ,";
                 retstring = retstring + " i.\"EwbDate\" \"EwbDate\" ,i.\"EWayBillNo\" \"EwayNo\" ,";            
                 retstring = retstring + " T.\"ClaimRefun\",";
             }
@@ -577,6 +593,10 @@ namespace EInvoicing_Logitax_API.Business_Objects
             {
                 retstring = retstring + "b.\"" + clsModule.ItemDsc + @""",";
             }
+            if (!string.IsNullOrEmpty(clsModule.GSTCol))
+            {
+                retstring = retstring + "a.\"" + clsModule.GSTCol + @""",";
+            }
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
 
@@ -656,6 +676,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 retstring = retstring + " i.\"ActToState\",i.\"SubSplyTyp\",ES.\"SubType\" \"SubtypeDescription\", i.\"DocType\" \"EDocType\" ,";
 
                 retstring += " i.\"U_Dispatch_Eway\" as \"DisEway\" ,";
+                retstring += " i.\"U_Dispatch_Name\" as \"DisName\" ,";
                 retstring = retstring + " i.\"EwbDate\" \"EwbDate\" ,i.\"EWayBillNo\" \"EwayNo\" ,";
                 retstring = retstring + " i.\"FrmState\" \"FrmState\" ,i.\"ToState\" \"ToState\" ,";
 
@@ -742,6 +763,10 @@ namespace EInvoicing_Logitax_API.Business_Objects
             {
                 retstring = retstring + "b.\"" + clsModule.ItemDsc + @""",";
             }
+            if (!string.IsNullOrEmpty(clsModule.GSTCol))
+            {
+                retstring = retstring + "a.\"" + clsModule.GSTCol + @""",";
+            }
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
 
@@ -823,6 +848,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 retstring = retstring + " i.\"ActToState\",i.\"SubSplyTyp\",ES.\"SubType\" \"SubtypeDescription\", i.\"DocType\" \"EDocType\" ,";
 
                 retstring += " i.\"U_Dispatch_Eway\" as \"DisEway\" ,";
+                retstring += " i.\"U_Dispatch_Name\" as \"DisName\" ,";
                 retstring = retstring + " i.\"EwbDate\" \"EwbDate\" ,i.\"EWayBillNo\" \"EwayNo\" ,";
                 retstring = retstring + " i.\"FrmState\" \"FrmState\" ,i.\"ToState\" \"ToState\" ,";
 
@@ -908,6 +934,10 @@ namespace EInvoicing_Logitax_API.Business_Objects
             {
                 retstring = retstring + "b.\"" + clsModule.ItemDsc + @""",";
             }
+            if (!string.IsNullOrEmpty(clsModule.GSTCol))
+            {
+                retstring = retstring + "a.\"" + clsModule.GSTCol + @""",";
+            }
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
 
@@ -989,6 +1019,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 retstring = retstring + " i.\"ActToState\",i.\"SubSplyTyp\",ES.\"SubType\" \"SubtypeDescription\", i.\"DocType\" \"EDocType\" ,";
 
                 retstring += " i.\"U_Dispatch_Eway\" as \"DisEway\" ,";
+                retstring += " i.\"U_Dispatch_Name\" as \"DisName\" ,";
                 retstring = retstring + " i.\"EwbDate\" \"EwbDate\" ,i.\"EWayBillNo\" \"EwayNo\" ,";
                 retstring = retstring + " i.\"FrmState\" \"FrmState\" ,i.\"ToState\" \"ToState\" ,";
 
@@ -1075,6 +1106,10 @@ namespace EInvoicing_Logitax_API.Business_Objects
             {
                 retstring = retstring + "b.\"" + clsModule.ItemDsc + @""",";
             }
+            if (!string.IsNullOrEmpty(clsModule.GSTCol))
+            {
+                retstring = retstring + "a.\"" + clsModule.GSTCol + @""",";
+            }
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
 
@@ -1153,6 +1188,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 retstring = retstring + " i.\"ActToState\",i.\"SubSplyTyp\",ES.\"SubType\" \"SubtypeDescription\", i.\"DocType\" \"EDocType\" ,";
 
                 retstring += " i.\"U_Dispatch_Eway\" as \"DisEway\" ,";
+                retstring += " i.\"U_Dispatch_Name\" as \"DisName\" ,";
                 retstring = retstring + " i.\"EwbDate\" \"EwbDate\" ,i.\"EWayBillNo\" \"EwayNo\" ,";
                 retstring = retstring + " i.\"FrmState\" \"FrmState\" ,i.\"ToState\" \"ToState\" ,";
 
@@ -1238,6 +1274,10 @@ namespace EInvoicing_Logitax_API.Business_Objects
             {
                 retstring = retstring + "b.\"" + clsModule.ItemDsc + @""",";
             }
+            if (!string.IsNullOrEmpty(clsModule.GSTCol))
+            {
+                retstring = retstring + "a.\"" + clsModule.GSTCol + @""",";
+            }
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
 
@@ -1317,6 +1357,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 retstring = retstring + " i.\"ActToState\",i.\"SubSplyTyp\",ES.\"SubType\" \"SubtypeDescription\", i.\"DocType\" \"EDocType\" ,";
 
                 retstring += " i.\"U_Dispatch_Eway\" as \"DisEway\" ,";
+                retstring += " i.\"U_Dispatch_Name\" as \"DisName\" ,";
                 retstring = retstring + " i.\"EwbDate\" \"EwbDate\" ,i.\"EWayBillNo\" \"EwayNo\" ,";
                 retstring = retstring + " i.\"FrmState\" \"FrmState\" ,i.\"ToState\" \"ToState\" ,";
 

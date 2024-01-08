@@ -49,7 +49,7 @@ namespace EInvoicing_Logitax_API.Common
 
 
 
-                    string strSQL = @"Select  ""U_DBType"" ,""U_EwayNo"" ,""U_VehNo"" ,""U_TransID"" ,""U_TransName"",""U_Distance"",""U_ItemDesc"" ";
+                    string strSQL = @"Select  ""U_DBType"" ,""U_EwayNo"" ,""U_VehNo"" ,""U_TransID"" ,""U_TransName"",""U_Distance"",""U_ItemDesc"",""U_GSTCol"" ";
                     strSQL += @" from ""@ATEICFG"" where ""Code""='01'";
 
                     DataTable dt = objglobalmethods.GetmultipleValue(strSQL);
@@ -62,6 +62,7 @@ namespace EInvoicing_Logitax_API.Common
                         clsModule.EwayTransportName = Convert.ToString(dt.Rows[0]["U_TransName"]);
                         clsModule.EwayDistance = Convert.ToString(dt.Rows[0]["U_Distance"]);
                         clsModule.ItemDsc = Convert.ToString(dt.Rows[0]["U_ItemDesc"]);
+                        clsModule.GSTCol = Convert.ToString(dt.Rows[0]["U_GSTCol"]);
 
                     }
 
@@ -172,6 +173,7 @@ namespace EInvoicing_Logitax_API.Common
             FilterForm(oFilters,  SAPbouiCOM.BoEventTypes.et_COMBO_SELECT, array);
             FilterForm(oFilters,  SAPbouiCOM.BoEventTypes.et_FORM_ACTIVATE, array);            
             FilterForm(oFilters,  SAPbouiCOM.BoEventTypes.et_FORM_DATA_ADD, array);                                    
+            FilterForm(oFilters,  SAPbouiCOM.BoEventTypes.et_CHOOSE_FROM_LIST, array);                                    
             FilterForm(oFilters,  SAPbouiCOM.BoEventTypes.et_ALL_EVENTS, Allevent);        
             
             objapplication.SetFilter(oFilters);

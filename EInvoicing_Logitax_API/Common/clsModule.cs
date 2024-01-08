@@ -15,6 +15,7 @@ namespace EInvoicing_Logitax_API.Common
         public static string EwayTransportName = "";
         public static string EwayDistance = "";
         public static string ItemDsc = "";
+        public static string GSTCol = "";
         public static bool HANA = false;
 
         [STAThread()]

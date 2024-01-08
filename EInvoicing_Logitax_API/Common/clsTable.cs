@@ -78,7 +78,8 @@ namespace EInvoicing_Logitax_API.Common
             AddFields("@ATEICFG", "GetCompAdd", "Get Company Address", SAPbobsCOM.BoFieldTypes.db_Alpha,100);
             AddFields("@ATEICFG", "InvTranGetcusAdd", "Inventory Transfer Get Customer Address", SAPbobsCOM.BoFieldTypes.db_Alpha,100);
             AddFields("@ATEICFG", "Gettran", "Get  Transaction Customer Address", SAPbobsCOM.BoFieldTypes.db_Alpha,100);
-         
+            AddFields("@ATEICFG", "GSTCol", "GST Column", SAPbobsCOM.BoFieldTypes.db_Alpha, 100);
+
 
             AddFields("@ATEICFG", "DBType", "SQL Or HANA", SAPbobsCOM.BoFieldTypes.db_Alpha, 5);
             AddFields("@ATEICFG", "EwayNo", "UDF EwayNo", SAPbobsCOM.BoFieldTypes.db_Alpha, 50);
@@ -125,6 +126,7 @@ namespace EInvoicing_Logitax_API.Common
             AddFields("OINV", "GST_Remarks", "GSTRemarks", SAPbobsCOM.BoFieldTypes.db_Memo);
 
             AddFields("INV26", "Dispatch_Eway", "Dispatch From Eway Bill", SAPbobsCOM.BoFieldTypes.db_Alpha, 5);
+            AddFields("INV26", "Dispatch_Name", "Dispatch Name", SAPbobsCOM.BoFieldTypes.db_Alpha, 100);
 
         }
 

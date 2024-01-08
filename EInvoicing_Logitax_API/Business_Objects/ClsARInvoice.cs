@@ -902,8 +902,20 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
                         if (string.IsNullOrEmpty(invrecordset.Fields.Item("Buyer GSTN").Value.ToString()) && !fromGst)
                         {
-                            clsModule.objaddon.objapplication.StatusBar.SetText("GST No is Missing for \"Create GSTNo\"...for " + invrecordset.Fields.Item("ShipToCode").Value.ToString(), SAPbouiCOM.BoMessageTime.bmt_Long, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-                            return false;
+                            if (!string.IsNullOrEmpty(clsModule.GSTCol))
+                            {
+                                if (string.IsNullOrEmpty(invrecordset.Fields.Item(clsModule.GSTCol).Value.ToString()))                                    
+                                {
+                                    clsModule.objaddon.objapplication.StatusBar.SetText("GST No is Missing for \"Create GSTNo\"...for " + clsModule.GSTCol , SAPbouiCOM.BoMessageTime.bmt_Long, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                                    return false;
+                                }
+                            }
+                            else
+                            {
+                                clsModule.objaddon.objapplication.StatusBar.SetText("GST No is Missing for \"Create GSTNo\"...for " + invrecordset.Fields.Item("ShipToCode").Value.ToString(), SAPbouiCOM.BoMessageTime.bmt_Long, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                                return false;
+                            }
+                          
                         }
 
                         string AssignEinvunit = invrecordset.Fields.Item("Unit").Value.ToString();
@@ -1081,7 +1093,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                         }
                                     }
 
-                                    if (invrecordset.Fields.Item("DisEway").Value.ToString()=="Y")
+                                    if (invrecordset.Fields.Item("DisEway").Value.ToString()=="N")
                                     {                                        
                                         GenerateIRNGetJson.json_data.DispDtls.Nm = invrecordset.Fields.Item("Seller_Legal Name").Value.ToString();
                                         GenerateIRNGetJson.json_data.DispDtls.Addr1 = sellerAddress1;
@@ -1093,6 +1105,11 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                     else
                                     {
                                         GenerateIRNGetJson.json_data.DispDtls.Nm = invrecordset.Fields.Item("FrmTraName").Value.ToString();
+                                        if (!string.IsNullOrEmpty(invrecordset.Fields.Item("DisName").Value.ToString()))
+                                        {
+                                            GenerateIRNGetJson.json_data.DispDtls.Nm = invrecordset.Fields.Item("DisName").Value.ToString();
+                                        }
+
                                         GenerateIRNGetJson.json_data.DispDtls.Addr1 = FRMAddress1;
                                         GenerateIRNGetJson.json_data.DispDtls.Addr2 = FRMAddress2;
                                         GenerateIRNGetJson.json_data.DispDtls.Loc = invrecordset.Fields.Item("FrmPlace").Value.ToString();
@@ -1130,6 +1147,11 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         }
 
                         GenerateIRNGetJson.json_data.BuyerDtls.Gstin = invrecordset.Fields.Item("Buyer GSTN").Value.ToString();
+
+                        if (!string.IsNullOrEmpty(clsModule.GSTCol))
+                        {
+                            GenerateIRNGetJson.json_data.BuyerDtls.Gstin = invrecordset.Fields.Item(clsModule.GSTCol).Value.ToString();
+                        }
                         GenerateIRNGetJson.json_data.BuyerDtls.LglNm = invrecordset.Fields.Item("Buyer_Legal Name").Value.ToString();                        
                         GenerateIRNGetJson.json_data.BuyerDtls.Addr1 = BuyerAddress1;
                         GenerateIRNGetJson.json_data.BuyerDtls.Addr2 = BuyerAddress2;
