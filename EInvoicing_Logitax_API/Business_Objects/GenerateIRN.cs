@@ -389,6 +389,9 @@ class ClsCancelEInvoice
         public string TransDocNo { get; set; }
         public string VehNo { get; set; }
         public string VehType { get; set; }
+        public DispDtls DispDtls { get; set; } = new DispDtls();
+        public ShipDtls ExpShipDtls { get; set; } = new ShipDtls();
+
     }
 
     public class GetEwayByIRN

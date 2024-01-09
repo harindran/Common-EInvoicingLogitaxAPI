@@ -174,6 +174,7 @@ namespace EInvoicing_Logitax_API.Common
             FilterForm(oFilters,  SAPbouiCOM.BoEventTypes.et_FORM_ACTIVATE, array);            
             FilterForm(oFilters,  SAPbouiCOM.BoEventTypes.et_FORM_DATA_ADD, array);                                    
             FilterForm(oFilters,  SAPbouiCOM.BoEventTypes.et_CHOOSE_FROM_LIST, array);                                    
+            FilterForm(oFilters,  SAPbouiCOM.BoEventTypes.et_KEY_DOWN, array);                                    
             FilterForm(oFilters,  SAPbouiCOM.BoEventTypes.et_ALL_EVENTS, Allevent);        
             
             objapplication.SetFilter(oFilters);

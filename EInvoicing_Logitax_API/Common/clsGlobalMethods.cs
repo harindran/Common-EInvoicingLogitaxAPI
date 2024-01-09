@@ -761,6 +761,31 @@ namespace EInvoicing_Logitax_API.Common
             }
         }
 
+        public void RemoveNullValues(JObject obj)
+        {
+            foreach (JProperty property in obj.Properties().ToList())
+            {
+                if (property.Value.Type == JTokenType.Object)
+                {
+                    RemoveNullValues((JObject)property.Value);
+                }
+                else if (property.Value.Type == JTokenType.Array)
+                {
+                    foreach (var arrayItem in property.Value.Children().ToList())
+                    {
+                        if (arrayItem.Type == JTokenType.Object)
+                        {
+                            RemoveNullValues((JObject)arrayItem);
+                        }
+                    }
+                }
+
+                if (property.Value.Type == JTokenType.Null)
+                {
+                    property.Remove();
+                }
+            }
+        }
 
     }
 }

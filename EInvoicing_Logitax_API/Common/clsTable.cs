@@ -77,6 +77,7 @@ namespace EInvoicing_Logitax_API.Common
             AddFields("@ATEICFG", "SERCONFIG", "Series Configuration", SAPbobsCOM.BoFieldTypes.db_Memo);
             AddFields("@ATEICFG", "GetCompAdd", "Get Company Address", SAPbobsCOM.BoFieldTypes.db_Alpha,100);
             AddFields("@ATEICFG", "InvTranGetcusAdd", "Inventory Transfer Get Customer Address", SAPbobsCOM.BoFieldTypes.db_Alpha,100);
+            AddFields("@ATEICFG", "InvTranGetBrnchAdd", "Inventory Transfer Get Branch Address", SAPbobsCOM.BoFieldTypes.db_Alpha,100);
             AddFields("@ATEICFG", "Gettran", "Get  Transaction Customer Address", SAPbobsCOM.BoFieldTypes.db_Alpha,100);
             AddFields("@ATEICFG", "GSTCol", "GST Column", SAPbobsCOM.BoFieldTypes.db_Alpha, 100);
 

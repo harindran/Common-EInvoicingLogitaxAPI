@@ -18,7 +18,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = "SELECT Row_number() Over(Partition by b.\"DocEntry\" order by b.\"DocEntry\" Asc )\" SINo\",(B.\"AssVal\"+B.\"Freight Total\") \"AssValN\" ,";
             retstring = retstring + " (B.\"AssAmt\"+B.\"CGSTAmt\"+B.\"SGSTAmt\"+B.\"IGSTAmt\") \"Total Item Value\",CAST((B.\"Tot Amt\"-B.\"Tot Amt1\")AS nvarchar(200)) \"LineDiscountAmt\",B.* FROM(";
-            retstring = retstring + "  Select B2.*, 'GST' as \"TaxSch\",T.\"BpGSTN\",";
+            retstring = retstring + "  Select B2.*, 'GST' as \"TaxSch\",T.\"BpGSTN\" as \"T_BpGSTN\",";
 
             retstring = retstring += docseries + " \"Inv_No\",";
 
@@ -28,7 +28,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             }
             if (!string.IsNullOrEmpty(clsModule.GSTCol))
             {
-                retstring = retstring + "a.\"" + clsModule.GSTCol + @""",";
+                retstring = retstring + "T.\"" + clsModule.GSTCol + @""",";
             }
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
@@ -195,7 +195,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             retstring = "SELECT Row_number () Over (Partition by b.\"DocEntry\" order by b.\"DocEntry\" Asc )\" SINo\",(B.\"AssVal\"+B.\"Freight Total\") \"AssValN\" ,";
             retstring = retstring + " (B.\"AssAmt\"+B.\"CGSTAmt\"+B.\"SGSTAmt\"+B.\"IGSTAmt\") \"Total Item Value\",CAST((B.\"Tot Amt\"-B.\"Tot Amt1\")AS nvarchar(200)) \"LineDiscountAmt\",";
             retstring = retstring + " B.* FROM(";
-            retstring = retstring + " Select B2.*, 'GST' as \"TaxSch\",T.\"BpGSTN\",";
+            retstring = retstring + " Select B2.*, 'GST' as \"TaxSch\",T.\"BpGSTN\" as \"T_BpGSTN\",";
 
             retstring = retstring += docseries + " \"Inv_No\",";
 
@@ -206,7 +206,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             if (!string.IsNullOrEmpty(clsModule.GSTCol))
             {
-                retstring = retstring + "a.\"" + clsModule.GSTCol + @""",";
+                retstring = retstring + "T.\"" + clsModule.GSTCol + @""",";
             }
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
@@ -358,7 +358,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = "SELECT Row_number() Over(Partition by b.\"DocEntry\" order by b.\"DocEntry\" Asc )\" SINo\",(B.\"AssVal\"+B.\"Freight Total\") \"AssValN\" ,";
             retstring = retstring + " (B.\"AssAmt\"+B.\"CGSTAmt\"+B.\"SGSTAmt\"+B.\"IGSTAmt\") \"Total Item Value\",CAST((B.\"Tot Amt\"-B.\"Tot Amt1\")AS nvarchar(200)) \"LineDiscountAmt\",B.* FROM(";
-            retstring = retstring + "  Select B2.*, 'GST' as \"TaxSch\",T.\"BpGSTN\",";
+            retstring = retstring + "  Select B2.*, 'GST' as \"TaxSch\",T.\"BpGSTN\" as \"T_BpGSTN\",";
 
             retstring = retstring += docseries + " \"Inv_No\",";
 
@@ -369,7 +369,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             }
             if (!string.IsNullOrEmpty(clsModule.GSTCol))
             {
-                retstring = retstring + "a.\"" + clsModule.GSTCol + @""",";
+                retstring = retstring + "T.\"" + clsModule.GSTCol + @""",";
             }
             retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
 
@@ -463,18 +463,41 @@ namespace EInvoicing_Logitax_API.Business_Objects
             retstring = retstring + " b.\"DiscPrcnt\",((b.\"PriceBefDi\"*\"Quantity\") * (b.\"DiscPrcnt\"/100)) \"LineDisc\",l.\"InvntryUom\" ,IFNULL(a.\"RoundDif\",0) \"Rounding\", a.\"TaxDate\" \"Cust Order Date\", a.\"TotalExpns\",l.\"FrgnName\",a.\"DocCur\",A.\"VatSum\", a.\"TotalExpns\" \"Freight\",";
             retstring = retstring + " l.\"SalUnitMsr\",IFNULL(b.\"LineTotal\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Line Total\", IFNULL(a.\"TotalExpns\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Freight Total\",IFNULL(a.\"DiscSum\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Disc Total\",l.\"ItemClass\", ";
 
+            if (clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_InvTranGetBrnchAdd\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01'; ") == "Y")
+            {
+                retstring = retstring + " Cast(COALESCE(FrmLoc.\"Building\",'') AS Varchar(200)) || COALESCE(FrmLoc.\"Street\",'') || COALESCE(FrmLoc.\"Block\",'') || COALESCE(FrmLoc.\"Address\",'')  \"FrmAddres1\",";
+                retstring = retstring + " FrmLoc.\"TaxIdNum\" \"FrmGSTN\",";
+            }
+            else
+            {
+                retstring = retstring + " FrmLoc.\"GSTRegnNo\" \"FrmGSTN\",";
+                retstring = retstring + " Cast(COALESCE(FrmLoc.\"Building\",'') AS Varchar(200)) || COALESCE(FrmLoc.\"Street\",'') || COALESCE(FrmLoc.\"Block\",'')  \"FrmAddres1\",";
+
+            }
+
+            
+
+            
 
 
-            retstring = retstring + " FrmLoc.\"GSTRegnNo\" \"FrmGSTN\",";
-            retstring = retstring + " Cast(FrmLoc.\"Building\" AS Varchar(200)) || FrmLoc.\"Street\" || FrmLoc.\"Block\"  \"FrmAddres1\",";
             retstring = retstring + " '' \"FrmAddres2\", '' \"FrmTraName\", ";
             retstring = retstring + " FrmLoc.\"City\" \"FrmPlace\", Replace(FrmLoc.\"ZipCode\",' ','') \"FrmZipCode\",";
             retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=FrmLoc.\"Country\" and \"Code\"=FrmLoc.\"State\") \"ActFrmStat\",";
             retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=FrmLoc.\"Country\" and \"Code\"=FrmLoc.\"State\") \"FrmState\",";
 
 
+            if (clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_InvTranGetcusAdd\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01'; ") == "Y")
+            {                
+                retstring = retstring + " Cast(COALESCE(ToLoc.\"Building\",'') AS Varchar(200)) || ' '||  COALESCE(ToLoc.\"Street\",'') || ' '|| COALESCE(ToLoc.\"Block\",'') || ' '|| COALESCE(ToLoc.\"Address2\",'') || ' '|| COALESCE(ToLoc.\"Address3\",'')  \"ToAddres1\",";
+            }
+            else
+            {
+                retstring = retstring + " Cast(COALESCE(ToLoc.\"Building\",'') AS Varchar(200)) || ' '|| COALESCE(ToLoc.\"Street\",'') || ' '|| COALESCE(ToLoc.\"Block\",'')  \"ToAddres1\",";
+            }
+
+
             retstring = retstring + " ToLoc.\"GSTRegnNo\" \"ToGSTN\",";
-            retstring = retstring + " Cast(ToLoc.\"Building\" AS Varchar(200)) || ToLoc.\"Street\" || ToLoc.\"Block\"  \"ToAddres1\",";
+           
             retstring = retstring + " '' \"ToAddres2\", '' \"ToTraName\",";
             retstring = retstring + " ToLoc.\"City\" \"ToPlace\", Replace(ToLoc.\"ZipCode\",' ','') \"ToZipCode\",";
             retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ToLoc.\"Country\" and \"Code\"=ToLoc.\"State\") \"ActToState\",";
@@ -555,7 +578,21 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring + " LEFT JOIN OWHS FrmAdd ON FrmAdd.\"WhsCode\" =a.\"Filler\"";
             retstring = retstring + " LEFT JOIN OWHS ToAdd ON ToAdd.\"WhsCode\" =a.\"ToWhsCode\"";
-            retstring = retstring + " LEFT JOIN OLCT FrmLoc ON FrmLoc.\"Code\" =FrmAdd.\"Location\"";
+          
+
+
+            if (clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_InvTranGetBrnchAdd\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01'; ") == "Y")
+            {
+                
+                retstring = retstring + "LEFT JOIN OBPL FrmLoc ON FrmLoc.\"BPLId\" =FrmAdd.\"BPLid\" ";
+            }
+            else
+            {
+                retstring = retstring + " LEFT JOIN OLCT FrmLoc ON FrmLoc.\"Code\" =FrmAdd.\"Location\"";
+
+            }
+
+
             if ( clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_InvTranGetcusAdd\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01'; ")=="Y")
             {
                 retstring = retstring + " LEFT JOIN CRD1 ToLoc on ToLoc.\"CardCode\" =a.\"CardCode\" and ToLoc.\"Address\" =A.\"ShipToCode\" and ToLoc.\"AdresType\"='S'";
@@ -585,7 +622,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = "SELECT Row_number() Over(Partition by b.\"DocEntry\" order by b.\"DocEntry\" Asc )\" SINo\",(B.\"AssVal\"+B.\"Freight Total\") \"AssValN\" ,";
             retstring = retstring + " (B.\"AssAmt\"+B.\"CGSTAmt\"+B.\"SGSTAmt\"+B.\"IGSTAmt\") \"Total Item Value\",CAST((B.\"Tot Amt\"-B.\"Tot Amt1\")AS nvarchar(200)) \"LineDiscountAmt\",B.* FROM(";
-            retstring = retstring + "  Select B2.*, 'GST' as \"TaxSch\",T.\"BpGSTN\",";
+            retstring = retstring + "  Select B2.*, 'GST' as \"TaxSch\",T.\"BpGSTN\" as \"T_BpGSTN\",";
 
             retstring = retstring += docseries + " \"Inv_No\",";
 
@@ -595,7 +632,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             }
             if (!string.IsNullOrEmpty(clsModule.GSTCol))
             {
-                retstring = retstring + "a.\"" + clsModule.GSTCol + @""",";
+                retstring = retstring + "T.\"" + clsModule.GSTCol + @""",";
             }
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
@@ -754,7 +791,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = "SELECT Row_number() Over(Partition by b.\"DocEntry\" order by b.\"DocEntry\" Asc )\" SINo\",(B.\"AssVal\"+B.\"Freight Total\") \"AssValN\" ,";
             retstring = retstring + " (B.\"AssAmt\"+B.\"CGSTAmt\"+B.\"SGSTAmt\"+B.\"IGSTAmt\") \"Total Item Value\",CAST((B.\"Tot Amt\"-B.\"Tot Amt1\")AS nvarchar(200)) \"LineDiscountAmt\",B.* FROM(";
-            retstring = retstring + "  Select B2.*, 'GST' as \"TaxSch\",T.\"BpGSTN\",";
+            retstring = retstring + "  Select B2.*, 'GST' as \"TaxSch\",T.\"BpGSTN\" as \"T_BpGSTN\",";
 
             retstring = retstring += docseries + " \"Inv_No\",";
 
@@ -765,7 +802,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             }
             if (!string.IsNullOrEmpty(clsModule.GSTCol))
             {
-                retstring = retstring + "a.\"" + clsModule.GSTCol + @""",";
+                retstring = retstring + "T.\"" + clsModule.GSTCol + @""",";
             }
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
@@ -926,7 +963,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = "SELECT Row_number() Over(Partition by b.\"DocEntry\" order by b.\"DocEntry\" Asc )\" SINo\",(B.\"AssVal\"+B.\"Freight Total\") \"AssValN\" ,";
             retstring = retstring + " (B.\"AssAmt\"+B.\"CGSTAmt\"+B.\"SGSTAmt\"+B.\"IGSTAmt\") \"Total Item Value\",CAST((B.\"Tot Amt\"-B.\"Tot Amt1\")AS nvarchar(200)) \"LineDiscountAmt\",B.* FROM(";
-            retstring = retstring + "  Select B2.*, 'GST' as \"TaxSch\",T.\"BpGSTN\",";
+            retstring = retstring + "  Select B2.*, 'GST' as \"TaxSch\",T.\"BpGSTN\" as \"T_BpGSTN\",";
 
             retstring = retstring += docseries + " \"Inv_No\",";
 
@@ -936,7 +973,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             }
             if (!string.IsNullOrEmpty(clsModule.GSTCol))
             {
-                retstring = retstring + "a.\"" + clsModule.GSTCol + @""",";
+                retstring = retstring + "T.\"" + clsModule.GSTCol + @""",";
             }
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
@@ -1098,7 +1135,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = "SELECT Row_number() Over(Partition by b.\"DocEntry\" order by b.\"DocEntry\" Asc )\" SINo\",(B.\"AssVal\"+B.\"Freight Total\") \"AssValN\" ,";
             retstring = retstring + " (B.\"AssAmt\"+B.\"CGSTAmt\"+B.\"SGSTAmt\"+B.\"IGSTAmt\") \"Total Item Value\",CAST((B.\"Tot Amt\"-B.\"Tot Amt1\")AS nvarchar(200)) \"LineDiscountAmt\",B.* FROM(";
-            retstring = retstring + "  Select B2.*, 'GST' as \"TaxSch\",T.\"BpGSTN\",";
+            retstring = retstring + "  Select B2.*, 'GST' as \"TaxSch\",T.\"BpGSTN\" as \"T_BpGSTN\",";
 
             retstring = retstring += docseries + " \"Inv_No\",";
 
@@ -1108,7 +1145,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             }
             if (!string.IsNullOrEmpty(clsModule.GSTCol))
             {
-                retstring = retstring + "a.\"" + clsModule.GSTCol + @""",";
+                retstring = retstring + "T.\"" + clsModule.GSTCol + @""",";
             }
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
@@ -1266,7 +1303,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = "SELECT Row_number() Over(Partition by b.\"DocEntry\" order by b.\"DocEntry\" Asc )\" SINo\",(B.\"AssVal\"+B.\"Freight Total\") \"AssValN\" ,";
             retstring = retstring + " (B.\"AssAmt\"+B.\"CGSTAmt\"+B.\"SGSTAmt\"+B.\"IGSTAmt\") \"Total Item Value\",CAST((B.\"Tot Amt\"-B.\"Tot Amt1\")AS nvarchar(200)) \"LineDiscountAmt\",B.* FROM(";
-            retstring = retstring + "  Select B2.*, 'GST' as \"TaxSch\",T.\"BpGSTN\",";
+            retstring = retstring + "  Select B2.*, 'GST' as \"TaxSch\",T.\"BpGSTN\" as \"T_BpGSTN\",";
 
             retstring = retstring += docseries + " \"Inv_No\",";
 
@@ -1276,7 +1313,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             }
             if (!string.IsNullOrEmpty(clsModule.GSTCol))
             {
-                retstring = retstring + "a.\"" + clsModule.GSTCol + @""",";
+                retstring = retstring + "T.\"" + clsModule.GSTCol + @""",";
             }
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";

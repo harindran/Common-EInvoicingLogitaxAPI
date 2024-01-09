@@ -85,6 +85,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             this.StaticText21 = ((SAPbouiCOM.StaticText)(this.GetItem("LSERCON").Specific));
             this.StaticText7 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_0").Specific));
             this.EditText20 = ((SAPbouiCOM.EditText)(this.GetItem("Item_4").Specific));
+            this.CheckBox3 = ((SAPbouiCOM.CheckBox)(this.GetItem("ChkGetBrn").Specific));
             this.OnCustomInitialize();
 
         }
@@ -293,6 +294,12 @@ namespace EInvoicing_Logitax_API.Business_Objects
             {
                 CheckBox2.Checked = true;
             }
+            strSQL = clsModule.objaddon.objglobalmethods.getSingleValue("Select \"U_InvTranGetBrnchAdd\" from \"@ATEICFG\" where \"Code\"='01'");
+            if (strSQL == "Y")
+            {
+                CheckBox3.Checked = true;
+            }
+            
         }
 
         private void Folder0_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
@@ -385,6 +392,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 oGeneralData.SetProperty("U_SERCONFIG", oForm.DataSources.UserDataSources.Item("UD_SERCON").Value);
                 oGeneralData.SetProperty("U_GetCompAdd", Convert.ToString(((CheckBox0.Checked == true) ? 'Y' : 'N'))); 
                 oGeneralData.SetProperty("U_InvTranGetcusAdd", Convert.ToString(((CheckBox1.Checked == true) ? 'Y' : 'N'))); 
+                oGeneralData.SetProperty("U_InvTranGetBrnchAdd", Convert.ToString(((CheckBox3.Checked == true) ? 'Y' : 'N'))); 
                 oGeneralData.SetProperty("U_Gettran", Convert.ToString(((CheckBox2.Checked == true) ? 'Y' : 'N'))); 
 
                 oGeneralData.SetProperty("U_DBType", Convert.ToString(((OptionBtn4.Selected == true) ? 'Y' : 'N')));
@@ -579,6 +587,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
         private SAPbouiCOM.StaticText StaticText21;
         private SAPbouiCOM.StaticText StaticText7;
         private SAPbouiCOM.EditText EditText20;
+        private SAPbouiCOM.CheckBox CheckBox3;
     }
 }
  
