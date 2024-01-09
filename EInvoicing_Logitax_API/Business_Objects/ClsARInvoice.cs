@@ -995,8 +995,8 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         string sellerAddress1 = "";
                         string sellerAddress2 = "";
 
-                        string SellerconcatAddress = string.Concat(invrecordset.Fields.Item("Seller_Building").Value.ToString(),",",
-                                                            invrecordset.Fields.Item("Seller_Block").Value.ToString(), ",",
+                        string SellerconcatAddress = string.Concat(invrecordset.Fields.Item("Seller_Building").Value.ToString()," ",
+                                                            invrecordset.Fields.Item("Seller_Block").Value.ToString(), " ",
                                                             invrecordset.Fields.Item("Seller_Street").Value.ToString());
 
                         List<string> Sellersubstrings = clsModule.objaddon.objglobalmethods.SplitByLength(SellerconcatAddress, 70);
@@ -1127,10 +1127,10 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         #region"Buyer"
                         string BuyerAddress1 = "";
                         string BuyerAddress2 = "";
-                        string BuyerconcatAddress = string.Concat(invrecordset.Fields.Item("Buyer_Building").Value.ToString(), ",",
-                                                            invrecordset.Fields.Item("Buyer_Block").Value.ToString(), ",",
-                                                            invrecordset.Fields.Item("Buyer_Street").Value.ToString(), ",",
-                                                            invrecordset.Fields.Item("Buyer_Address2").Value.ToString(), ",",
+                        string BuyerconcatAddress = string.Concat(invrecordset.Fields.Item("Buyer_Building").Value.ToString(), " ",
+                                                            invrecordset.Fields.Item("Buyer_Block").Value.ToString(), " ",
+                                                            invrecordset.Fields.Item("Buyer_Street").Value.ToString(), " ",
+                                                            invrecordset.Fields.Item("Buyer_Address2").Value.ToString(), " ",
                                                             invrecordset.Fields.Item("Buyer_Address3").Value.ToString());
                         List<string> Buyersubstrings = clsModule.objaddon.objglobalmethods.SplitByLength(BuyerconcatAddress, 70);
                         foreach (string substring in Buyersubstrings)
@@ -2142,10 +2142,10 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                     clsModule.objaddon.objapplication.StatusBar.SetText("Zip Code Missing E-way Details Page.... ", SAPbouiCOM.BoMessageTime.bmt_Long, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
                                     return false;
                                 }
-                                //if (invrecordset.Fields.Item("FrmZipCode").Value.ToString() == invrecordset.Fields.Item("ToZipCode").Value.ToString())
-                                //{
-                                //    CalcDistance = 1;
-                                //}
+                                if (invrecordset.Fields.Item("FrmZipCode").Value.ToString() == invrecordset.Fields.Item("ToZipCode").Value.ToString())
+                                {
+                                    CalcDistance = 1;
+                                }
 
                                 if (clsModule.objaddon.objglobalmethods.Ctoint(invrecordset.Fields.Item("Distance").Value.ToString()) > 0)
                                 {
@@ -2360,7 +2360,8 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                        t2.""TransDocNo"" ,t2.""TransDate"",t2.""FrmZipCode"",t2.""ToZipCode"",";
                             strSQL += @" t2.""VehicleNo"" ,t2.""FrmState"" ,t2.""ToState"" ,
                                         t2.""EWayBillNo"",t2.""FrmPlace"" ,t2.""ToPlace"" ,t2.""ActFrmStat"" ,t2.""ActToState""
-                                        FROM " + tb + @" t1 LEFT JOIN " + eway + @" t2 ON t1.""DocEntry"" =t2.""DocEntry"" where t1.""DocEntry""='" + DocEntry + @"'";
+                                        FROM " + tb + @" t1 LEFT JOIN " + eway + @" t2 ON t1.""DocEntry"" =t2.""DocEntry"" ";                          
+                            strSQL += @" where t1.""DocEntry""='" + DocEntry + @"'";
                         }
                         else
                         {

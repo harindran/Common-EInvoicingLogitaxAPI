@@ -466,11 +466,11 @@ namespace EInvoicing_Logitax_API.Business_Objects
             if (clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_InvTranGetBrnchAdd\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01'; ") == "Y")
             {
                 retstring = retstring + " Cast(COALESCE(FrmLoc.\"Building\",'') AS Varchar(200)) || COALESCE(FrmLoc.\"Street\",'') || COALESCE(FrmLoc.\"Block\",'') || COALESCE(FrmLoc.\"Address\",'')  \"FrmAddres1\",";
-                retstring = retstring + " FrmLoc.\"TaxIdNum\" \"FrmGSTN\",";
+                retstring = retstring + " FrmLoc.\"TaxIdNum\" \"FrmGSTN\", FrmLoc.\"BPLName\" \"FrmTraName\", ";
             }
             else
             {
-                retstring = retstring + " FrmLoc.\"GSTRegnNo\" \"FrmGSTN\",";
+                retstring = retstring + " FrmLoc.\"GSTRegnNo\" \"FrmGSTN\", B1.\"CompnyName\"  \"FrmTraName\", ";
                 retstring = retstring + " Cast(COALESCE(FrmLoc.\"Building\",'') AS Varchar(200)) || COALESCE(FrmLoc.\"Street\",'') || COALESCE(FrmLoc.\"Block\",'')  \"FrmAddres1\",";
 
             }
@@ -480,7 +480,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             
 
 
-            retstring = retstring + " '' \"FrmAddres2\", '' \"FrmTraName\", ";
+            retstring = retstring + " '' \"FrmAddres2\" , ";
             retstring = retstring + " FrmLoc.\"City\" \"FrmPlace\", Replace(FrmLoc.\"ZipCode\",' ','') \"FrmZipCode\",";
             retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=FrmLoc.\"Country\" and \"Code\"=FrmLoc.\"State\") \"ActFrmStat\",";
             retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=FrmLoc.\"Country\" and \"Code\"=FrmLoc.\"State\") \"FrmState\",";
@@ -489,16 +489,18 @@ namespace EInvoicing_Logitax_API.Business_Objects
             if (clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_InvTranGetcusAdd\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01'; ") == "Y")
             {                
                 retstring = retstring + " Cast(COALESCE(ToLoc.\"Building\",'') AS Varchar(200)) || ' '||  COALESCE(ToLoc.\"Street\",'') || ' '|| COALESCE(ToLoc.\"Block\",'') || ' '|| COALESCE(ToLoc.\"Address2\",'') || ' '|| COALESCE(ToLoc.\"Address3\",'')  \"ToAddres1\",";
+                retstring = retstring + " ToLoc.\"Address\" \"ToTraName\",";
             }
             else
             {
                 retstring = retstring + " Cast(COALESCE(ToLoc.\"Building\",'') AS Varchar(200)) || ' '|| COALESCE(ToLoc.\"Street\",'') || ' '|| COALESCE(ToLoc.\"Block\",'')  \"ToAddres1\",";
+                retstring = retstring + " B1.\"CompnyName\" \"ToTraName\",";
             }
 
 
             retstring = retstring + " ToLoc.\"GSTRegnNo\" \"ToGSTN\",";
            
-            retstring = retstring + " '' \"ToAddres2\", '' \"ToTraName\",";
+            retstring = retstring + " '' \"ToAddres2\", ";
             retstring = retstring + " ToLoc.\"City\" \"ToPlace\", Replace(ToLoc.\"ZipCode\",' ','') \"ToZipCode\",";
             retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ToLoc.\"Country\" and \"Code\"=ToLoc.\"State\") \"ActToState\",";
             retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ToLoc.\"Country\" and \"Code\"=ToLoc.\"State\") \"ToState\",";
