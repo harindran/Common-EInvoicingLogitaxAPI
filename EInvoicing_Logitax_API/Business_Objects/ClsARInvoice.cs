@@ -870,6 +870,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
             string requestParams;
             string SapMessage;
 
+            string ClientCode = "";
+            string UserCode = "";
+            string Password = "";
                     
             try
             {
@@ -878,6 +881,19 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 SAPbobsCOM.Recordset invrecordset, Freightrecset;
                 objRs = (SAPbobsCOM.Recordset)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
                 Freightrecset = (SAPbobsCOM.Recordset)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+
+                strSQL = @"Select T0.""U_ClientCode"",T0.""U_UserCode"",T0.""U_Password"" from ""@ATEICFG"" T0  where T0.""Code"" ='01'";
+
+                objRs.DoQuery(strSQL);
+                if (objRs.RecordCount > 0)
+                {
+                    ClientCode= objRs.Fields.Item("U_ClientCode").Value.ToString();
+                    UserCode = objRs.Fields.Item("U_UserCode").Value.ToString();
+                    Password = objRs.Fields.Item("U_Password").Value.ToString();
+                }
+
+
+
                 if (Create_Cancel == EinvoiceMethod.CreateIRN)
                 {
                     GenerateIRN GenerateIRNGetJson = new GenerateIRN();
@@ -890,7 +906,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                     if (invrecordset.RecordCount > 0)
                     {
                         Double Calcdistance = 0;
-                        strSQL = @"Select T0.""U_ClientCode"",T0.""U_UserCode"",T0.""U_Password"",T1.""LineId"",T1.""U_URLType"",T1.""U_Type"",Case when T0.""U_Live""='N' then CONCAT(T0.""U_UATUrl"",T1.""U_URL"") Else CONCAT(T0.""U_LIVEUrl"",T1.""U_URL"") End as URL";
+                        strSQL = @"Select T1.""LineId"",T1.""U_URLType"",T1.""U_Type"",Case when T0.""U_Live""='N' then CONCAT(T0.""U_UATUrl"",T1.""U_URL"") Else CONCAT(T0.""U_LIVEUrl"",T1.""U_URL"") End as URL";
                         strSQL += @" ,""U_GetCompAdd"",""U_Gettran"" ";
                         strSQL += @" ,Case when T0.""U_Live""='N' then T0.""U_UATUrl"" Else T0.""U_LIVEUrl"" End as BaseURL";
                         strSQL += @" from ""@ATEICFG"" T0 join ""@ATEICFG1"" T1 on T0.""Code""=T1.""Code"" where T0.""Code""='01' and T1.""U_URLType"" ='Generate IRN' and T1.""U_Type""='E-Invoice' Order by ""LineId"" Desc";
@@ -957,9 +973,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             if (clsModule.objaddon.objglobalmethods.CtoD(invrecordset.Fields.Item("Distance").Value) > 0)
                             {
                                 Generate_EWay distanceEway = new Generate_EWay();
-                                distanceEway.CLIENTCODE = objRs.Fields.Item("U_ClientCode").Value.ToString();
-                                distanceEway.USERCODE = objRs.Fields.Item("U_UserCode").Value.ToString();
-                                distanceEway.PASSWORD = objRs.Fields.Item("U_Password").Value.ToString();
+                                distanceEway.CLIENTCODE = ClientCode;
+                                distanceEway.USERCODE = UserCode;
+                                distanceEway.PASSWORD = Password;
                                 distanceEway.frompincode = invrecordset.Fields.Item("FrmZipCode").Value.ToString();
                                 distanceEway.topincode = invrecordset.Fields.Item("ToZipCode").Value.ToString();
 
@@ -977,9 +993,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             }
                         }
 
-                        GenerateIRNGetJson.client_code = objRs.Fields.Item("U_ClientCode").Value.ToString();
-                        GenerateIRNGetJson.user_code = objRs.Fields.Item("U_UserCode").Value.ToString();
-                        GenerateIRNGetJson.password = objRs.Fields.Item("U_Password").Value.ToString();
+                        GenerateIRNGetJson.client_code = ClientCode;
+                        GenerateIRNGetJson.user_code = UserCode;
+                        GenerateIRNGetJson.password = Password;
                         GenerateIRNGetJson.json_data.Version = "1.1";
                         GenerateIRNGetJson.json_data.TranDtls.TaxSch = invrecordset.Fields.Item("TaxSch").Value.ToString();
                         GenerateIRNGetJson.json_data.TranDtls.SupTyp = invrecordset.Fields.Item("SupTyp").Value.ToString();
@@ -1615,7 +1631,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                     if (invrecordset.RecordCount > 0)
                     {
                         decimal Calcdistance = 0;
-                        strSQL = @"Select T0.""U_ClientCode"",T0.""U_UserCode"",T0.""U_Password"",T1.""LineId"",T0.""U_UATUrl"",T1.""U_URLType"",T1.""U_Type"",Case when T0.""U_Live""='N' then CONCAT(T0.""U_UATUrl"",T1.""U_URL"") Else CONCAT(T0.""U_LIVEUrl"",T1.""U_URL"") End as URL";
+                        strSQL = @"Select T1.""LineId"",T0.""U_UATUrl"",T1.""U_URLType"",T1.""U_Type"",Case when T0.""U_Live""='N' then CONCAT(T0.""U_UATUrl"",T1.""U_URL"") Else CONCAT(T0.""U_LIVEUrl"",T1.""U_URL"") End as URL";
                         strSQL += @" ,Case when T0.""U_Live""='N' then T0.""U_UATUrl"" Else T0.""U_LIVEUrl"" End as BaseURL";
                         strSQL += @" from ""@ATEICFG"" T0 join ""@ATEICFG1"" T1 on T0.""Code""=T1.""Code"" where T0.""Code""='01' and T1.""U_URLType"" ='Generate IRN' and T1.""U_Type""='E-Way' Order by ""LineId"" Desc";
                         objRs.DoQuery(strSQL);
@@ -1632,9 +1648,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         }
 
                         Generate_EWay distanceEway = new Generate_EWay();
-                        distanceEway.CLIENTCODE = objRs.Fields.Item("U_ClientCode").Value.ToString();
-                        distanceEway.USERCODE = objRs.Fields.Item("U_UserCode").Value.ToString();
-                        distanceEway.PASSWORD = objRs.Fields.Item("U_Password").Value.ToString();
+                        distanceEway.CLIENTCODE = ClientCode;
+                        distanceEway.USERCODE = UserCode;
+                        distanceEway.PASSWORD = Password;
                         distanceEway.frompincode = invrecordset.Fields.Item("FrmZipCode").Value.ToString();
                         distanceEway.topincode = invrecordset.Fields.Item("ToZipCode").Value.ToString();
                         if (string.IsNullOrEmpty(invrecordset.Fields.Item("FrmZipCode").Value.ToString()) || string.IsNullOrEmpty(invrecordset.Fields.Item("ToZipCode").Value.ToString()))
@@ -1667,9 +1683,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             return false;
                         }
 
-                        GenerateIRNGetJson.CLIENTCODE = objRs.Fields.Item("U_ClientCode").Value.ToString();
-                        GenerateIRNGetJson.USERCODE = objRs.Fields.Item("U_UserCode").Value.ToString();
-                        GenerateIRNGetJson.PASSWORD = objRs.Fields.Item("U_Password").Value.ToString();
+                        GenerateIRNGetJson.CLIENTCODE = ClientCode;
+                        GenerateIRNGetJson.USERCODE = UserCode;
+                        GenerateIRNGetJson.PASSWORD = Password;
                         GenerateIRNGetJson.version = "1.1";
 
                         string FRMAddress1 = "";
@@ -1835,7 +1851,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                     clsModule.objaddon.objapplication.StatusBar.SetText("Cancelling E-Invoice. Please wait...", SAPbouiCOM.BoMessageTime.bmt_Long, SAPbouiCOM.BoStatusBarMessageType.smt_Success);
                     ClientCred_Cancel ClientCred = new ClientCred_Cancel();
                     {
-                        strSQL = @"Select T0.""U_ClientCode"",T0.""U_UserCode"",T0.""U_Password"",T1.""LineId"",T1.""U_URLType"",T1.""U_Type"",Case when T0.""U_Live""='N' " +
+                        strSQL = @"Select T1.""LineId"",T1.""U_URLType"",T1.""U_Type"",Case when T0.""U_Live""='N' " +
                                   @"then CONCAT(T0.""U_UATUrl"",T1.""U_URL"") Else CONCAT(T0.""U_LIVEUrl"",T1.""U_URL"") End as URL";
                         strSQL += @" ,Case when T0.""U_Live""='N' then T0.""U_UATUrl"" Else T0.""U_LIVEUrl"" End as BaseURL";
                         strSQL += @" from ""@ATEICFG"" T0 join ""@ATEICFG1"" T1 on T0.""Code""=T1.""Code"" where T0.""Code""='01'" +
@@ -1851,9 +1867,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
                         if (objRs.RecordCount > 0)
                         {
-                            ClientCred.CLIENTCODE = objRs.Fields.Item("U_ClientCode").Value.ToString();
-                            ClientCred.USERCODE = objRs.Fields.Item("U_UserCode").Value.ToString();
-                            ClientCred.PASSWORD = objRs.Fields.Item("U_Password").Value.ToString();
+                            ClientCred.CLIENTCODE = ClientCode;
+                            ClientCred.USERCODE = UserCode;
+                            ClientCred.PASSWORD = Password;
                         }
 
                         switch (TransType)
@@ -1912,7 +1928,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                     {
                         string method = Create_Cancel == EinvoiceMethod.CancelEway ? "Cancel IRN" : "Cancel Eway By IRN";
 
-                        strSQL = @"Select T0.""U_ClientCode"",T0.""U_UserCode"",T0.""U_Password"",T1.""LineId"",T1.""U_URLType"",T1.""U_Type"",Case when T0.""U_Live""='N' " +
+                        strSQL = @"Select T1.""LineId"",T1.""U_URLType"",T1.""U_Type"",Case when T0.""U_Live""='N' " +
                                      @"then CONCAT(T0.""U_UATUrl"",T1.""U_URL"") Else CONCAT(T0.""U_LIVEUrl"",T1.""U_URL"") End as URL";
                         strSQL += @" ,Case when T0.""U_Live""='N' then T0.""U_UATUrl"" Else T0.""U_LIVEUrl"" End as BaseURL";
                         strSQL += @" from ""@ATEICFG"" T0 join ""@ATEICFG1"" T1 on T0.""Code""=T1.""Code"" where T0.""Code""='01'" +
@@ -1931,9 +1947,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
                         if (objRs.RecordCount > 0)
                         {
-                            ClientCred.CLIENTCODE = objRs.Fields.Item("U_ClientCode").Value.ToString();
-                            ClientCred.USERCODE = objRs.Fields.Item("U_UserCode").Value.ToString();
-                            ClientCred.PASSWORD = objRs.Fields.Item("U_Password").Value.ToString();
+                            ClientCred.CLIENTCODE = ClientCode;
+                            ClientCred.USERCODE = UserCode;
+                            ClientCred.PASSWORD = Password;
                         }
 
                         if (String.IsNullOrEmpty(clsModule.EwayNo))
@@ -2030,7 +2046,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                     string Docseries;
                     clsModule.objaddon.objapplication.StatusBar.SetText("Generating E-Way by IRN. Please wait...", SAPbouiCOM.BoMessageTime.bmt_Long, SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
 
-                    strSQL = @"Select T0.""U_ClientCode"",T0.""U_UserCode"",T0.""U_Password"",T1.""LineId"",T1.""U_URLType"",T1.""U_Type"",T0.""U_UATUrl"",Case when T0.""U_Live""='N' then CONCAT(T0.""U_UATUrl"",T1.""U_URL"") Else CONCAT(T0.""U_LIVEUrl"",T1.""U_URL"") End as URL";
+                    strSQL = @"Select T1.""LineId"",T1.""U_URLType"",T1.""U_Type"",T0.""U_UATUrl"",Case when T0.""U_Live""='N' then CONCAT(T0.""U_UATUrl"",T1.""U_URL"") Else CONCAT(T0.""U_LIVEUrl"",T1.""U_URL"") End as URL";
                     strSQL += @" ,Case when T0.""U_Live""='N' then T0.""U_UATUrl"" Else T0.""U_LIVEUrl"" End as BaseURL,T0.""U_SERCONFIG""";
                     strSQL += @" from ""@ATEICFG"" T0 join ""@ATEICFG1"" T1 on T0.""Code""=T1.""Code"" where T0.""Code""='01'  and T1.""U_URLType"" ='Generate Eway by IRN' and T1.""U_Type""='E-Way' Order by ""LineId"" Desc";
                     objRs.DoQuery(strSQL);
@@ -2040,9 +2056,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
                     GetEwayByIRN clienCred_GetIRN_DocNum = new GetEwayByIRN();
                     if (objRs.RecordCount > 0)
                     {
-                        clienCred_GetIRN_DocNum.CLIENTCODE = objRs.Fields.Item("U_ClientCode").Value.ToString();
-                        clienCred_GetIRN_DocNum.USERCODE = objRs.Fields.Item("U_UserCode").Value.ToString();
-                        clienCred_GetIRN_DocNum.PASSWORD = objRs.Fields.Item("U_Password").Value.ToString();
+                        clienCred_GetIRN_DocNum.CLIENTCODE = ClientCode;
+                        clienCred_GetIRN_DocNum.USERCODE = UserCode;
+                        clienCred_GetIRN_DocNum.PASSWORD = Password;
                         Docseries = objRs.Fields.Item("U_SERCONFIG").Value.ToString();
                         invrecordset = (SAPbobsCOM.Recordset)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
                         string tb = "";
@@ -2132,9 +2148,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             {
                                 decimal CalcDistance = 0;
                                 Generate_EWay distanceEway = new Generate_EWay();
-                                distanceEway.CLIENTCODE = objRs.Fields.Item("U_ClientCode").Value.ToString();
-                                distanceEway.USERCODE = objRs.Fields.Item("U_UserCode").Value.ToString();
-                                distanceEway.PASSWORD = objRs.Fields.Item("U_Password").Value.ToString();
+                                distanceEway.CLIENTCODE = ClientCode;
+                                distanceEway.USERCODE = UserCode;
+                                distanceEway.PASSWORD = Password;
                                 distanceEway.frompincode = invrecordset.Fields.Item("FrmZipCode").Value.ToString();
                                 distanceEway.topincode = invrecordset.Fields.Item("ToZipCode").Value.ToString();
                                 if (string.IsNullOrEmpty(invrecordset.Fields.Item("FrmZipCode").Value.ToString()) || string.IsNullOrEmpty(invrecordset.Fields.Item("ToZipCode").Value.ToString()))
@@ -2314,7 +2330,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 {
                     clsModule.objaddon.objapplication.StatusBar.SetText("Generating E-Way Update Please wait...", SAPbouiCOM.BoMessageTime.bmt_Long, SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
 
-                    strSQL = @"Select T0.""U_ClientCode"",T0.""U_UserCode"",T0.""U_Password"",T1.""LineId"",T1.""U_URLType"",T1.""U_Type"",T0.""U_UATUrl"",Case when T0.""U_Live""='N' then CONCAT(T0.""U_UATUrl"",T1.""U_URL"") Else CONCAT(T0.""U_LIVEUrl"",T1.""U_URL"") End as URL";
+                    strSQL = @"Select T1.""LineId"",T1.""U_URLType"",T1.""U_Type"",T0.""U_UATUrl"",Case when T0.""U_Live""='N' then CONCAT(T0.""U_UATUrl"",T1.""U_URL"") Else CONCAT(T0.""U_LIVEUrl"",T1.""U_URL"") End as URL";
                     strSQL += @" ,Case when T0.""U_Live""='N' then T0.""U_UATUrl"" Else T0.""U_LIVEUrl"" End as BaseURL,T1.""U_URL""";
                     strSQL += @" from ""@ATEICFG"" T0 join ""@ATEICFG1"" T1 on T0.""Code""=T1.""Code"" where T0.""Code""='01'  and T1.""U_URLType"" ='Update Eway' and T1.""U_Type""='E-Way' Order by ""LineId"" Desc";
                     objRs.DoQuery(strSQL);
@@ -2329,9 +2345,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         {
                             clsModule.objaddon.objapplication.StatusBar.SetText("Check API for \"Update Eway\". Need update Transport API and Update Eway API... ", SAPbouiCOM.BoMessageTime.bmt_Long, SAPbouiCOM.BoStatusBarMessageType.smt_Error); return false;
                         }
-                        clienCred_GetIRN_DocNum.CLIENTCODE = objRs.Fields.Item("U_ClientCode").Value.ToString();
-                        clienCred_GetIRN_DocNum.USERCODE = objRs.Fields.Item("U_UserCode").Value.ToString();
-                        clienCred_GetIRN_DocNum.PASSWORD = objRs.Fields.Item("U_Password").Value.ToString();
+                        clienCred_GetIRN_DocNum.CLIENTCODE = ClientCode;
+                        clienCred_GetIRN_DocNum.USERCODE = UserCode;
+                        clienCred_GetIRN_DocNum.PASSWORD = Password;
                         invrecordset = (SAPbobsCOM.Recordset)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
                         string tb = "";
                         string eway = "";
@@ -2388,9 +2404,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         {
 
                             //Generate_EWay distanceEway = new Generate_EWay();
-                            //distanceEway.CLIENTCODE = objRs.Fields.Item("U_ClientCode").Value.ToString();
-                            //distanceEway.USERCODE = objRs.Fields.Item("U_UserCode").Value.ToString();
-                            //distanceEway.PASSWORD = objRs.Fields.Item("U_Password").Value.ToString();
+                            //distanceEway.CLIENTCODE = ClientCode;
+                            //distanceEway.USERCODE = UserCode;
+                            //distanceEway.PASSWORD = Password;
                             //distanceEway.frompincode = invrecordset.Fields.Item("FrmZipCode").Value.ToString();
                             //distanceEway.topincode = invrecordset.Fields.Item("ToZipCode").Value.ToString();
                             //if (string.IsNullOrEmpty(invrecordset.Fields.Item("FrmZipCode").Value.ToString()) || string.IsNullOrEmpty(invrecordset.Fields.Item("ToZipCode").Value.ToString()))
@@ -2468,7 +2484,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 {
                     clsModule.objaddon.objapplication.StatusBar.SetText("Getting IRN. Please wait...", SAPbouiCOM.BoMessageTime.bmt_Long, SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
 
-                    strSQL = @"Select T0.""U_ClientCode"",T0.""U_UserCode"",T0.""U_Password"",T1.""LineId"",T1.""U_URLType"",T1.""U_Type"",T0.""U_SERCONFIG"",Case when T0.""U_Live""='N' then CONCAT(T0.""U_UATUrl"",T1.""U_URL"") Else CONCAT(T0.""U_LIVEUrl"",T1.""U_URL"") End as URL";
+                    strSQL = @"Select T1.""LineId"",T1.""U_URLType"",T1.""U_Type"",T0.""U_SERCONFIG"",Case when T0.""U_Live""='N' then CONCAT(T0.""U_UATUrl"",T1.""U_URL"") Else CONCAT(T0.""U_LIVEUrl"",T1.""U_URL"") End as URL";
                     strSQL += @" ,Case when T0.""U_Live""='N' then T0.""U_UATUrl"" Else T0.""U_LIVEUrl"" End as BaseURL";
                     strSQL += @" from ""@ATEICFG"" T0 join ""@ATEICFG1"" T1 on T0.""Code""=T1.""Code"" where T0.""Code""='01'  and T1.""U_URLType"" ='Get IRN Details by Document number' and T1.""U_Type""='E-Invoice' Order by ""LineId"" Desc";
 
@@ -2482,9 +2498,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
                     if (objRs.RecordCount > 0)
                     {
 
-                        clienCred_GetIRN_DocNum.CLIENTCODE = objRs.Fields.Item("U_ClientCode").Value.ToString();
-                        clienCred_GetIRN_DocNum.USERCODE = objRs.Fields.Item("U_UserCode").Value.ToString();
-                        clienCred_GetIRN_DocNum.PASSWORD = objRs.Fields.Item("U_Password").Value.ToString();
+                        clienCred_GetIRN_DocNum.CLIENTCODE = ClientCode;
+                        clienCred_GetIRN_DocNum.USERCODE = UserCode;
+                        clienCred_GetIRN_DocNum.PASSWORD = Password;
                         Baseurl= objRs.Fields.Item("BaseURL").Value.ToString();
                         if (!String.IsNullOrEmpty(Convert.ToString(objRs.Fields.Item("U_SERCONFIG").Value)))
                         {
@@ -2566,7 +2582,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 }
                 else if (Create_Cancel == EinvoiceMethod.GETIRNDetails)
                 {
-                    strSQL = @"Select T0.""U_ClientCode"",T0.""U_UserCode"",T0.""U_Password"",T1.""LineId"",T1.""U_URLType"",T1.""U_Type"",T0.""U_SERCONFIG"",Case when T0.""U_Live""='N' then CONCAT(T0.""U_UATUrl"",T1.""U_URL"") Else CONCAT(T0.""U_LIVEUrl"",T1.""U_URL"") End as URL";
+                    strSQL = @"Select T1.""LineId"",T1.""U_URLType"",T1.""U_Type"",T0.""U_SERCONFIG"",Case when T0.""U_Live""='N' then CONCAT(T0.""U_UATUrl"",T1.""U_URL"") Else CONCAT(T0.""U_LIVEUrl"",T1.""U_URL"") End as URL";
                     strSQL += @" ,Case when T0.""U_Live""='N' then T0.""U_UATUrl"" Else T0.""U_LIVEUrl"" End as BaseURL,T1.";
                     strSQL += @" from ""@ATEICFG"" T0 join ""@ATEICFG1"" T1 on T0.""Code""=T1.""Code"" where T0.""Code""='01'  and T1.""U_URLType"" ='Get IRN Details' and T1.""U_Type""='E-Invoice' Order by ""LineId"" Desc";
 
@@ -2578,9 +2594,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
                     GetIRN getIRN = new GetIRN();
                     if (objRs.RecordCount > 0)
                     {
-                        getIRN.CLIENTCODE = objRs.Fields.Item("U_ClientCode").Value.ToString();//"ptmuT";
-                        getIRN.USERCODE = objRs.Fields.Item("U_UserCode").Value.ToString();// "Premier_DEMO";
-                        getIRN.PASSWORD = objRs.Fields.Item("U_Password").Value.ToString();//"Premier@123";
+                        getIRN.CLIENTCODE =ClientCode;//"ptmuT";
+                        getIRN.USERCODE = UserCode;// "Premier_DEMO";
+                        getIRN.PASSWORD = Password;//"Premier@123";
                         invrecordset = (SAPbobsCOM.Recordset)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
                         string tb = "";
                         string tbline = "";
