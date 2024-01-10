@@ -66,6 +66,11 @@ namespace EInvoicing_Logitax_API.Common
 
                     }
 
+                    if (string.IsNullOrEmpty(clsModule.EwayNo))
+                    {
+                        Create_DatabaseFieldsAfter();
+                    }
+
                     SetFilters();
                     objapplication.AppEvent += new SAPbouiCOM._IApplicationEvents_AppEventEventHandler(objapplication_AppEvent);
                     objapplication.MenuEvent += new SAPbouiCOM._IApplicationEvents_MenuEventEventHandler(objapplication_MenuEvent);
@@ -190,10 +195,34 @@ namespace EInvoicing_Logitax_API.Common
 
         private void Create_DatabaseFields()
         {
-            objapplication.StatusBar.SetText("Creating Database Fields.Please Wait...", SAPbouiCOM.BoMessageTime.bmt_Long, SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+            try
+            {
+                objapplication.StatusBar.SetText("Creating Database Fields.Please Wait...", SAPbouiCOM.BoMessageTime.bmt_Long, SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+                var objtable = new clsTable();
+                objtable.FieldCreation();
+                objapplication.StatusBar.SetText(" Database Created Successfully...", SAPbouiCOM.BoMessageTime.bmt_Long, SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+            }
+            catch (Exception)
+            {
+                
+            }
+           
+        }
+
+        private void Create_DatabaseFieldsAfter()
+        {
+            try
+            {
+                objapplication.StatusBar.SetText("Creating Database Fields.Please Wait...", SAPbouiCOM.BoMessageTime.bmt_Long, SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
             var objtable = new clsTable();
-            objtable.FieldCreation();
+            objtable.FieldCreationNewversion();
             objapplication.StatusBar.SetText(" Database Created Successfully...", SAPbouiCOM.BoMessageTime.bmt_Long, SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
+            }
+            catch (Exception)
+            {
+
+            }
+
         }
 
         #region Menu Creation Details

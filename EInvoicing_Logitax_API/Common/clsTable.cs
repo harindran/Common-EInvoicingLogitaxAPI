@@ -125,15 +125,18 @@ namespace EInvoicing_Logitax_API.Common
             AddFields("OINV", "GST_RefNo", "GSTRefNum", SAPbobsCOM.BoFieldTypes.db_Alpha, 200);
             AddFields("OINV", "GST_status", "GSTStatus", SAPbobsCOM.BoFieldTypes.db_Numeric);
             AddFields("OINV", "GST_Remarks", "GSTRemarks", SAPbobsCOM.BoFieldTypes.db_Memo);
-
-            AddFields("INV26", "Dispatch_Eway", "Dispatch From Eway Bill", SAPbobsCOM.BoFieldTypes.db_Alpha, 5);
-            AddFields("INV26", "Dispatch_Name", "Dispatch Name", SAPbobsCOM.BoFieldTypes.db_Alpha, 100);
-
+           
         }
 
-        #region Table Creation Common Functions
+        public void FieldCreationNewversion()
+        {
+            AddFields("INV26", "Dispatch_Eway", "Dispatch From Eway Bill", SAPbobsCOM.BoFieldTypes.db_Alpha, 5);
+            AddFields("INV26", "Dispatch_Name", "Dispatch Name", SAPbobsCOM.BoFieldTypes.db_Alpha, 100);
+        }
 
-        private void AddTables(string strTab, string strDesc, SAPbobsCOM.BoUTBTableType nType)
+            #region Table Creation Common Functions
+
+            private void AddTables(string strTab, string strDesc, SAPbobsCOM.BoUTBTableType nType)
         {
             // var oUserTablesMD = default(SAPbobsCOM.UserTablesMD);
             SAPbobsCOM.UserTablesMD oUserTablesMD = null;
@@ -225,7 +228,7 @@ namespace EInvoicing_Logitax_API.Common
             }
             catch (Exception ex)
             {
-                throw ex;
+                //throw ex;
             }
             finally
             {
