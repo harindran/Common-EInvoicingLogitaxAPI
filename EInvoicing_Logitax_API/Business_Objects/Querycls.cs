@@ -487,23 +487,72 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
 
             if (clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_InvTranGetcusAdd\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01'; ") == "Y")
-            {                
-                retstring = retstring + " Cast(COALESCE(ToLoc.\"Building\",'') AS Varchar(200)) || ' '||  COALESCE(ToLoc.\"Street\",'') || ' '|| COALESCE(ToLoc.\"Block\",'') || ' '|| COALESCE(ToLoc.\"Address2\",'') || ' '|| COALESCE(ToLoc.\"Address3\",'')  \"ToAddres1\",";
-                retstring = retstring + " ToLoc.\"Address\" \"ToTraName\",";
+            {
+                retstring += " case when COALESCE(a.\"CardCode\",'') <>'' then ";
+                retstring += " Cast(COALESCE(ToLoc.\"Building\",'') AS Varchar(200)) || ' '||  COALESCE(ToLoc.\"Street\",'') || ' '|| COALESCE(ToLoc.\"Block\",'') || ' '|| COALESCE(ToLoc.\"Address2\",'') || ' '|| COALESCE(ToLoc.\"Address3\",'') ";
+                retstring += " else ";
+                retstring += " Cast(COALESCE(ToLocSub.\"Building\",'') AS Varchar(200)) || ' '|| COALESCE(ToLocSub.\"Street\",'') || ' '|| COALESCE(ToLocSub.\"Block\",'') ";
+                retstring += " End ";
+                retstring += " \"ToAddres1\",";
+
+                retstring += " case when COALESCE(a.\"CardCode\",'') <>'' then ";
+                retstring += " ToLoc.\"Address\" ";
+                retstring += " else ";
+                retstring += " B1.\"CompnyName\" ";
+                retstring += " End ";
+                retstring += " \"ToTraName\",";
+
+                retstring += " case when COALESCE(a.\"CardCode\",'') <>'' then ";
+                retstring += " ToLoc.\"GSTRegnNo\" ";
+                retstring += " else ";
+                retstring += " ToLocSub.\"GSTRegnNo\" ";
+                retstring += " End ";
+                retstring +=" \"ToGSTN\", ";
+
+                retstring += " '' \"ToAddres2\", ";
+
+
+                retstring += " case when COALESCE(a.\"CardCode\",'') <>'' then ";
+                retstring += " ToLoc.\"City\" ";
+                retstring += " else ";
+                retstring += " ToLocSub.\"City\" ";
+                retstring += " End ";
+                retstring += " \"ToPlace\", ";
+
+                retstring += " case when COALESCE(a.\"CardCode\",'') <>'' then ";
+                retstring += " Replace(ToLoc.\"ZipCode\",' ','') ";
+                retstring += " else ";
+                retstring += " Replace(ToLocSub.\"ZipCode\",' ','') ";
+                retstring += " End ";
+                retstring += " \"ToZipCode\", ";
+
+
+                retstring += " case when COALESCE(a.\"CardCode\",'') <>'' then ";
+                retstring += " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ToLoc.\"Country\" and \"Code\"=ToLoc.\"State\") ";
+                retstring += " else ";
+                retstring += " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ToLocSub.\"Country\" and \"Code\"=ToLocSub.\"State\") ";
+                retstring += " End ";
+                retstring += " \"ActToState\", ";
+
+                retstring += " case when COALESCE(a.\"CardCode\",'') <>'' then ";
+                retstring += " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ToLoc.\"Country\" and \"Code\"=ToLoc.\"State\") ";
+                retstring += " else ";
+                retstring += " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ToLocSub.\"Country\" and \"Code\"=ToLocSub.\"State\") ";
+                retstring += " End ";
+                retstring += " \"ToState\", ";
+             
             }
             else
             {
                 retstring = retstring + " Cast(COALESCE(ToLoc.\"Building\",'') AS Varchar(200)) || ' '|| COALESCE(ToLoc.\"Street\",'') || ' '|| COALESCE(ToLoc.\"Block\",'')  \"ToAddres1\",";
                 retstring = retstring + " B1.\"CompnyName\" \"ToTraName\",";
+
+                retstring = retstring + " ToLoc.\"GSTRegnNo\" \"ToGSTN\",";
+                retstring = retstring + " '' \"ToAddres2\", ";
+                retstring = retstring + " ToLoc.\"City\" \"ToPlace\", Replace(ToLoc.\"ZipCode\",' ','') \"ToZipCode\",";
+                retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ToLoc.\"Country\" and \"Code\"=ToLoc.\"State\") \"ActToState\",";
+                retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ToLoc.\"Country\" and \"Code\"=ToLoc.\"State\") \"ToState\",";
             }
-
-
-            retstring = retstring + " ToLoc.\"GSTRegnNo\" \"ToGSTN\",";
-           
-            retstring = retstring + " '' \"ToAddres2\", ";
-            retstring = retstring + " ToLoc.\"City\" \"ToPlace\", Replace(ToLoc.\"ZipCode\",' ','') \"ToZipCode\",";
-            retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ToLoc.\"Country\" and \"Code\"=ToLoc.\"State\") \"ActToState\",";
-            retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ToLoc.\"Country\" and \"Code\"=ToLoc.\"State\") \"ToState\",";
 
 
             if (String.IsNullOrEmpty(clsModule.EwayNo))
@@ -604,9 +653,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 retstring = retstring + " LEFT JOIN OLCT ToLoc ON ToLoc.\"Code\" =ToAdd.\"Location\"";
             }
 
-            
 
-            
+            retstring = retstring + " LEFT JOIN OLCT ToLocSub ON ToLocSub.\"Code\" =ToAdd.\"Location\"";
+
 
             retstring = retstring + " LEFT JOIN(SELECT \"BankName\" \"CBankName\",Y.\"BankCode\" \"CBankCode\",\"Branch\" \"CBranch\", \"Account\" \"CAccount\",\"AcctName\" \"CAcctName\",";
             retstring = retstring + " X.\"SwiftNum\" \"CIFSCNo\" FROM DSC1 X,ODSC Y Where X.\"AbsEntry\"=Y.\"AbsEntry\" ) B2 On B2.\"CBankCode\"=B1.\"DflBnkCode\"";

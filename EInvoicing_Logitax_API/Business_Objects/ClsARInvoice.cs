@@ -2116,10 +2116,10 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             if (!String.IsNullOrEmpty(clsModule.EwayNo))
                             {
                                 string distance = "0";
-                                if (invrecordset.Fields.Item("FrmZipCode").Value.ToString() == invrecordset.Fields.Item("ToZipCode").Value.ToString())
-                                {
-                                    distance = "1";
-                                }
+                                //if (invrecordset.Fields.Item("FrmZipCode").Value.ToString() == invrecordset.Fields.Item("ToZipCode").Value.ToString())
+                                //{
+                                //    distance = "1";
+                                //}
                                 if (clsModule.objaddon.objglobalmethods.Ctoint(invrecordset.Fields.Item(clsModule.EwayDistance).Value.ToString()) > 0)
                                 {
                                     distance = invrecordset.Fields.Item(clsModule.EwayDistance).Value.ToString();
