@@ -40,7 +40,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
         {
             CheckBox0.Item.Top = StaticText0.Item.Top;
             CheckBox0.Item.Left = StaticText0.Item.Left+ StaticText0.Item.Width+5;
-           
+            CheckBox0.Item.Click();
 
         }
 

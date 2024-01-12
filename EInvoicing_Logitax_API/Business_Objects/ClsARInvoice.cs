@@ -2158,10 +2158,10 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                     clsModule.objaddon.objapplication.StatusBar.SetText("Zip Code Missing E-way Details Page.... ", SAPbouiCOM.BoMessageTime.bmt_Long, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
                                     return false;
                                 }
-                                if (invrecordset.Fields.Item("FrmZipCode").Value.ToString() == invrecordset.Fields.Item("ToZipCode").Value.ToString())
-                                {
-                                    CalcDistance = 1;
-                                }
+                                //if (invrecordset.Fields.Item("FrmZipCode").Value.ToString() == invrecordset.Fields.Item("ToZipCode").Value.ToString())
+                                //{
+                                //    CalcDistance = 1;
+                                //}
 
                                 if (clsModule.objaddon.objglobalmethods.Ctoint(invrecordset.Fields.Item("Distance").Value.ToString()) > 0)
                                 {

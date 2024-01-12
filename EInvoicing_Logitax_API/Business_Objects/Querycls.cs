@@ -102,7 +102,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring + " a.\"DocDueDate\" \"Inv Due Date\", a.\"NumAtCard\", a.\"Printed\",a.\"PayToCode\", a.\"ShipToCode\", a.\"Comments\" ,Left(Replace(o.\"ChapterID\",'.','')," + HSNLength + ") \"ChapterID\" , A.\"DiscSum\", A.\"RoundDif\",";
             retstring = retstring + " b.\"DiscPrcnt\",((b.\"PriceBefDi\"*\"Quantity\") * (b.\"DiscPrcnt\"/100)) \"LineDisc\",l.\"InvntryUom\" ,IFNULL(a.\"RoundDif\",0) \"Rounding\", a.\"TaxDate\" \"Cust Order Date\", a.\"TotalExpns\",l.\"FrgnName\",a.\"DocCur\",A.\"VatSum\", a.\"TotalExpns\" \"Freight\",";
-            retstring = retstring + " l.\"SalUnitMsr\",IFNULL(b.\"LineTotal\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Line Total\", IFNULL(a.\"TotalExpns\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Freight Total\",IFNULL(a.\"DiscSum\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Disc Total\",l.\"ItemClass\", ";
+            retstring = retstring + " l.\"SalUnitMsr\",IFNULL(b.\"LineTotal\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Line Total\", IFNULL(a.\"TotalExpns\",0) \"Freight Total\",IFNULL(a.\"DiscSum\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Disc Total\",l.\"ItemClass\", ";
 
             if (String.IsNullOrEmpty(clsModule.EwayNo))
             {
@@ -275,7 +275,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring + " a.\"DocDueDate\" \"Inv Due Date\", a.\"NumAtCard\", a.\"Printed\",a.\"PayToCode\", a.\"ShipToCode\", a.\"Comments\" ,Left(Replace(o.\"ChapterID\",'.','')," + HSNLength + ") \"ChapterID\" , A.\"DiscSum\", A.\"RoundDif\",";
             retstring = retstring + " b.\"DiscPrcnt\",((b.\"PriceBefDi\"*\"Quantity\") * (b.\"DiscPrcnt\"/100)) \"LineDisc\",l.\"InvntryUom\" ,IFNULL(a.\"RoundDif\",0) \"Rounding\", a.\"TaxDate\" \"Cust Order Date\", a.\"TotalExpns\",l.\"FrgnName\",a.\"DocCur\",A.\"VatSum\", a.\"TotalExpns\" \"Freight\",";
-            retstring = retstring + " l.\"SalUnitMsr\",  IFNULL(b.\"LineTotal\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Line Total\", IFNULL(a.\"TotalExpns\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Freight Total\",IFNULL(a.\"DiscSum\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Disc Total\",l.\"ItemClass\", ";
+            retstring = retstring + " l.\"SalUnitMsr\",  IFNULL(b.\"LineTotal\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Line Total\", IFNULL(a.\"TotalExpns\",0) \"Freight Total\",IFNULL(a.\"DiscSum\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Disc Total\",l.\"ItemClass\", ";
           
             if (String.IsNullOrEmpty(clsModule.EwayNo))
             {
@@ -461,7 +461,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
           
             retstring = retstring + " a.\"DocDueDate\" \"Inv Due Date\", a.\"NumAtCard\", a.\"Printed\",a.\"PayToCode\", a.\"ShipToCode\", a.\"Comments\" ,Left(Replace(o.\"ChapterID\",'.','')," + HSNLength + ") \"ChapterID\" , A.\"DiscSum\", A.\"RoundDif\",";
             retstring = retstring + " b.\"DiscPrcnt\",((b.\"PriceBefDi\"*\"Quantity\") * (b.\"DiscPrcnt\"/100)) \"LineDisc\",l.\"InvntryUom\" ,IFNULL(a.\"RoundDif\",0) \"Rounding\", a.\"TaxDate\" \"Cust Order Date\", a.\"TotalExpns\",l.\"FrgnName\",a.\"DocCur\",A.\"VatSum\", a.\"TotalExpns\" \"Freight\",";
-            retstring = retstring + " l.\"SalUnitMsr\",IFNULL(b.\"LineTotal\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Line Total\", IFNULL(a.\"TotalExpns\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Freight Total\",IFNULL(a.\"DiscSum\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Disc Total\",l.\"ItemClass\", ";
+            retstring = retstring + " l.\"SalUnitMsr\",IFNULL(b.\"LineTotal\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Line Total\", IFNULL(a.\"TotalExpns\",0) \"Freight Total\",IFNULL(a.\"DiscSum\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Disc Total\",l.\"ItemClass\", ";
 
             if (clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_InvTranGetBrnchAdd\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01'; ") == "Y")
             {
@@ -753,7 +753,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
           
             retstring = retstring + " a.\"DocDueDate\" \"Inv Due Date\", a.\"NumAtCard\", a.\"Printed\",a.\"PayToCode\", a.\"ShipToCode\", a.\"Comments\" ,Left(Replace(o.\"ChapterID\",'.','')," + HSNLength + ") \"ChapterID\" , A.\"DiscSum\", A.\"RoundDif\",";
             retstring = retstring + " b.\"DiscPrcnt\",((b.\"PriceBefDi\"*\"Quantity\") * (b.\"DiscPrcnt\"/100)) \"LineDisc\",l.\"InvntryUom\" ,IFNULL(a.\"RoundDif\",0) \"Rounding\", a.\"TaxDate\" \"Cust Order Date\", a.\"TotalExpns\",l.\"FrgnName\",a.\"DocCur\",A.\"VatSum\", a.\"TotalExpns\" \"Freight\",";
-            retstring = retstring + " l.\"SalUnitMsr\",IFNULL(b.\"LineTotal\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Line Total\", IFNULL(a.\"TotalExpns\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Freight Total\",IFNULL(a.\"DiscSum\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Disc Total\",l.\"ItemClass\", ";
+            retstring = retstring + " l.\"SalUnitMsr\",IFNULL(b.\"LineTotal\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Line Total\", IFNULL(a.\"TotalExpns\",0) \"Freight Total\",IFNULL(a.\"DiscSum\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Disc Total\",l.\"ItemClass\", ";
 
             if (String.IsNullOrEmpty(clsModule.EwayNo))
             {
@@ -925,7 +925,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
           
             retstring = retstring + " a.\"DocDueDate\" \"Inv Due Date\", a.\"NumAtCard\", a.\"Printed\",a.\"PayToCode\", a.\"ShipToCode\", a.\"Comments\" ,Left(Replace(o.\"ChapterID\",'.','')," + HSNLength + ") \"ChapterID\" , A.\"DiscSum\", A.\"RoundDif\",";
             retstring = retstring + " b.\"DiscPrcnt\",((b.\"PriceBefDi\"*\"Quantity\") * (b.\"DiscPrcnt\"/100)) \"LineDisc\",l.\"InvntryUom\" ,IFNULL(a.\"RoundDif\",0) \"Rounding\", a.\"TaxDate\" \"Cust Order Date\", a.\"TotalExpns\",l.\"FrgnName\",a.\"DocCur\",A.\"VatSum\", a.\"TotalExpns\" \"Freight\",";
-            retstring = retstring + " l.\"SalUnitMsr\",IFNULL(b.\"LineTotal\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Line Total\", IFNULL(a.\"TotalExpns\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Freight Total\",IFNULL(a.\"DiscSum\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Disc Total\",l.\"ItemClass\", ";
+            retstring = retstring + " l.\"SalUnitMsr\",IFNULL(b.\"LineTotal\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Line Total\", IFNULL(a.\"TotalExpns\",0) \"Freight Total\",IFNULL(a.\"DiscSum\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Disc Total\",l.\"ItemClass\", ";
 
             if (String.IsNullOrEmpty(clsModule.EwayNo))
             {
@@ -1096,7 +1096,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring + " a.\"DocDueDate\" \"Inv Due Date\", a.\"NumAtCard\", a.\"Printed\",a.\"PayToCode\", a.\"ShipToCode\", a.\"Comments\" ,Left(Replace(o.\"ChapterID\",'.','')," + HSNLength + ") \"ChapterID\" , A.\"DiscSum\", A.\"RoundDif\",";
             retstring = retstring + " b.\"DiscPrcnt\",((b.\"PriceBefDi\"*\"Quantity\") * (b.\"DiscPrcnt\"/100)) \"LineDisc\",l.\"InvntryUom\" ,IFNULL(a.\"RoundDif\",0) \"Rounding\", a.\"TaxDate\" \"Cust Order Date\", a.\"TotalExpns\",l.\"FrgnName\",a.\"DocCur\",A.\"VatSum\", a.\"TotalExpns\" \"Freight\",";
-            retstring = retstring + " l.\"SalUnitMsr\",IFNULL(b.\"LineTotal\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Line Total\", IFNULL(a.\"TotalExpns\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Freight Total\",IFNULL(a.\"DiscSum\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Disc Total\",l.\"ItemClass\", ";
+            retstring = retstring + " l.\"SalUnitMsr\",IFNULL(b.\"LineTotal\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Line Total\", IFNULL(a.\"TotalExpns\",0) \"Freight Total\",IFNULL(a.\"DiscSum\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Disc Total\",l.\"ItemClass\", ";
 
             if (String.IsNullOrEmpty(clsModule.EwayNo))
             {
@@ -1265,7 +1265,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring + " a.\"DocDueDate\" \"Inv Due Date\", a.\"NumAtCard\", a.\"Printed\",a.\"PayToCode\", a.\"ShipToCode\", a.\"Comments\" ,Left(Replace(o.\"ChapterID\",'.','')," + HSNLength + ") \"ChapterID\" , A.\"DiscSum\", A.\"RoundDif\",";
             retstring = retstring + " b.\"DiscPrcnt\",((b.\"PriceBefDi\"*\"Quantity\") * (b.\"DiscPrcnt\"/100)) \"LineDisc\",l.\"InvntryUom\" ,IFNULL(a.\"RoundDif\",0) \"Rounding\", a.\"TaxDate\" \"Cust Order Date\", a.\"TotalExpns\",l.\"FrgnName\",a.\"DocCur\",A.\"VatSum\", a.\"TotalExpns\" \"Freight\",";
-            retstring = retstring + " l.\"SalUnitMsr\",IFNULL(b.\"LineTotal\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Line Total\", IFNULL(a.\"TotalExpns\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Freight Total\",IFNULL(a.\"DiscSum\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Disc Total\",l.\"ItemClass\", ";
+            retstring = retstring + " l.\"SalUnitMsr\",IFNULL(b.\"LineTotal\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Line Total\", IFNULL(a.\"TotalExpns\",0) \"Freight Total\",IFNULL(a.\"DiscSum\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Disc Total\",l.\"ItemClass\", ";
 
             if (String.IsNullOrEmpty(clsModule.EwayNo))
             {
@@ -1434,7 +1434,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring + " a.\"DocDueDate\" \"Inv Due Date\", a.\"NumAtCard\", a.\"Printed\",a.\"PayToCode\", a.\"ShipToCode\", a.\"Comments\" ,Left(Replace(o.\"ChapterID\",'.','')," + HSNLength + ") \"ChapterID\" , A.\"DiscSum\", A.\"RoundDif\",";
             retstring = retstring + " b.\"DiscPrcnt\",((b.\"PriceBefDi\"*\"Quantity\") * (b.\"DiscPrcnt\"/100)) \"LineDisc\",l.\"InvntryUom\" ,IFNULL(a.\"RoundDif\",0) \"Rounding\", a.\"TaxDate\" \"Cust Order Date\", a.\"TotalExpns\",l.\"FrgnName\",a.\"DocCur\",A.\"VatSum\", a.\"TotalExpns\" \"Freight\",";
-            retstring = retstring + " l.\"SalUnitMsr\",IFNULL(b.\"LineTotal\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Line Total\", IFNULL(a.\"TotalExpns\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Freight Total\",IFNULL(a.\"DiscSum\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Disc Total\",l.\"ItemClass\", ";
+            retstring = retstring + " l.\"SalUnitMsr\",IFNULL(b.\"LineTotal\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Line Total\", IFNULL(a.\"TotalExpns\",0) \"Freight Total\",IFNULL(a.\"DiscSum\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Disc Total\",l.\"ItemClass\", ";
 
             if (String.IsNullOrEmpty(clsModule.EwayNo))
             {
