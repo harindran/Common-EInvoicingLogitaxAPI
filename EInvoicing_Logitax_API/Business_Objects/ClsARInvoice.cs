@@ -873,12 +873,13 @@ namespace EInvoicing_Logitax_API.Business_Objects
             string ClientCode = "";
             string UserCode = "";
             string Password = "";
+            bool Getbranch = false;
                     
             try
             {
 
 
-                SAPbobsCOM.Recordset invrecordset, Freightrecset;
+                SAPbobsCOM.Recordset invrecordset, Freightrecset,disRecset,RSbranch;
                 objRs = (SAPbobsCOM.Recordset)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
                 Freightrecset = (SAPbobsCOM.Recordset)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
 
@@ -892,6 +893,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                     Password = objRs.Fields.Item("U_Password").Value.ToString();
                 }
 
+             
 
 
                 if (Create_Cancel == EinvoiceMethod.CreateIRN)
@@ -905,10 +907,30 @@ namespace EInvoicing_Logitax_API.Business_Objects
                     invrecordset.DoQuery(strSQL);
                     if (invrecordset.RecordCount > 0)
                     {
+
+                        strSQL = @"Select T0.""U_ClientCode"",T0.""U_UserCode"",T0.""U_Password"" from ""OBPL"" T0 ";
+                        strSQL += @" where T0.""BPLId"" ='" + invrecordset.Fields.Item("BPLId").Value.ToString() + "'";
+
+                        objRs.DoQuery(strSQL);
+                        if (objRs.RecordCount > 0)
+                        {
+                            if (!string.IsNullOrEmpty(objRs.Fields.Item("U_ClientCode").Value.ToString()))
+                            {
+                                ClientCode = objRs.Fields.Item("U_ClientCode").Value.ToString();
+                                UserCode = objRs.Fields.Item("U_UserCode").Value.ToString();
+                                Password = objRs.Fields.Item("U_Password").Value.ToString();
+                                Getbranch = true;
+                            }
+                        }
+
+
+
+
+
                         Double Calcdistance = 0;
                         strSQL = @"Select T1.""LineId"",T1.""U_URLType"",T1.""U_Type"",Case when T0.""U_Live""='N' then CONCAT(T0.""U_UATUrl"",T1.""U_URL"") Else CONCAT(T0.""U_LIVEUrl"",T1.""U_URL"") End as URL";
-                        strSQL += @" ,""U_GetCompAdd"",""U_Gettran"" ";
-                        strSQL += @" ,Case when T0.""U_Live""='N' then T0.""U_UATUrl"" Else T0.""U_LIVEUrl"" End as BaseURL";
+                        strSQL += @" ,""U_GetCompAdd"",""U_Gettran"",""U_GetDisAddWare"", ";
+                        strSQL += @" Case when T0.""U_Live""='N' then T0.""U_UATUrl"" Else T0.""U_LIVEUrl"" End as BaseURL";
                         strSQL += @" from ""@ATEICFG"" T0 join ""@ATEICFG1"" T1 on T0.""Code""=T1.""Code"" where T0.""Code""='01' and T1.""U_URLType"" ='Generate IRN' and T1.""U_Type""='E-Invoice' Order by ""LineId"" Desc";
                         objRs.DoQuery(strSQL);
                         if (objRs.RecordCount == 0)
@@ -1034,15 +1056,68 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         #region "Seller"
                         if (objRs.Fields.Item("U_GetCompAdd").Value.ToString() != "Y")
                         {
+                            if (Getbranch)
+                            {
+
+                                string BranchAddress1 = "";
+                                string BranchAddress2 = "";
+
+                             
+                                strSQL = "Select \"TaxIdNum\" AS \"GST\",\"BPLName\"  AS \"SellerName\", ";
+                                strSQL +=" \"Building\" ,\"Block\" ,\"Street\",\"City\" ,\"ZipCode\",  COALESCE(\"GSTCode\", '96') AS \"Statecode\" from \"OBPL\" T0 ";
+                                strSQL = strSQL + " LEFT JOIN OCST st on st.\"Code\"=T0.\"State\" and st.\"Country\"=T0.\"Country\" ";
+                                strSQL += @" where T0.""BPLId"" ='" + invrecordset.Fields.Item("BPLId").Value.ToString() + "'";
+
+                                
+
+                                RSbranch = clsModule.objaddon.objglobalmethods.GetmultipleRS(strSQL);
+                                if (RSbranch.RecordCount > 0)
+                                {
+
+                                    string BranchrconcatAddress = string.Concat(RSbranch.Fields.Item("Building").Value.ToString(), " ",
+                                                                 RSbranch.Fields.Item("Block").Value.ToString(), " ",
+                                                                 RSbranch.Fields.Item("Street").Value.ToString());
+
+                                    List<string> Branchsubstrings = clsModule.objaddon.objglobalmethods.SplitByLength(BranchrconcatAddress, 70);
+
+                                    foreach (string substring in Branchsubstrings)
+                                    {
+                                        if (string.IsNullOrEmpty(BranchAddress1))
+                                        {
+                                            BranchAddress1 = substring;
+                                            continue;
+                                        }
+                                        if (string.IsNullOrEmpty(BranchAddress2))
+                                        {
+                                            BranchAddress2 = substring;
+                                            continue;
+                                        }
+                                    }
+
+                                    GenerateIRNGetJson.json_data.SellerDtls.Gstin = RSbranch.Fields.Item("GST").Value.ToString();
+                                    GenerateIRNGetJson.json_data.SellerDtls.LglNm = RSbranch.Fields.Item("SellerName").Value.ToString();
+                                    GenerateIRNGetJson.json_data.SellerDtls.Addr1 = BranchAddress1;
+                                    GenerateIRNGetJson.json_data.SellerDtls.Addr2 = BranchAddress2;
+                                    GenerateIRNGetJson.json_data.SellerDtls.Loc = RSbranch.Fields.Item("City").Value.ToString();
+                                    GenerateIRNGetJson.json_data.SellerDtls.Pin = RSbranch.Fields.Item("ZipCode").Value.ToString();
+                                    GenerateIRNGetJson.json_data.SellerDtls.Stcd = RSbranch.Fields.Item("Statecode").Value.ToString();
+                                }
+
+                            }
+                            else
+                            {
+                                GenerateIRNGetJson.json_data.SellerDtls.Gstin = invrecordset.Fields.Item("Seller GSTN").Value.ToString();
+                                GenerateIRNGetJson.json_data.SellerDtls.LglNm = invrecordset.Fields.Item("Seller_Legal Name").Value.ToString();
+                                GenerateIRNGetJson.json_data.SellerDtls.Addr1 = sellerAddress1;
+                                GenerateIRNGetJson.json_data.SellerDtls.Addr2 = sellerAddress2;
+                                GenerateIRNGetJson.json_data.SellerDtls.Loc = invrecordset.Fields.Item("Seller Location Name").Value.ToString();
+                                GenerateIRNGetJson.json_data.SellerDtls.Pin = invrecordset.Fields.Item("Seller_PIN code").Value.ToString();
+                                GenerateIRNGetJson.json_data.SellerDtls.Stcd = invrecordset.Fields.Item("Seller_State_code").Value.ToString();
+                            }
 
 
-                            GenerateIRNGetJson.json_data.SellerDtls.Gstin = invrecordset.Fields.Item("Seller GSTN").Value.ToString();
-                            GenerateIRNGetJson.json_data.SellerDtls.LglNm = invrecordset.Fields.Item("Seller_Legal Name").Value.ToString();
-                            GenerateIRNGetJson.json_data.SellerDtls.Addr1 = sellerAddress1;
-                            GenerateIRNGetJson.json_data.SellerDtls.Addr2 = sellerAddress2;
-                            GenerateIRNGetJson.json_data.SellerDtls.Loc = invrecordset.Fields.Item("Seller Location Name").Value.ToString();
-                            GenerateIRNGetJson.json_data.SellerDtls.Pin = invrecordset.Fields.Item("Seller_PIN code").Value.ToString();
-                            GenerateIRNGetJson.json_data.SellerDtls.Stcd = invrecordset.Fields.Item("Seller_State_code").Value.ToString();
+
+
                         }
                         else
                         {
@@ -1110,17 +1185,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                         }
                                     }
 
-                                    if (invrecordset.Fields.Item("DisEway").Value.ToString()=="N")
-                                    {                                        
-                                        GenerateIRNGetJson.json_data.DispDtls.Nm = invrecordset.Fields.Item("Seller_Legal Name").Value.ToString();
-                                        GenerateIRNGetJson.json_data.DispDtls.Addr1 = sellerAddress1;
-                                        GenerateIRNGetJson.json_data.DispDtls.Addr2 = sellerAddress2;
-                                        GenerateIRNGetJson.json_data.DispDtls.Loc = invrecordset.Fields.Item("CompnyCity").Value.ToString();
-                                        GenerateIRNGetJson.json_data.DispDtls.Pin = invrecordset.Fields.Item("CompnyPincode").Value.ToString();
-                                        GenerateIRNGetJson.json_data.DispDtls.Stcd = invrecordset.Fields.Item("Compnystatecode").Value.ToString();
-                                    }
-                                    else
+                                    if (invrecordset.Fields.Item("DisEway").Value.ToString() == "Y")
                                     {
+
                                         GenerateIRNGetJson.json_data.DispDtls.Nm = invrecordset.Fields.Item("FrmTraName").Value.ToString();
                                         if (!string.IsNullOrEmpty(invrecordset.Fields.Item("DisName").Value.ToString()))
                                         {
@@ -1134,8 +1201,66 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                         GenerateIRNGetJson.json_data.DispDtls.Stcd = invrecordset.Fields.Item("ActFrmStat").Value.ToString();
 
                                     }
-                                   
+                                    else
+                                    {
+
+                                        if (objRs.Fields.Item("U_GetDisAddWare").Value.ToString() == "Y")
+                                        {
+                                            string diswarequery = "SELECT \"Building\" ,\"Block\" ,\"Street\" ,\"Address2\" ,\"Address3\" , ";
+                                            diswarequery += " \"City\" ,\"ZipCode\" , COALESCE(\"GSTCode\",'96') as \"Statecode\"  ";
+                                            diswarequery += "FROM OWHS o ";
+                                            diswarequery += " LEFT JOIN OCST st1 on st1.\"Code\"=o.\"State\" and st1.\"Country\"=o.\"Country\" ";
+                                            diswarequery += " WHERE \"WhsCode\" IN(SELECT \"WhsCode\"  FROM inv1 WHERE  \"DocEntry\" = '" + DocEntry + "'); ";
+
+                                            disRecset = clsModule.objaddon.objglobalmethods.GetmultipleRS(diswarequery);
+                                            if (disRecset.RecordCount > 0)
+                                            {
+                                                string DisAddress1 = "";
+                                                string DisAddress2 = "";
+                                                string DisconcatAddress = string.Concat(disRecset.Fields.Item("Building").Value.ToString(), " ",
+                                                                                    disRecset.Fields.Item("Block").Value.ToString(), " ",
+                                                                                    disRecset.Fields.Item("Street").Value.ToString(), " ",
+                                                                                    disRecset.Fields.Item("Address2").Value.ToString(), " ",
+                                                                                    disRecset.Fields.Item("Address3").Value.ToString());
+                                                List<string> Dissubstrings = clsModule.objaddon.objglobalmethods.SplitByLength(DisconcatAddress, 70);
+                                                foreach (string substring in Dissubstrings)
+                                                {
+                                                    if (string.IsNullOrEmpty(DisAddress1))
+                                                    {
+                                                        DisAddress1 = substring;
+                                                        continue;
+                                                    }
+                                                    if (string.IsNullOrEmpty(DisAddress2))
+                                                    {
+                                                        DisAddress2 = substring;
+                                                        continue;
+                                                    }
+                                                }
+
+                                                GenerateIRNGetJson.json_data.DispDtls.Nm = invrecordset.Fields.Item("Seller_Legal Name").Value.ToString();
+                                                GenerateIRNGetJson.json_data.DispDtls.Addr1 = DisAddress1;
+                                                GenerateIRNGetJson.json_data.DispDtls.Addr2 = DisAddress2;
+                                                GenerateIRNGetJson.json_data.DispDtls.Loc = disRecset.Fields.Item("City").Value.ToString();
+                                                GenerateIRNGetJson.json_data.DispDtls.Pin = disRecset.Fields.Item("ZipCode").Value.ToString();
+                                                GenerateIRNGetJson.json_data.DispDtls.Stcd = disRecset.Fields.Item("Statecode").Value.ToString();
+                                            }
+
+                                        }
+                                        else
+                                        {
+                                            GenerateIRNGetJson.json_data.DispDtls.Nm = invrecordset.Fields.Item("Seller_Legal Name").Value.ToString();
+                                            GenerateIRNGetJson.json_data.DispDtls.Addr1 = sellerAddress1;
+                                            GenerateIRNGetJson.json_data.DispDtls.Addr2 = sellerAddress2;
+                                            GenerateIRNGetJson.json_data.DispDtls.Loc = invrecordset.Fields.Item("CompnyCity").Value.ToString();
+                                            GenerateIRNGetJson.json_data.DispDtls.Pin = invrecordset.Fields.Item("CompnyPincode").Value.ToString();
+                                            GenerateIRNGetJson.json_data.DispDtls.Stcd = invrecordset.Fields.Item("Compnystatecode").Value.ToString();
+                                        }
+
+                                    }
                                 }
+
+
+                                    
                             }
                         }
                         #endregion
@@ -1213,36 +1338,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
 
 
-                        /*  string shipAddress1 = "";
-                         string shipAddress2 = "";
-                         string shipconcatAddress = string.Concat(invrecordset.Fields.Item("Ship_Building").Value.ToString(),
-                                                             invrecordset.Fields.Item("Ship_Block").Value.ToString(),
-                                                             invrecordset.Fields.Item("Ship_Street").Value.ToString(),
-                                                             invrecordset.Fields.Item("Ship_Address2").Value.ToString(),
-                                                             invrecordset.Fields.Item("Ship_Address3").Value.ToString());
-                         List<string> shipsubstrings = clsModule.objaddon.objglobalmethods.SplitByLength(shipconcatAddress, 70);
-                         foreach (string substring in shipsubstrings)
-                         {
-                             if (string.IsNullOrEmpty(shipAddress1))
-                             {
-                                 shipAddress1 = substring;
-                                 continue;
-                             }
-                             if (string.IsNullOrEmpty(shipAddress2))
-                             {
-                                 shipAddress2 = substring;
-                                 continue;
-                             }
-                         }
-
-                         GenerateIRNGetJson.json_data.ShipDtls.Gstin = invrecordset.Fields.Item("Buyer GSTN").Value.ToString();
-                         GenerateIRNGetJson.json_data.ShipDtls.LglNm = invrecordset.Fields.Item("Buyer_Legal Name").Value.ToString();
-                         GenerateIRNGetJson.json_data.ShipDtls.Addr1 = shipAddress1;
-                         GenerateIRNGetJson.json_data.ShipDtls.Addr2 = shipAddress2;
-                         GenerateIRNGetJson.json_data.ShipDtls.Loc = invrecordset.Fields.Item("SCity").Value.ToString();
-                         GenerateIRNGetJson.json_data.ShipDtls.Pin = invrecordset.Fields.Item("SZipCode").Value.ToString();
-                         GenerateIRNGetJson.json_data.ShipDtls.Stcd = invrecordset.Fields.Item("Shipp to State Code").Value.ToString();
-                         */
+                        
                         if (String.IsNullOrEmpty(clsModule.EwayNo))
                         {
                             if (!(string.IsNullOrEmpty(invrecordset.Fields.Item("ToGSTN").Value.ToString()) || string.IsNullOrEmpty(invrecordset.Fields.Item("ToAddres1").Value.ToString())))
@@ -1368,6 +1464,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         //GenerateIRNGetJson.json_data.ValDtls.Discount =Convert.ToDecimal(invrecordset.Fields.Item("Disc Total").Value.ToString()); no uncommet
 
                         GenerateIRNGetJson.json_data.ValDtls.AssVal =Convert.ToDecimal(invrecordset.Fields.Item("AssValN").Value.ToString());
+
+                        GenerateIRNGetJson.json_data.ValDtls.OthChrg =Convert.ToDecimal(invrecordset.Fields.Item("OthrAmt").Value.ToString());
+
                         GenerateIRNGetJson.json_data.ValDtls.TotInvVal =Convert.ToDecimal(invrecordset.Fields.Item("Doc Total").Value.ToString());
                         GenerateIRNGetJson.json_data.ValDtls.RndOffAmt =Convert.ToDecimal(invrecordset.Fields.Item("RoundDif").Value.ToString());
 
@@ -1595,9 +1694,14 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         datatable = Get_API_Response(requestParams, objRs.Fields.Item("URL").Value.ToString());
                         E_Invoice_Logs(DocEntry, datatable, TransType, "Create", Type, requestParams);
 
-                        string msg = datatable.Rows[0]["message"].ToString();
-                        if (datatable.Rows[0]["error_log_ids"].ToString() == string.Empty)
+                        string msg =columnFind(datatable,"message",0);
+                        msg += columnFind(datatable, "error", 0);
+                        msg += columnFind(datatable, "error_log_ids", 0);
+
+                        if (string.IsNullOrEmpty(msg))
                         {
+                            
+                          
                             clsModule.objaddon.objapplication.StatusBar.SetText("Generate: " + msg, SAPbouiCOM.BoMessageTime.bmt_Medium, SAPbouiCOM.BoStatusBarMessageType.smt_None);
 
                         }
@@ -2047,7 +2151,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                     clsModule.objaddon.objapplication.StatusBar.SetText("Generating E-Way by IRN. Please wait...", SAPbouiCOM.BoMessageTime.bmt_Long, SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
 
                     strSQL = @"Select T1.""LineId"",T1.""U_URLType"",T1.""U_Type"",T0.""U_UATUrl"",Case when T0.""U_Live""='N' then CONCAT(T0.""U_UATUrl"",T1.""U_URL"") Else CONCAT(T0.""U_LIVEUrl"",T1.""U_URL"") End as URL";
-                    strSQL += @" ,Case when T0.""U_Live""='N' then T0.""U_UATUrl"" Else T0.""U_LIVEUrl"" End as BaseURL,T0.""U_SERCONFIG""";
+                    strSQL += @" ,Case when T0.""U_Live""='N' then T0.""U_UATUrl"" Else T0.""U_LIVEUrl"" End as BaseURL,T0.""U_SERCONFIG"",T0.""U_GetDisAddWare"" ";
                     strSQL += @" from ""@ATEICFG"" T0 join ""@ATEICFG1"" T1 on T0.""Code""=T1.""Code"" where T0.""Code""='01'  and T1.""U_URLType"" ='Generate Eway by IRN' and T1.""U_Type""='E-Way' Order by ""LineId"" Desc";
                     objRs.DoQuery(strSQL);
                     if (objRs.RecordCount == 0) { clsModule.objaddon.objapplication.StatusBar.SetText("API is Missing for \"Generate Eway by IRN\". Please update in general settings... ", SAPbouiCOM.BoMessageTime.bmt_Long, SAPbouiCOM.BoStatusBarMessageType.smt_Error); return false; }
@@ -2084,6 +2188,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             strSQL += " t2.\"TransType\",t2.\"FrmTraName\",t2.\"ToTraName\", ";                       
                             strSQL += " t2.\"U_Dispatch_Eway\" as \"DisEway\" ,";
                             strSQL += " t2.\"U_Dispatch_Name\" as \"DisName\" ,";
+                            
 
                             strSQL += "  B1.\"CompnyAddr\",B1.\"CompnyName\" \"Seller_Legal Name\", B3.\"City\" \"CompnyCity\", Replace(B3.\"ZipCode\",' ','') \"CompnyPincode\", ";
                             strSQL += " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=B3.\"Country\" and \"Code\"=B3.\"State\") \"Compnystatecode\", ";
@@ -2226,18 +2331,36 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                                 continue;
                                             }
                                         }
+                                        #region "old"
+                                        //if (invrecordset.Fields.Item("DisEway").Value.ToString() == "N")
+                                        //{
+                                        //    clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Nm = invrecordset.Fields.Item("Seller_Legal Name").Value.ToString();
+                                        //    clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Addr1 = sellerAddress1;
+                                        //    clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Addr2 = sellerAddress2;
+                                        //    clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Loc = invrecordset.Fields.Item("CompnyCity").Value.ToString();
+                                        //    clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Pin = invrecordset.Fields.Item("CompnyPincode").Value.ToString();
+                                        //    clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Stcd = invrecordset.Fields.Item("Compnystatecode").Value.ToString();
+                                        //}
+                                        //else
+                                        //{                                       
+                                        //    clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Nm = invrecordset.Fields.Item("FrmTraName").Value.ToString();
+                                        //    if (!string.IsNullOrEmpty(invrecordset.Fields.Item("DisName").Value.ToString()))
+                                        //    {
+                                        //        clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Nm = invrecordset.Fields.Item("DisName").Value.ToString();
+                                        //    }
 
-                                        if (invrecordset.Fields.Item("DisEway").Value.ToString() == "N")
+                                        //    clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Addr1 = FRMAddress1;
+                                        //    clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Addr2 = FRMAddress2;
+                                        //    clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Loc = invrecordset.Fields.Item("FrmPlace").Value.ToString();
+                                        //    clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Pin = invrecordset.Fields.Item("FrmZipCode").Value.ToString();
+                                        //    clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Stcd = invrecordset.Fields.Item("ActFrmStat").Value.ToString();
+                                        //}
+                                        #endregion "old"
+
+
+                                        if (invrecordset.Fields.Item("DisEway").Value.ToString() == "Y")
                                         {
-                                            clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Nm = invrecordset.Fields.Item("Seller_Legal Name").Value.ToString();
-                                            clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Addr1 = sellerAddress1;
-                                            clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Addr2 = sellerAddress2;
-                                            clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Loc = invrecordset.Fields.Item("CompnyCity").Value.ToString();
-                                            clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Pin = invrecordset.Fields.Item("CompnyPincode").Value.ToString();
-                                            clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Stcd = invrecordset.Fields.Item("Compnystatecode").Value.ToString();
-                                        }
-                                        else
-                                        {                                       
+
                                             clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Nm = invrecordset.Fields.Item("FrmTraName").Value.ToString();
                                             if (!string.IsNullOrEmpty(invrecordset.Fields.Item("DisName").Value.ToString()))
                                             {
@@ -2249,7 +2372,65 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                             clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Loc = invrecordset.Fields.Item("FrmPlace").Value.ToString();
                                             clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Pin = invrecordset.Fields.Item("FrmZipCode").Value.ToString();
                                             clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Stcd = invrecordset.Fields.Item("ActFrmStat").Value.ToString();
+
                                         }
+                                        else
+                                        {
+
+                                            if (objRs.Fields.Item("U_GetDisAddWare").Value.ToString() == "Y")
+                                            {
+                                                string diswarequery = "SELECT \"Building\" ,\"Block\" ,\"Street\" ,\"Address2\" ,\"Address3\" , ";
+                                                diswarequery += " \"City\" ,\"ZipCode\" , COALESCE(\"GSTCode\",'96') as \"Statecode\"  ";
+                                                diswarequery += "FROM OWHS o ";
+                                                diswarequery += " LEFT JOIN OCST st1 on st1.\"Code\"=o.\"State\" and st1.\"Country\"=o.\"Country\" ";
+                                                diswarequery += " WHERE \"WhsCode\" IN(SELECT \"WhsCode\"  FROM inv1 WHERE  \"DocEntry\" = '" + DocEntry + "'); ";
+
+                                                disRecset = clsModule.objaddon.objglobalmethods.GetmultipleRS(diswarequery);
+                                                if (disRecset.RecordCount > 0)
+                                                {
+                                                    string DisAddress1 = "";
+                                                    string DisAddress2 = "";
+                                                    string DisconcatAddress = string.Concat(disRecset.Fields.Item("Building").Value.ToString(), " ",
+                                                                                        disRecset.Fields.Item("Block").Value.ToString(), " ",
+                                                                                        disRecset.Fields.Item("Street").Value.ToString(), " ",
+                                                                                        disRecset.Fields.Item("Address2").Value.ToString(), " ",
+                                                                                        disRecset.Fields.Item("Address3").Value.ToString());
+                                                    List<string> Dissubstrings = clsModule.objaddon.objglobalmethods.SplitByLength(DisconcatAddress, 70);
+                                                    foreach (string substring in Dissubstrings)
+                                                    {
+                                                        if (string.IsNullOrEmpty(DisAddress1))
+                                                        {
+                                                            DisAddress1 = substring;
+                                                            continue;
+                                                        }
+                                                        if (string.IsNullOrEmpty(DisAddress2))
+                                                        {
+                                                            DisAddress2 = substring;
+                                                            continue;
+                                                        }
+                                                    }
+
+                                                    clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Nm = invrecordset.Fields.Item("Seller_Legal Name").Value.ToString();
+                                                    clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Addr1 = DisAddress1;
+                                                    clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Addr2 = DisAddress2;
+                                                    clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Loc = disRecset.Fields.Item("City").Value.ToString();
+                                                    clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Pin = disRecset.Fields.Item("ZipCode").Value.ToString();
+                                                    clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Stcd = disRecset.Fields.Item("Statecode").Value.ToString();
+                                                }
+
+                                            }
+                                            else
+                                            {
+                                                clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Nm = invrecordset.Fields.Item("Seller_Legal Name").Value.ToString();
+                                                clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Addr1 = sellerAddress1;
+                                                clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Addr2 = sellerAddress2;
+                                                clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Loc = invrecordset.Fields.Item("CompnyCity").Value.ToString();
+                                                clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Pin = invrecordset.Fields.Item("CompnyPincode").Value.ToString();
+                                                clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Stcd = invrecordset.Fields.Item("Compnystatecode").Value.ToString();
+                                            }
+
+                                        }
+
                                     }
                                 }
                                 if (!(string.IsNullOrEmpty(invrecordset.Fields.Item("ToGSTN").Value.ToString()) || string.IsNullOrEmpty(invrecordset.Fields.Item("ToAddres1").Value.ToString())))

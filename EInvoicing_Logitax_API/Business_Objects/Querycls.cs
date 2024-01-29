@@ -47,6 +47,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,st.\"Country\" \"CCode\",  ";
 
+            retstring = retstring += " a.\"BPLId\" ,";
 
             retstring = retstring + " a.\"CardCode\", a.\"CardName\" \"Buyer_Legal Name\",";
             retstring = retstring + " crd11.\"City\" \"BCity\",st1.\"Name\" \"BState\" ,cy1.\"Name\" \"BCountry\",";
@@ -98,7 +99,11 @@ namespace EInvoicing_Logitax_API.Business_Objects
             retstring = retstring + " Case when a.\"DocType\"='S' then  (Select Sum(IFNULL(\"LineTotal\",0))* case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end from INV1 where \"DocEntry\"=b.\"DocEntry\") " +
                                                                   "Else (Select Sum(IFNULL(\"INMPrice\",0)*\"Quantity\")* case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end from INV1 where \"DocEntry\"=b.\"DocEntry\") End \"AssVal\",";
 
-            retstring = retstring + " (a.\"DocTotal\" +a.\"DpmAmnt\") - COALESCE((Select Sum(INV5.\"WTAmnt\") from INV5 where INV5.\"AbsEntry\"=a.\"DocEntry\"),0.0) \"Doc Total\" ,";
+            retstring = retstring + " (a.\"DocTotal\" +a.\"DpmAmnt\") - ";
+            retstring += " (CASE WHEN (SELECT \"U_AddTCSOth\"  FROM \"@ATEICFG\" e WHERE e.\"Code\" ='01')='Y' ";
+            retstring += " THEN  0 ELSE COALESCE((Select Sum(INV5.\"WTAmnt\") from INV5 where INV5.\"AbsEntry\" = a.\"DocEntry\"),0.0) END ) AS \"Doc Total\", ";
+            retstring += " (CASE WHEN (SELECT \"U_AddTCSOth\"  FROM \"@ATEICFG\" e WHERE e.\"Code\" ='01')='Y' ";
+            retstring += " THEN   COALESCE((Select Sum(INV5.\"WTAmnt\") from INV5 where INV5.\"AbsEntry\" = a.\"DocEntry\"),0.0) ELSE 0 END ) AS \"OthrAmt\", ";
 
             retstring = retstring + " a.\"DocDueDate\" \"Inv Due Date\", a.\"NumAtCard\", a.\"Printed\",a.\"PayToCode\", a.\"ShipToCode\", a.\"Comments\" ,Left(Replace(o.\"ChapterID\",'.','')," + HSNLength + ") \"ChapterID\" , A.\"DiscSum\", A.\"RoundDif\",";
             retstring = retstring + " b.\"DiscPrcnt\",((b.\"PriceBefDi\"*\"Quantity\") * (b.\"DiscPrcnt\"/100)) \"LineDisc\",l.\"InvntryUom\" ,IFNULL(a.\"RoundDif\",0) \"Rounding\", a.\"TaxDate\" \"Cust Order Date\", a.\"TotalExpns\",l.\"FrgnName\",a.\"DocCur\",A.\"VatSum\", a.\"TotalExpns\" \"Freight\",";
@@ -223,7 +228,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring += " CASE WHEN COALESCE(Crd11.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd11.\"GSTRegnNo\" END as \"Buyer GSTN\",";
 
-            retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,st.\"Country\" \"CCode\", ";            
+            retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,st.\"Country\" \"CCode\", ";
+
+            retstring = retstring += " a.\"BPLId\" ,";
 
             retstring = retstring + " a.\"CardCode\", a.\"CardName\" \"Buyer_Legal Name\",";
             retstring = retstring + " crd11.\"City\" \"BCity\",st1.\"Name\" \"BState\" ,cy1.\"Name\" \"BCountry\",";
@@ -271,7 +278,13 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                                               "Else (Select Sum(IFNULL(\"INMPrice\",0)*\"Quantity\")* case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end from RIN1 where \"DocEntry\"=b.\"DocEntry\") End \"AssVal\",";
 
 
-            retstring = retstring + " (a.\"DocTotal\" +a.\"DpmAmnt\") - COALESCE((Select Sum(RIN5.\"WTAmnt\") from RIN5 where RIN5.\"AbsEntry\"=a.\"DocEntry\"),0.0) \"Doc Total\" ,";
+         
+            retstring = retstring + " (a.\"DocTotal\" +a.\"DpmAmnt\") - ";
+            retstring += " (CASE WHEN (SELECT \"U_AddTCSOth\"  FROM \"@ATEICFG\" e WHERE e.\"Code\" ='01')='Y' ";
+            retstring += " THEN  0 ELSE COALESCE((Select Sum(RIN5.\"WTAmnt\") from RIN5 where RIN5.\"AbsEntry\" = a.\"DocEntry\"),0.0) END ) AS \"Doc Total\", ";
+            retstring += " (CASE WHEN (SELECT \"U_AddTCSOth\"  FROM \"@ATEICFG\" e WHERE e.\"Code\" ='01')='Y' ";
+            retstring += " THEN   COALESCE((Select Sum(RIN5.\"WTAmnt\") from RIN5 where RIN5.\"AbsEntry\" = a.\"DocEntry\"),0.0) ELSE 0 END ) AS \"OthrAmt\", ";
+
 
             retstring = retstring + " a.\"DocDueDate\" \"Inv Due Date\", a.\"NumAtCard\", a.\"Printed\",a.\"PayToCode\", a.\"ShipToCode\", a.\"Comments\" ,Left(Replace(o.\"ChapterID\",'.','')," + HSNLength + ") \"ChapterID\" , A.\"DiscSum\", A.\"RoundDif\",";
             retstring = retstring + " b.\"DiscPrcnt\",((b.\"PriceBefDi\"*\"Quantity\") * (b.\"DiscPrcnt\"/100)) \"LineDisc\",l.\"InvntryUom\" ,IFNULL(a.\"RoundDif\",0) \"Rounding\", a.\"TaxDate\" \"Cust Order Date\", a.\"TotalExpns\",l.\"FrgnName\",a.\"DocCur\",A.\"VatSum\", a.\"TotalExpns\" \"Freight\",";
@@ -388,6 +401,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,st.\"Country\" \"CCode\",  ";
 
+            retstring = retstring += " a.\"BPLId\" ,";
 
             retstring = retstring + " a.\"CardCode\", a.\"CardName\" \"Buyer_Legal Name\",";
             retstring = retstring + " crd11.\"City\" \"BCity\",st1.\"Name\" \"BState\" ,cy1.\"Name\" \"BCountry\",";
@@ -455,10 +469,16 @@ namespace EInvoicing_Logitax_API.Business_Objects
             // retstring = retstring + " (a.\"DocTotal\" +a.\"DpmAmnt\") - COALESCE((Select Sum(WTR5.\"WTAmnt\") from WTR5 where WTR5.\"AbsEntry\"=a.\"DocEntry\"),0.0) \"Doc Total\" ,";
 
             retstring = retstring + " (Select Sum(COALESCE(\"INMPrice\",0)*\"Quantity\")* case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end from WTR1 where \"DocEntry\"=b.\"DocEntry\")  \"AssVal\",";
-            
-            retstring = retstring + " (case when (select sum(\"U_UTL_ST_LINETOTAL\") from WTR1 where \"DocEntry\"=a.\"DocEntry\") =0 then a.\"DocTotal\" else  (select sum(\"U_UTL_ST_LINETOTAL\") from WTR1 where \"DocEntry\"=a.\"DocEntry\") end  +a.\"DpmAmnt\") - COALESCE((Select Sum(WTR5.\"WTAmnt\") from WTR5 where WTR5.\"AbsEntry\"=a.\"DocEntry\"),0.0) \"Doc Total\" ,";
 
-          
+            retstring = retstring + " (case when (select sum(\"U_UTL_ST_LINETOTAL\") from WTR1 where \"DocEntry\"=a.\"DocEntry\") =0 then a.\"DocTotal\"  ";
+            retstring += " else  (select sum(\"U_UTL_ST_LINETOTAL\") from WTR1 where \"DocEntry\"=a.\"DocEntry\") end  +a.\"DpmAmnt\") - ";
+
+            retstring += " (CASE WHEN (SELECT \"U_AddTCSOth\"  FROM \"@ATEICFG\" e WHERE e.\"Code\" ='01')='Y' ";
+            retstring += " THEN  0 ELSE COALESCE((Select Sum(WTR5.\"WTAmnt\") from WTR5 where WTR5.\"AbsEntry\" = a.\"DocEntry\"),0.0) END ) AS \"Doc Total\", ";
+            retstring += " (CASE WHEN (SELECT \"U_AddTCSOth\"  FROM \"@ATEICFG\" e WHERE e.\"Code\" ='01')='Y' ";
+            retstring += " THEN   COALESCE((Select Sum(WTR5.\"WTAmnt\") from WTR5 where WTR5.\"AbsEntry\" = a.\"DocEntry\"),0.0) ELSE 0 END ) AS \"OthrAmt\", ";
+
+
             retstring = retstring + " a.\"DocDueDate\" \"Inv Due Date\", a.\"NumAtCard\", a.\"Printed\",a.\"PayToCode\", a.\"ShipToCode\", a.\"Comments\" ,Left(Replace(o.\"ChapterID\",'.','')," + HSNLength + ") \"ChapterID\" , A.\"DiscSum\", A.\"RoundDif\",";
             retstring = retstring + " b.\"DiscPrcnt\",((b.\"PriceBefDi\"*\"Quantity\") * (b.\"DiscPrcnt\"/100)) \"LineDisc\",l.\"InvntryUom\" ,IFNULL(a.\"RoundDif\",0) \"Rounding\", a.\"TaxDate\" \"Cust Order Date\", a.\"TotalExpns\",l.\"FrgnName\",a.\"DocCur\",A.\"VatSum\", a.\"TotalExpns\" \"Freight\",";
             retstring = retstring + " l.\"SalUnitMsr\",IFNULL(b.\"LineTotal\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Line Total\", IFNULL(a.\"TotalExpns\",0) \"Freight Total\",IFNULL(a.\"DiscSum\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Disc Total\",l.\"ItemClass\", ";
@@ -702,6 +722,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,st.\"Country\" \"CCode\",  ";
 
+            retstring = retstring += " a.\"BPLId\" ,";
 
             retstring = retstring + " a.\"CardCode\", a.\"CardName\" \"Buyer_Legal Name\",";
             retstring = retstring + " crd11.\"City\" \"BCity\",st1.\"Name\" \"BState\" ,cy1.\"Name\" \"BCountry\",";
@@ -749,8 +770,16 @@ namespace EInvoicing_Logitax_API.Business_Objects
             retstring = retstring + " Case when a.\"DocType\"='S' then  (Select Sum(IFNULL(\"LineTotal\",0))* case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end from DLN1 where \"DocEntry\"=b.\"DocEntry\") " +
                                                            "Else (Select Sum(IFNULL(\"INMPrice\",0)*\"Quantity\")* case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end from DLN1 where \"DocEntry\"=b.\"DocEntry\") End \"AssVal\",";
 
-            retstring = retstring + " (a.\"DocTotal\" +a.\"DpmAmnt\") - COALESCE((Select Sum(DLN5.\"WTAmnt\") from DLN5 where DLN5.\"AbsEntry\"=a.\"DocEntry\"),0.0) \"Doc Total\" ,";
-          
+         
+
+
+            retstring = retstring + " (a.\"DocTotal\" +a.\"DpmAmnt\") - ";
+            retstring += " (CASE WHEN (SELECT \"U_AddTCSOth\"  FROM \"@ATEICFG\" e WHERE e.\"Code\" ='01')='Y' ";
+            retstring += " THEN  0 ELSE COALESCE((Select Sum(DLN5.\"WTAmnt\") from DLN5 where DLN5.\"AbsEntry\" = a.\"DocEntry\"),0.0) END ) AS \"Doc Total\", ";
+            retstring += " (CASE WHEN (SELECT \"U_AddTCSOth\"  FROM \"@ATEICFG\" e WHERE e.\"Code\" ='01')='Y' ";
+            retstring += " THEN   COALESCE((Select Sum(DLN5.\"WTAmnt\") from DLN5 where DLN5.\"AbsEntry\" = a.\"DocEntry\"),0.0) ELSE 0 END ) AS \"OthrAmt\", ";
+
+
             retstring = retstring + " a.\"DocDueDate\" \"Inv Due Date\", a.\"NumAtCard\", a.\"Printed\",a.\"PayToCode\", a.\"ShipToCode\", a.\"Comments\" ,Left(Replace(o.\"ChapterID\",'.','')," + HSNLength + ") \"ChapterID\" , A.\"DiscSum\", A.\"RoundDif\",";
             retstring = retstring + " b.\"DiscPrcnt\",((b.\"PriceBefDi\"*\"Quantity\") * (b.\"DiscPrcnt\"/100)) \"LineDisc\",l.\"InvntryUom\" ,IFNULL(a.\"RoundDif\",0) \"Rounding\", a.\"TaxDate\" \"Cust Order Date\", a.\"TotalExpns\",l.\"FrgnName\",a.\"DocCur\",A.\"VatSum\", a.\"TotalExpns\" \"Freight\",";
             retstring = retstring + " l.\"SalUnitMsr\",IFNULL(b.\"LineTotal\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Line Total\", IFNULL(a.\"TotalExpns\",0) \"Freight Total\",IFNULL(a.\"DiscSum\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Disc Total\",l.\"ItemClass\", ";
@@ -873,6 +902,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,st.\"Country\" \"CCode\",  ";
 
+            retstring = retstring += " a.\"BPLId\" ,";
 
             retstring = retstring + " a.\"CardCode\", a.\"CardName\" \"Buyer_Legal Name\",";
             retstring = retstring + " crd11.\"City\" \"BCity\",st1.\"Name\" \"BState\" ,cy1.\"Name\" \"BCountry\",";
@@ -921,8 +951,15 @@ namespace EInvoicing_Logitax_API.Business_Objects
             retstring = retstring + " Case when a.\"DocType\"='S' then  (Select Sum(IFNULL(\"LineTotal\",0))* case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end from RPC1 where \"DocEntry\"=b.\"DocEntry\") " +
                                                            "Else (Select Sum(IFNULL(\"INMPrice\",0)*\"Quantity\")* case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end from RPC1 where \"DocEntry\"=b.\"DocEntry\") End \"AssVal\",";
 
-            retstring = retstring + " (a.\"DocTotal\" +a.\"DpmAmnt\") - COALESCE((Select Sum(RPC5.\"WTAmnt\") from RPC5 where RPC5.\"AbsEntry\"=a.\"DocEntry\"),0.0) \"Doc Total\" ,";
           
+            retstring = retstring + " (a.\"DocTotal\" +a.\"DpmAmnt\") - ";
+            retstring += " (CASE WHEN (SELECT \"U_AddTCSOth\"  FROM \"@ATEICFG\" e WHERE e.\"Code\" ='01')='Y' ";
+            retstring += " THEN  0 ELSE COALESCE((Select Sum(RPC5.\"WTAmnt\") from RPC5 where RPC5.\"AbsEntry\" = a.\"DocEntry\"),0.0) END ) AS \"Doc Total\", ";
+            retstring += " (CASE WHEN (SELECT \"U_AddTCSOth\"  FROM \"@ATEICFG\" e WHERE e.\"Code\" ='01')='Y' ";
+            retstring += " THEN   COALESCE((Select Sum(RPC5.\"WTAmnt\") from RPC5 where RPC5.\"AbsEntry\" = a.\"DocEntry\"),0.0) ELSE 0 END ) AS \"OthrAmt\", ";
+
+
+
             retstring = retstring + " a.\"DocDueDate\" \"Inv Due Date\", a.\"NumAtCard\", a.\"Printed\",a.\"PayToCode\", a.\"ShipToCode\", a.\"Comments\" ,Left(Replace(o.\"ChapterID\",'.','')," + HSNLength + ") \"ChapterID\" , A.\"DiscSum\", A.\"RoundDif\",";
             retstring = retstring + " b.\"DiscPrcnt\",((b.\"PriceBefDi\"*\"Quantity\") * (b.\"DiscPrcnt\"/100)) \"LineDisc\",l.\"InvntryUom\" ,IFNULL(a.\"RoundDif\",0) \"Rounding\", a.\"TaxDate\" \"Cust Order Date\", a.\"TotalExpns\",l.\"FrgnName\",a.\"DocCur\",A.\"VatSum\", a.\"TotalExpns\" \"Freight\",";
             retstring = retstring + " l.\"SalUnitMsr\",IFNULL(b.\"LineTotal\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Line Total\", IFNULL(a.\"TotalExpns\",0) \"Freight Total\",IFNULL(a.\"DiscSum\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Disc Total\",l.\"ItemClass\", ";
@@ -1045,6 +1082,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,st.\"Country\" \"CCode\",  ";
 
+            retstring = retstring += " a.\"BPLId\" ,";
 
             retstring = retstring + " a.\"CardCode\", a.\"CardName\" \"Buyer_Legal Name\",";
             retstring = retstring + " crd11.\"City\" \"BCity\",st1.\"Name\" \"BState\" ,cy1.\"Name\" \"BCountry\",";
@@ -1092,7 +1130,12 @@ namespace EInvoicing_Logitax_API.Business_Objects
             retstring = retstring + " Case when a.\"DocType\"='S' then  (Select Sum(IFNULL(\"LineTotal\",0))* case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end from PCH1 where \"DocEntry\"=b.\"DocEntry\") " +
                                                "Else (Select Sum(IFNULL(\"INMPrice\",0)*\"Quantity\")* case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end from PCH1 where \"DocEntry\"=b.\"DocEntry\") End \"AssVal\",";
 
-            retstring = retstring + " (a.\"DocTotal\" +a.\"DpmAmnt\") - COALESCE((Select Sum(PCH5.\"WTAmnt\") from PCH5 where PCH5.\"AbsEntry\"=a.\"DocEntry\"),0.0) \"Doc Total\" ,";
+            retstring = retstring + " (a.\"DocTotal\" +a.\"DpmAmnt\") - ";
+            retstring += " (CASE WHEN (SELECT \"U_AddTCSOth\"  FROM \"@ATEICFG\" e WHERE e.\"Code\" ='01')='Y' ";
+            retstring += " THEN  0 ELSE COALESCE((Select Sum(PCH5.\"WTAmnt\") from PCH5 where PCH5.\"AbsEntry\" = a.\"DocEntry\"),0.0) END ) AS \"Doc Total\", ";
+            retstring += " (CASE WHEN (SELECT \"U_AddTCSOth\"  FROM \"@ATEICFG\" e WHERE e.\"Code\" ='01')='Y' ";
+            retstring += " THEN   COALESCE((Select Sum(PCH5.\"WTAmnt\") from PCH5 where PCH5.\"AbsEntry\" = a.\"DocEntry\"),0.0) ELSE 0 END ) AS \"OthrAmt\", ";
+
 
             retstring = retstring + " a.\"DocDueDate\" \"Inv Due Date\", a.\"NumAtCard\", a.\"Printed\",a.\"PayToCode\", a.\"ShipToCode\", a.\"Comments\" ,Left(Replace(o.\"ChapterID\",'.','')," + HSNLength + ") \"ChapterID\" , A.\"DiscSum\", A.\"RoundDif\",";
             retstring = retstring + " b.\"DiscPrcnt\",((b.\"PriceBefDi\"*\"Quantity\") * (b.\"DiscPrcnt\"/100)) \"LineDisc\",l.\"InvntryUom\" ,IFNULL(a.\"RoundDif\",0) \"Rounding\", a.\"TaxDate\" \"Cust Order Date\", a.\"TotalExpns\",l.\"FrgnName\",a.\"DocCur\",A.\"VatSum\", a.\"TotalExpns\" \"Freight\",";
@@ -1215,6 +1258,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,st.\"Country\" \"CCode\",  ";
 
+            retstring = retstring += " a.\"BPLId\" ,";
 
             retstring = retstring + " a.\"CardCode\", a.\"CardName\" \"Buyer_Legal Name\",";
             retstring = retstring + " crd11.\"City\" \"BCity\",st1.\"Name\" \"BState\" ,cy1.\"Name\" \"BCountry\",";
@@ -1261,7 +1305,12 @@ namespace EInvoicing_Logitax_API.Business_Objects
             retstring = retstring + " Case when a.\"DocType\"='S' then  (Select Sum(IFNULL(\"LineTotal\",0))* case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end from DPI1 where \"DocEntry\"=b.\"DocEntry\") " +
                                                "Else (Select Sum(IFNULL(\"INMPrice\",0)*\"Quantity\")* case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end from DPI1 where \"DocEntry\"=b.\"DocEntry\") End \"AssVal\",";
 
-            retstring = retstring + " (a.\"DocTotal\" +a.\"DpmAmnt\") - COALESCE((Select Sum(DPI5.\"WTAmnt\") from DPI5 where DPI5.\"AbsEntry\"=a.\"DocEntry\"),0.0) \"Doc Total\" ,";
+            retstring = retstring + " (a.\"DocTotal\" +a.\"DpmAmnt\") - ";
+            retstring += " (CASE WHEN (SELECT \"U_AddTCSOth\"  FROM \"@ATEICFG\" e WHERE e.\"Code\" ='01')='Y' ";
+            retstring += " THEN  0 ELSE COALESCE((Select Sum(DPI5.\"WTAmnt\") from DPI5 where DPI5.\"AbsEntry\" = a.\"DocEntry\"),0.0) END ) AS \"Doc Total\", ";
+            retstring += " (CASE WHEN (SELECT \"U_AddTCSOth\"  FROM \"@ATEICFG\" e WHERE e.\"Code\" ='01')='Y' ";
+            retstring += " THEN   COALESCE((Select Sum(DPI5.\"WTAmnt\") from DPI5 where DPI5.\"AbsEntry\" = a.\"DocEntry\"),0.0) ELSE 0 END ) AS \"OthrAmt\", ";
+
 
             retstring = retstring + " a.\"DocDueDate\" \"Inv Due Date\", a.\"NumAtCard\", a.\"Printed\",a.\"PayToCode\", a.\"ShipToCode\", a.\"Comments\" ,Left(Replace(o.\"ChapterID\",'.','')," + HSNLength + ") \"ChapterID\" , A.\"DiscSum\", A.\"RoundDif\",";
             retstring = retstring + " b.\"DiscPrcnt\",((b.\"PriceBefDi\"*\"Quantity\") * (b.\"DiscPrcnt\"/100)) \"LineDisc\",l.\"InvntryUom\" ,IFNULL(a.\"RoundDif\",0) \"Rounding\", a.\"TaxDate\" \"Cust Order Date\", a.\"TotalExpns\",l.\"FrgnName\",a.\"DocCur\",A.\"VatSum\", a.\"TotalExpns\" \"Freight\",";
@@ -1385,6 +1434,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,st.\"Country\" \"CCode\",  ";
 
+            retstring = retstring += " a.\"BPLId\" ,"; 
 
             retstring = retstring + " a.\"CardCode\", a.\"CardName\" \"Buyer_Legal Name\",";
             retstring = retstring + " crd11.\"City\" \"BCity\",st1.\"Name\" \"BState\" ,cy1.\"Name\" \"BCountry\",";
@@ -1430,7 +1480,14 @@ namespace EInvoicing_Logitax_API.Business_Objects
             retstring = retstring + " Case when a.\"DocType\"='S' then  (Select Sum(IFNULL(\"LineTotal\",0))* case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end from DPO1 where \"DocEntry\"=b.\"DocEntry\") " +
                                      "Else (Select Sum(IFNULL(\"INMPrice\",0)*\"Quantity\")* case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end from DPO1 where \"DocEntry\"=b.\"DocEntry\") End \"AssVal\",";
 
-            retstring = retstring + " (a.\"DocTotal\" +a.\"DpmAmnt\") - COALESCE((Select Sum(DPO5.\"WTAmnt\") from DPO5 where DPO5.\"AbsEntry\"=a.\"DocEntry\"),0.0) \"Doc Total\" ,";
+        
+
+            retstring = retstring + " (a.\"DocTotal\" +a.\"DpmAmnt\") - ";
+            retstring += " (CASE WHEN (SELECT \"U_AddTCSOth\"  FROM \"@ATEICFG\" e WHERE e.\"Code\" ='01')='Y' ";
+            retstring += " THEN  0 ELSE COALESCE((Select Sum(DPO5.\"WTAmnt\") from DPO5 where DPO5.\"AbsEntry\" = a.\"DocEntry\"),0.0) END ) AS \"Doc Total\", ";
+            retstring += " (CASE WHEN (SELECT \"U_AddTCSOth\"  FROM \"@ATEICFG\" e WHERE e.\"Code\" ='01')='Y' ";
+            retstring += " THEN   COALESCE((Select Sum(DPO5.\"WTAmnt\") from DPO5 where DPO5.\"AbsEntry\" = a.\"DocEntry\"),0.0) ELSE 0 END ) AS \"OthrAmt\", ";
+
 
             retstring = retstring + " a.\"DocDueDate\" \"Inv Due Date\", a.\"NumAtCard\", a.\"Printed\",a.\"PayToCode\", a.\"ShipToCode\", a.\"Comments\" ,Left(Replace(o.\"ChapterID\",'.','')," + HSNLength + ") \"ChapterID\" , A.\"DiscSum\", A.\"RoundDif\",";
             retstring = retstring + " b.\"DiscPrcnt\",((b.\"PriceBefDi\"*\"Quantity\") * (b.\"DiscPrcnt\"/100)) \"LineDisc\",l.\"InvntryUom\" ,IFNULL(a.\"RoundDif\",0) \"Rounding\", a.\"TaxDate\" \"Cust Order Date\", a.\"TotalExpns\",l.\"FrgnName\",a.\"DocCur\",A.\"VatSum\", a.\"TotalExpns\" \"Freight\",";

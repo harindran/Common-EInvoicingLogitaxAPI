@@ -78,9 +78,10 @@ namespace EInvoicing_Logitax_API.Common
             AddFields("@ATEICFG", "GetCompAdd", "Get Company Address", SAPbobsCOM.BoFieldTypes.db_Alpha,100);
             AddFields("@ATEICFG", "InvTranGetcusAdd", "Inventory Transfer Get Customer Address", SAPbobsCOM.BoFieldTypes.db_Alpha,100);
             AddFields("@ATEICFG", "InvTranGetBrnchAdd", "Inventory Transfer Get Branch Address", SAPbobsCOM.BoFieldTypes.db_Alpha,100);
+            AddFields("@ATEICFG", "GetDisAddWare", "Dispatch Address WareHouse", SAPbobsCOM.BoFieldTypes.db_Alpha,100);
             AddFields("@ATEICFG", "Gettran", "Get  Transaction Customer Address", SAPbobsCOM.BoFieldTypes.db_Alpha,100);
             AddFields("@ATEICFG", "GSTCol", "GST Column", SAPbobsCOM.BoFieldTypes.db_Alpha, 100);
-
+            AddFields("@ATEICFG", "AddTCSOth", "Add TCS Amount in Other Charge", SAPbobsCOM.BoFieldTypes.db_Alpha, 100);
 
             AddFields("@ATEICFG", "DBType", "SQL Or HANA", SAPbobsCOM.BoFieldTypes.db_Alpha, 5);
             AddFields("@ATEICFG", "EwayNo", "UDF EwayNo", SAPbobsCOM.BoFieldTypes.db_Alpha, 50);
@@ -125,7 +126,11 @@ namespace EInvoicing_Logitax_API.Common
             AddFields("OINV", "GST_RefNo", "GSTRefNum", SAPbobsCOM.BoFieldTypes.db_Alpha, 200);
             AddFields("OINV", "GST_status", "GSTStatus", SAPbobsCOM.BoFieldTypes.db_Numeric);
             AddFields("OINV", "GST_Remarks", "GSTRemarks", SAPbobsCOM.BoFieldTypes.db_Memo);
-           
+
+            AddFields("OBPL", "ClientCode", "Client Code", SAPbobsCOM.BoFieldTypes.db_Alpha, 30);
+            AddFields("OBPL", "UserCode", "User Code", SAPbobsCOM.BoFieldTypes.db_Alpha, 30);
+            AddFields("OBPL", "Password", "Password", SAPbobsCOM.BoFieldTypes.db_Alpha, 30);
+
         }
 
         public void FieldCreationNewversion()

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using EInvoicing_Logitax_API.Common;
 using SAPbouiCOM.Framework;
 
 namespace EInvoicing_Logitax_API.Business_Objects
@@ -40,7 +41,8 @@ namespace EInvoicing_Logitax_API.Business_Objects
         {
             CheckBox0.Item.Top = StaticText0.Item.Top;
             CheckBox0.Item.Left = StaticText0.Item.Left+ StaticText0.Item.Width+5;
-            CheckBox0.Item.Click();
+            if (clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_GetDisAddWare\" FROM \"@ATEICFG\" a  WHERE a.\"Code\" ='01'") != "Y")
+            { CheckBox0.Item.Click(); }
 
         }
 

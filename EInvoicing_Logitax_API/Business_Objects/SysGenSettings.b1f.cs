@@ -86,6 +86,8 @@ namespace EInvoicing_Logitax_API.Business_Objects
             this.StaticText7 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_0").Specific));
             this.EditText20 = ((SAPbouiCOM.EditText)(this.GetItem("Item_4").Specific));
             this.CheckBox3 = ((SAPbouiCOM.CheckBox)(this.GetItem("ChkGetBrn").Specific));
+            this.CheckBox4 = ((SAPbouiCOM.CheckBox)(this.GetItem("Getdisadd").Specific));
+            this.CheckBox5 = ((SAPbouiCOM.CheckBox)(this.GetItem("AddTCSOth").Specific));
             this.OnCustomInitialize();
 
         }
@@ -294,10 +296,20 @@ namespace EInvoicing_Logitax_API.Business_Objects
             {
                 CheckBox2.Checked = true;
             }
+            strSQL = clsModule.objaddon.objglobalmethods.getSingleValue("Select \"U_GetDisAddWare\" from \"@ATEICFG\" where \"Code\"='01'");
+            if (strSQL == "Y")
+            {
+                CheckBox4.Checked = true;
+            }
             strSQL = clsModule.objaddon.objglobalmethods.getSingleValue("Select \"U_InvTranGetBrnchAdd\" from \"@ATEICFG\" where \"Code\"='01'");
             if (strSQL == "Y")
             {
                 CheckBox3.Checked = true;
+            }
+            strSQL = clsModule.objaddon.objglobalmethods.getSingleValue("Select \"U_AddTCSOth\" from \"@ATEICFG\" where \"Code\"='01'");
+            if (strSQL == "Y")
+            {
+                CheckBox5.Checked = true;
             }
             
         }
@@ -394,6 +406,8 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 oGeneralData.SetProperty("U_InvTranGetcusAdd", Convert.ToString(((CheckBox1.Checked == true) ? 'Y' : 'N'))); 
                 oGeneralData.SetProperty("U_InvTranGetBrnchAdd", Convert.ToString(((CheckBox3.Checked == true) ? 'Y' : 'N'))); 
                 oGeneralData.SetProperty("U_Gettran", Convert.ToString(((CheckBox2.Checked == true) ? 'Y' : 'N'))); 
+                oGeneralData.SetProperty("U_GetDisAddWare", Convert.ToString(((CheckBox4.Checked == true) ? 'Y' : 'N'))); 
+                oGeneralData.SetProperty("U_AddTCSOth", Convert.ToString(((CheckBox5.Checked == true) ? 'Y' : 'N'))); 
 
                 oGeneralData.SetProperty("U_DBType", Convert.ToString(((OptionBtn4.Selected == true) ? 'Y' : 'N')));
                 oGeneralData.SetProperty("U_EwayNo", oForm.DataSources.UserDataSources.Item("EwayNo").Value);
@@ -588,6 +602,8 @@ namespace EInvoicing_Logitax_API.Business_Objects
         private SAPbouiCOM.StaticText StaticText7;
         private SAPbouiCOM.EditText EditText20;
         private SAPbouiCOM.CheckBox CheckBox3;
+        private SAPbouiCOM.CheckBox CheckBox4;
+        private SAPbouiCOM.CheckBox CheckBox5;
     }
 }
  
