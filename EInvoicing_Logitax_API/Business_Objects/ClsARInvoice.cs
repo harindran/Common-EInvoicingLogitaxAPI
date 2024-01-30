@@ -929,7 +929,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
                         Double Calcdistance = 0;
                         strSQL = @"Select T1.""LineId"",T1.""U_URLType"",T1.""U_Type"",Case when T0.""U_Live""='N' then CONCAT(T0.""U_UATUrl"",T1.""U_URL"") Else CONCAT(T0.""U_LIVEUrl"",T1.""U_URL"") End as URL";
-                        strSQL += @" ,""U_GetCompAdd"",""U_Gettran"",""U_GetDisAddWare"", ";
+                        strSQL += @" ,""U_GetCompAdd"",""U_Gettran"",""U_GetDisAddWare"",""U_ShipToInvName"",""U_BillToWare"",""U_GettrnShp"", ";
                         strSQL += @" Case when T0.""U_Live""='N' then T0.""U_UATUrl"" Else T0.""U_LIVEUrl"" End as BaseURL";
                         strSQL += @" from ""@ATEICFG"" T0 join ""@ATEICFG1"" T1 on T0.""Code""=T1.""Code"" where T0.""Code""='01' and T1.""U_URLType"" ='Generate IRN' and T1.""U_Type""='E-Invoice' Order by ""LineId"" Desc";
                         objRs.DoQuery(strSQL);
@@ -951,7 +951,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             }
                             else
                             {
-                                clsModule.objaddon.objapplication.StatusBar.SetText("GST No is Missing for \"Create GSTNo\"...for " + invrecordset.Fields.Item("ShipToCode").Value.ToString(), SAPbouiCOM.BoMessageTime.bmt_Long, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                                clsModule.objaddon.objapplication.StatusBar.SetText("GST No is Missing for \"Create GSTNo\"...for " + invrecordset.Fields.Item("PayToCode").Value.ToString(), SAPbouiCOM.BoMessageTime.bmt_Long, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
                                 return false;
                             }
                           
@@ -1104,6 +1104,80 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                 }
 
                             }
+                            else if (objRs.Fields.Item("U_BillToWare").Value.ToString() == "Y")
+                            {
+                                string Line1 = "";
+                               
+                                switch (TransType)
+                                {
+                                    case "INV":
+                                        Line1 = "INV1";
+                                        break;
+                                    case "CRN":
+                                        Line1 = "RIN1";
+                                        break;
+                                    case "WTR":
+                                        Line1 = "WTR1";
+                                        break;
+                                    case "DLN":
+                                        Line1 = "DLN1";
+                                        break;
+                                    case "PCH":
+                                        Line1 = "PCH1";
+                                        break;
+                                    case "RPC":
+                                        Line1 = "RPC1";
+                                        break;
+                                    case "DPO":
+                                        Line1 = "DPO1";
+                                        break;
+                                    case "DPI":
+                                        Line1 = "DPI1";
+                                        break;
+                                }
+
+                                string diswarequery = "SELECT \"Building\" ,\"Block\" ,\"Street\" ,\"Address2\" ,\"Address3\" , ";
+                                diswarequery += " \"City\" ,\"ZipCode\" , COALESCE(\"GSTCode\",'96') as \"Statecode\"  ";
+                                diswarequery += "FROM OWHS o ";
+                                diswarequery += " LEFT JOIN OCST st1 on st1.\"Code\"=o.\"State\" and st1.\"Country\"=o.\"Country\" ";
+                                diswarequery += " WHERE \"WhsCode\" IN(SELECT \"WhsCode\"  FROM "+ Line1 + " WHERE  \"DocEntry\" = '" + DocEntry + "'); ";
+
+                                disRecset = clsModule.objaddon.objglobalmethods.GetmultipleRS(diswarequery);
+                                if (disRecset.RecordCount > 0)
+                                {
+                                    string DisAddress1 = "";
+                                    string DisAddress2 = "";
+                                    string DisconcatAddress = string.Concat(disRecset.Fields.Item("Building").Value.ToString(), " ",
+                                                                        disRecset.Fields.Item("Block").Value.ToString(), " ",
+                                                                        disRecset.Fields.Item("Street").Value.ToString(), " ",
+                                                                        disRecset.Fields.Item("Address2").Value.ToString(), " ",
+                                                                        disRecset.Fields.Item("Address3").Value.ToString());
+                                    List<string> Dissubstrings = clsModule.objaddon.objglobalmethods.SplitByLength(DisconcatAddress, 70);
+                                    foreach (string substring in Dissubstrings)
+                                    {
+                                        if (string.IsNullOrEmpty(DisAddress1))
+                                        {
+                                            DisAddress1 = substring;
+                                            continue;
+                                        }
+                                        if (string.IsNullOrEmpty(DisAddress2))
+                                        {
+                                            DisAddress2 = substring;
+                                            continue;
+                                        }
+                                    }
+
+                                    GenerateIRNGetJson.json_data.SellerDtls.Gstin = invrecordset.Fields.Item("Seller GSTN").Value.ToString();
+                                    GenerateIRNGetJson.json_data.SellerDtls.LglNm = invrecordset.Fields.Item("Seller_Legal Name").Value.ToString();
+                                    GenerateIRNGetJson.json_data.SellerDtls.Addr1 = DisAddress1;
+                                    GenerateIRNGetJson.json_data.SellerDtls.Addr2 = DisAddress2;
+                                    GenerateIRNGetJson.json_data.SellerDtls.Loc = disRecset.Fields.Item("City").Value.ToString();
+                                    GenerateIRNGetJson.json_data.SellerDtls.Pin = disRecset.Fields.Item("ZipCode").Value.ToString();
+                                    GenerateIRNGetJson.json_data.SellerDtls.Stcd = disRecset.Fields.Item("Statecode").Value.ToString();
+                                }
+
+                            }
+
                             else
                             {
                                 GenerateIRNGetJson.json_data.SellerDtls.Gstin = invrecordset.Fields.Item("Seller GSTN").Value.ToString();
@@ -1114,10 +1188,6 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                 GenerateIRNGetJson.json_data.SellerDtls.Pin = invrecordset.Fields.Item("Seller_PIN code").Value.ToString();
                                 GenerateIRNGetJson.json_data.SellerDtls.Stcd = invrecordset.Fields.Item("Seller_State_code").Value.ToString();
                             }
-
-
-
-
                         }
                         else
                         {
@@ -1149,14 +1219,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             GenerateIRNGetJson.json_data.SellerDtls.Pin = invrecordset.Fields.Item("CompnyPincode").Value.ToString();
                             GenerateIRNGetJson.json_data.SellerDtls.Stcd = invrecordset.Fields.Item("Compnystatecode").Value.ToString();
                         }
-                        /*
-                        GenerateIRNGetJson.json_data.DispDtls.Nm = invrecordset.Fields.Item("Seller_Legal Name").Value.ToString();
-                        GenerateIRNGetJson.json_data.DispDtls.Addr1 = sellerAddress1;
-                        GenerateIRNGetJson.json_data.DispDtls.Addr2 = sellerAddress2;
-                        GenerateIRNGetJson.json_data.DispDtls.Loc = invrecordset.Fields.Item("Seller Location Name").Value.ToString();
-                        GenerateIRNGetJson.json_data.DispDtls.Pin = invrecordset.Fields.Item("Seller_PIN code").Value.ToString();
-                        GenerateIRNGetJson.json_data.DispDtls.Stcd = invrecordset.Fields.Item("Seller_State_code").Value.ToString();
-                        */
+                     
                         if (String.IsNullOrEmpty(clsModule.EwayNo))
                         {
                             if (!(string.IsNullOrEmpty(invrecordset.Fields.Item("FrmGSTN").Value.ToString()) || string.IsNullOrEmpty(invrecordset.Fields.Item("FrmAddres1").Value.ToString())))
@@ -1206,11 +1269,41 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
                                         if (objRs.Fields.Item("U_GetDisAddWare").Value.ToString() == "Y")
                                         {
+
+                                            string Line1 = "";
+
+                                            switch (TransType)
+                                            {
+                                                case "INV":
+                                                    Line1 = "INV1";
+                                                    break;
+                                                case "CRN":
+                                                    Line1 = "RIN1";
+                                                    break;
+                                                case "WTR":
+                                                    Line1 = "WTR1";
+                                                    break;
+                                                case "DLN":
+                                                    Line1 = "DLN1";
+                                                    break;
+                                                case "PCH":
+                                                    Line1 = "PCH1";
+                                                    break;
+                                                case "RPC":
+                                                    Line1 = "RPC1";
+                                                    break;
+                                                case "DPO":
+                                                    Line1 = "DPO1";
+                                                    break;
+                                                case "DPI":
+                                                    Line1 = "DPI1";
+                                                    break;
+                                            }
                                             string diswarequery = "SELECT \"Building\" ,\"Block\" ,\"Street\" ,\"Address2\" ,\"Address3\" , ";
                                             diswarequery += " \"City\" ,\"ZipCode\" , COALESCE(\"GSTCode\",'96') as \"Statecode\"  ";
                                             diswarequery += "FROM OWHS o ";
                                             diswarequery += " LEFT JOIN OCST st1 on st1.\"Code\"=o.\"State\" and st1.\"Country\"=o.\"Country\" ";
-                                            diswarequery += " WHERE \"WhsCode\" IN(SELECT \"WhsCode\"  FROM inv1 WHERE  \"DocEntry\" = '" + DocEntry + "'); ";
+                                            diswarequery += " WHERE \"WhsCode\" IN(SELECT \"WhsCode\"  FROM  "+ Line1 + " WHERE  \"DocEntry\" = '" + DocEntry + "'); ";
 
                                             disRecset = clsModule.objaddon.objglobalmethods.GetmultipleRS(diswarequery);
                                             if (disRecset.RecordCount > 0)
@@ -1367,11 +1460,54 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
                                     GenerateIRNGetJson.json_data.ShipDtls.Gstin = invrecordset.Fields.Item("ToGSTN").Value.ToString();
                                     GenerateIRNGetJson.json_data.ShipDtls.LglNm = invrecordset.Fields.Item("ToTraName").Value.ToString();
+
+                                    if (objRs.Fields.Item("U_ShipToInvName").Value.ToString() == "Y")
+                                    {
+                                        GenerateIRNGetJson.json_data.ShipDtls.LglNm = invrecordset.Fields.Item("ShipToCode").Value.ToString();
+                                    }
+
                                     GenerateIRNGetJson.json_data.ShipDtls.Addr1 = TOAddress1;
                                     GenerateIRNGetJson.json_data.ShipDtls.Addr2 = TOAddress2;
                                     GenerateIRNGetJson.json_data.ShipDtls.Loc = invrecordset.Fields.Item("ToPlace").Value.ToString();
                                     GenerateIRNGetJson.json_data.ShipDtls.Pin = invrecordset.Fields.Item("ToZipCode").Value.ToString();
                                     GenerateIRNGetJson.json_data.ShipDtls.Stcd = invrecordset.Fields.Item("ActToState").Value.ToString();
+
+
+
+                                    if (objRs.Fields.Item("U_GettrnShp").Value.ToString() == "Y")
+                                    {
+                                        string TshipAddress1 = "";
+                                        string TshipAddress2 = "";
+                                        string TBuyerconcatAddress = string.Concat(invrecordset.Fields.Item("T_Ship_Building").Value.ToString(),
+                                                                            invrecordset.Fields.Item("T_Ship_Block").Value.ToString(),
+                                                                            invrecordset.Fields.Item("T_Ship_Street").Value.ToString(),
+                                                                            invrecordset.Fields.Item("T_Ship_Address2").Value.ToString(),
+                                                                            invrecordset.Fields.Item("T_Ship_Address3").Value.ToString());
+                                        List<string> Tshipsubstrings = clsModule.objaddon.objglobalmethods.SplitByLength(TBuyerconcatAddress, 70);
+                                        foreach (string substring in Tshipsubstrings)
+                                        {
+                                            if (string.IsNullOrEmpty(TshipAddress1))
+                                            {
+                                                TshipAddress1 = substring;
+                                                continue;
+                                            }
+                                            if (string.IsNullOrEmpty(TshipAddress2))
+                                            {
+                                                TshipAddress2 = substring;
+                                                continue;
+                                            }
+                                        }
+                                        GenerateIRNGetJson.json_data.ShipDtls.Gstin = invrecordset.Fields.Item("Shipto GSTN").Value.ToString();
+                                        GenerateIRNGetJson.json_data.ShipDtls.Addr1 = TshipAddress1;
+                                        GenerateIRNGetJson.json_data.ShipDtls.Addr2 = TshipAddress2;
+                                        GenerateIRNGetJson.json_data.ShipDtls.Loc = invrecordset.Fields.Item("T_SCity").Value.ToString();
+                                        GenerateIRNGetJson.json_data.ShipDtls.Pin = invrecordset.Fields.Item("T_SZipCode").Value.ToString();
+                                        GenerateIRNGetJson.json_data.ShipDtls.Stcd = invrecordset.Fields.Item("T_Shipp to State Code").Value.ToString();
+                                        
+                                    }
+
+
+
                                 }
                             }
                         }
@@ -2151,7 +2287,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                     clsModule.objaddon.objapplication.StatusBar.SetText("Generating E-Way by IRN. Please wait...", SAPbouiCOM.BoMessageTime.bmt_Long, SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
 
                     strSQL = @"Select T1.""LineId"",T1.""U_URLType"",T1.""U_Type"",T0.""U_UATUrl"",Case when T0.""U_Live""='N' then CONCAT(T0.""U_UATUrl"",T1.""U_URL"") Else CONCAT(T0.""U_LIVEUrl"",T1.""U_URL"") End as URL";
-                    strSQL += @" ,Case when T0.""U_Live""='N' then T0.""U_UATUrl"" Else T0.""U_LIVEUrl"" End as BaseURL,T0.""U_SERCONFIG"",T0.""U_GetDisAddWare"" ";
+                    strSQL += @" ,Case when T0.""U_Live""='N' then T0.""U_UATUrl"" Else T0.""U_LIVEUrl"" End as BaseURL,T0.""U_SERCONFIG"",T0.""U_GetDisAddWare"",""U_ShipToInvName"",""U_BillToWare"",""U_GettrnShp"" ";
                     strSQL += @" from ""@ATEICFG"" T0 join ""@ATEICFG1"" T1 on T0.""Code""=T1.""Code"" where T0.""Code""='01'  and T1.""U_URLType"" ='Generate Eway by IRN' and T1.""U_Type""='E-Way' Order by ""LineId"" Desc";
                     objRs.DoQuery(strSQL);
                     if (objRs.RecordCount == 0) { clsModule.objaddon.objapplication.StatusBar.SetText("API is Missing for \"Generate Eway by IRN\". Please update in general settings... ", SAPbouiCOM.BoMessageTime.bmt_Long, SAPbouiCOM.BoStatusBarMessageType.smt_Error); return false; }
@@ -2167,15 +2303,21 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         invrecordset = (SAPbobsCOM.Recordset)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
                         string tb = "";
                         string eway = "";
+                        string Linetb = "";
+                        string Line12 = "";
                         switch (TransType)
                         {
                             case "INV":
                                 tb = "OINV";
                                 eway = "inv26";
+                                Linetb = "inv1";
+                                Line12 = "inv12";
                                 break;
                             case "CRN":
                                 tb = "ORIN";
                                 eway = "rin26";
+                                Linetb = "rin1";
+                                Line12 = "rin12";
                                 break;
                         }
                         if (String.IsNullOrEmpty(clsModule.EwayNo))
@@ -2188,6 +2330,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             strSQL += " t2.\"TransType\",t2.\"FrmTraName\",t2.\"ToTraName\", ";                       
                             strSQL += " t2.\"U_Dispatch_Eway\" as \"DisEway\" ,";
                             strSQL += " t2.\"U_Dispatch_Name\" as \"DisName\" ,";
+                            strSQL += " t1.\"ShipToCode\" as \"ShipToCode\" ,";
                             
 
                             strSQL += "  B1.\"CompnyAddr\",B1.\"CompnyName\" \"Seller_Legal Name\", B3.\"City\" \"CompnyCity\", Replace(B3.\"ZipCode\",' ','') \"CompnyPincode\", ";
@@ -2207,7 +2350,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             strSQL += @"Replace(CRD1.""ZipCode"",' ','') ""ToZipCode"",'' ""TransMode"" ,a.""" + clsModule.EwayTransportId + @""" ,a.""" + clsModule.EwayTransportName + @""",a.""" + clsModule.EwayDistance + @"""  ,'' ""TransDate"",";
                             strSQL += "'' \"TransDocNo\"";
                             strSQL += @" ,a.""" + clsModule.EwayUDF + @""" ,'' ""VehicleTyp""  FROM " + tb + @" a  ";
-                            strSQL += @" INNER JOIN INV1 b on b.""DocEntry"" = a.""DocEntry"" ";
+                            strSQL += @" INNER JOIN  "+ Linetb + @" b on b.""DocEntry"" = a.""DocEntry"" ";
                             strSQL += @" LEFT JOIN OLCT ss on ss.""Code"" = b.""LocCode""";
                             strSQL += " LEFT JOIN CRD1 CRD1 on CRD1.\"CardCode\" =a.\"CardCode\" and CRD1.\"Address\" =a.\"ShipToCode\" and CRD1.\"AdresType\" ='S'";
                             strSQL += @" LEFT JOIN NNM1 nnm1 ON a.""Series"" =nnm1.""Series"" ";
@@ -2221,10 +2364,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             if (!String.IsNullOrEmpty(clsModule.EwayNo))
                             {
                                 string distance = "0";
-                                //if (invrecordset.Fields.Item("FrmZipCode").Value.ToString() == invrecordset.Fields.Item("ToZipCode").Value.ToString())
-                                //{
-                                //    distance = "1";
-                                //}
+                               
                                 if (clsModule.objaddon.objglobalmethods.Ctoint(invrecordset.Fields.Item(clsModule.EwayDistance).Value.ToString()) > 0)
                                 {
                                     distance = invrecordset.Fields.Item(clsModule.EwayDistance).Value.ToString();
@@ -2263,11 +2403,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                     clsModule.objaddon.objapplication.StatusBar.SetText("Zip Code Missing E-way Details Page.... ", SAPbouiCOM.BoMessageTime.bmt_Long, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
                                     return false;
                                 }
-                                //if (invrecordset.Fields.Item("FrmZipCode").Value.ToString() == invrecordset.Fields.Item("ToZipCode").Value.ToString())
-                                //{
-                                //    CalcDistance = 1;
-                                //}
-
+                                
                                 if (clsModule.objaddon.objglobalmethods.Ctoint(invrecordset.Fields.Item("Distance").Value.ToString()) > 0)
                                 {
                                     CalcDistance = clsModule.objaddon.objglobalmethods.CtoD(invrecordset.Fields.Item("Distance").Value.ToString());
@@ -2331,32 +2467,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                                 continue;
                                             }
                                         }
-                                        #region "old"
-                                        //if (invrecordset.Fields.Item("DisEway").Value.ToString() == "N")
-                                        //{
-                                        //    clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Nm = invrecordset.Fields.Item("Seller_Legal Name").Value.ToString();
-                                        //    clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Addr1 = sellerAddress1;
-                                        //    clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Addr2 = sellerAddress2;
-                                        //    clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Loc = invrecordset.Fields.Item("CompnyCity").Value.ToString();
-                                        //    clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Pin = invrecordset.Fields.Item("CompnyPincode").Value.ToString();
-                                        //    clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Stcd = invrecordset.Fields.Item("Compnystatecode").Value.ToString();
-                                        //}
-                                        //else
-                                        //{                                       
-                                        //    clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Nm = invrecordset.Fields.Item("FrmTraName").Value.ToString();
-                                        //    if (!string.IsNullOrEmpty(invrecordset.Fields.Item("DisName").Value.ToString()))
-                                        //    {
-                                        //        clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Nm = invrecordset.Fields.Item("DisName").Value.ToString();
-                                        //    }
-
-                                        //    clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Addr1 = FRMAddress1;
-                                        //    clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Addr2 = FRMAddress2;
-                                        //    clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Loc = invrecordset.Fields.Item("FrmPlace").Value.ToString();
-                                        //    clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Pin = invrecordset.Fields.Item("FrmZipCode").Value.ToString();
-                                        //    clienCred_GetIRN_DocNum.ewbeinvoicelist[0].DispDtls.Stcd = invrecordset.Fields.Item("ActFrmStat").Value.ToString();
-                                        //}
-                                        #endregion "old"
-
+                                      
 
                                         if (invrecordset.Fields.Item("DisEway").Value.ToString() == "Y")
                                         {
@@ -2383,7 +2494,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                                 diswarequery += " \"City\" ,\"ZipCode\" , COALESCE(\"GSTCode\",'96') as \"Statecode\"  ";
                                                 diswarequery += "FROM OWHS o ";
                                                 diswarequery += " LEFT JOIN OCST st1 on st1.\"Code\"=o.\"State\" and st1.\"Country\"=o.\"Country\" ";
-                                                diswarequery += " WHERE \"WhsCode\" IN(SELECT \"WhsCode\"  FROM inv1 WHERE  \"DocEntry\" = '" + DocEntry + "'); ";
+                                                diswarequery += " WHERE \"WhsCode\" IN(SELECT \"WhsCode\"  FROM "+ Linetb + " WHERE  \"DocEntry\" = '" + DocEntry + "'); ";
 
                                                 disRecset = clsModule.objaddon.objglobalmethods.GetmultipleRS(diswarequery);
                                                 if (disRecset.RecordCount > 0)
@@ -2458,12 +2569,72 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                         }
 
                                         clienCred_GetIRN_DocNum.ewbeinvoicelist[0].ExpShipDtls.Gstin = invrecordset.Fields.Item("ToGSTN").Value.ToString();
+
+                                        if (objRs.Fields.Item("U_ShipToInvName").Value.ToString() == "Y")
+                                        {
+                                            clienCred_GetIRN_DocNum.ewbeinvoicelist[0].ExpShipDtls.LglNm = invrecordset.Fields.Item("ShipToCode").Value.ToString();
+                                        }
                                         clienCred_GetIRN_DocNum.ewbeinvoicelist[0].ExpShipDtls.LglNm = invrecordset.Fields.Item("ToTraName").Value.ToString();
                                         clienCred_GetIRN_DocNum.ewbeinvoicelist[0].ExpShipDtls.Addr1 = TOAddress1;
                                         clienCred_GetIRN_DocNum.ewbeinvoicelist[0].ExpShipDtls.Addr2 = TOAddress2;
                                         clienCred_GetIRN_DocNum.ewbeinvoicelist[0].ExpShipDtls.Loc = invrecordset.Fields.Item("ToPlace").Value.ToString();
                                         clienCred_GetIRN_DocNum.ewbeinvoicelist[0].ExpShipDtls.Pin = invrecordset.Fields.Item("ToZipCode").Value.ToString();
                                         clienCred_GetIRN_DocNum.ewbeinvoicelist[0].ExpShipDtls.Stcd = invrecordset.Fields.Item("ActToState").Value.ToString();
+
+
+
+
+                                        if (objRs.Fields.Item("U_GettrnShp").Value.ToString() == "Y")
+                                        {
+                                            string diswarequery = "select ";
+                                            diswarequery += " CASE WHEN COALESCE(Crd1.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd1.\"GSTRegnNo\" END as \"Shipto GSTN\",";
+                                            diswarequery += " T.\"BuildingS\" \"T_Ship_Building\",T.\"BlockS\" \"T_Ship_Block\",T.\"StreetS\" \"T_Ship_Street\",T.\"Address2S\" \"T_Ship_Address2\",T.\"Address3S\" \"T_Ship_Address3\",";
+                                            diswarequery +=  " T.\"CityS\" \"T_SCity\" , CASE WHEN T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN '999999' ELSE Replace(T.\"ZipCodeS\",' ','') END as  \"T_SZipCode\", ";
+                                            diswarequery += " (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateS\" and \"Country\"=T.\"CountryS\") \"T_Shipp to State Code\" ";
+                                            diswarequery += " FROM "+ tb + " a ";
+                                            diswarequery += " LEFT JOIN CRD1 CRD1 on CRD1.\"CardCode\" =a.\"CardCode\" and CRD1.\"Address\" =a.\"ShipToCode\" and CRD1.\"AdresType\" ='S'";
+                                            diswarequery += " LEFT JOIN "+ Line12 + " T ON T.\"DocEntry\"=a.\"DocEntry\"";
+                                            diswarequery += " WHERE a.\"DocEntry\"=" + DocEntry + " ";
+
+                                            disRecset = clsModule.objaddon.objglobalmethods.GetmultipleRS(diswarequery);
+                                            if (disRecset.RecordCount > 0)
+                                            {
+
+
+
+                                                string TshipAddress1 = "";
+                                                string TshipAddress2 = "";
+                                                string TBuyerconcatAddress = string.Concat(disRecset.Fields.Item("T_Ship_Building").Value.ToString(),
+                                                                                    disRecset.Fields.Item("T_Ship_Block").Value.ToString(),
+                                                                                    disRecset.Fields.Item("T_Ship_Street").Value.ToString(),
+                                                                                    disRecset.Fields.Item("T_Ship_Address2").Value.ToString(),
+                                                                                    disRecset.Fields.Item("T_Ship_Address3").Value.ToString());
+                                                List<string> Tshipsubstrings = clsModule.objaddon.objglobalmethods.SplitByLength(TBuyerconcatAddress, 70);
+                                                foreach (string substring in Tshipsubstrings)
+                                                {
+                                                    if (string.IsNullOrEmpty(TshipAddress1))
+                                                    {
+                                                        TshipAddress1 = substring;
+                                                        continue;
+                                                    }
+                                                    if (string.IsNullOrEmpty(TshipAddress2))
+                                                    {
+                                                        TshipAddress2 = substring;
+                                                        continue;
+                                                    }
+                                                }
+                                                clienCred_GetIRN_DocNum.ewbeinvoicelist[0].ExpShipDtls.Gstin = disRecset.Fields.Item("Shipto GSTN").Value.ToString();
+                                                clienCred_GetIRN_DocNum.ewbeinvoicelist[0].ExpShipDtls.Addr1 = TshipAddress1;
+                                                clienCred_GetIRN_DocNum.ewbeinvoicelist[0].ExpShipDtls.Addr2 = TshipAddress2;
+                                                clienCred_GetIRN_DocNum.ewbeinvoicelist[0].ExpShipDtls.Loc = disRecset.Fields.Item("T_SCity").Value.ToString();
+                                                clienCred_GetIRN_DocNum.ewbeinvoicelist[0].ExpShipDtls.Pin = disRecset.Fields.Item("T_SZipCode").Value.ToString();
+                                                clienCred_GetIRN_DocNum.ewbeinvoicelist[0].ExpShipDtls.Stcd = disRecset.Fields.Item("T_Shipp to State Code").Value.ToString();
+
+                                            }
+
+                                        }
+
+
                                     }
                                 }
 
@@ -2532,23 +2703,28 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         invrecordset = (SAPbobsCOM.Recordset)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
                         string tb = "";
                         string eway = "";
+                        string linetb = "";
                         switch (TransType)
                         {
                             case "INV":
                                 tb = "OINV";
                                 eway = "inv26";
+                                linetb = "inv1";
                                 break;
                             case "CRN":
                                 tb = "ORIN";
                                 eway = "rin26";
+                                linetb = "rin1";
                                 break;
                             case "WTR":
                                 tb = "OWTR";
                                 eway = "WTR26";
+                                linetb = "WTR1";
                                 break;
                             case "DLN":
                                 tb = "ODLN";
                                 eway = "DLN26";
+                                linetb = "DLN";
                                 break;
                         }
                         if (String.IsNullOrEmpty(clsModule.EwayNo))
@@ -2571,7 +2747,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             strSQL += @" st.""Name"" as FrmStateN, cy.""Name"" as FrmPlace  ";
                             
                             strSQL += @"  FROM " + tb + @" a  ";
-                            strSQL += @" INNER JOIN INV1 b on b.""DocEntry"" = a.""DocEntry"" ";
+                            strSQL += @" INNER JOIN "+linetb +@" b on b.""DocEntry"" = a.""DocEntry"" ";
                             strSQL += @" LEFT JOIN OLCT ss on ss.""Code"" = b.""LocCode""";
                             strSQL += " LEFT JOIN CRD1 CRD1 on CRD1.\"CardCode\" =a.\"CardCode\" and CRD1.\"Address\" =a.\"ShipToCode\" and CRD1.\"AdresType\" ='S'";
                             strSQL += " LEFT JOIN OCST st on st.\"Code\"=CRD1.\"State\" and st.\"Country\"=CRD1.\"Country\"";

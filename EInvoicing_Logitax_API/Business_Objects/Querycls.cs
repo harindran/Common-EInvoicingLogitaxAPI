@@ -44,6 +44,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=B3.\"Country\" and \"Code\"=B3.\"State\") \"Compnystatecode\", ";
 
             retstring = retstring += " CASE WHEN COALESCE(Crd11.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd11.\"GSTRegnNo\" END as \"Buyer GSTN\",";
+            retstring = retstring += " CASE WHEN COALESCE(Crd1.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd1.\"GSTRegnNo\" END as \"Shipto GSTN\",";
 
             retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,st.\"Country\" \"CCode\",  ";
 
@@ -227,6 +228,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
 
             retstring = retstring += " CASE WHEN COALESCE(Crd11.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd11.\"GSTRegnNo\" END as \"Buyer GSTN\",";
+            retstring = retstring += " CASE WHEN COALESCE(Crd1.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd1.\"GSTRegnNo\" END as \"Shipto GSTN\",";
 
             retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,st.\"Country\" \"CCode\", ";
 
@@ -398,6 +400,8 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
 
             retstring = retstring += " CASE WHEN COALESCE(Crd11.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd11.\"GSTRegnNo\" END as \"Buyer GSTN\",";
+            retstring = retstring += " CASE WHEN COALESCE(Crd1.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd1.\"GSTRegnNo\" END as \"Shipto GSTN\",";
+
 
             retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,st.\"Country\" \"CCode\",  ";
 
@@ -719,6 +723,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
 
             retstring = retstring += " CASE WHEN COALESCE(Crd11.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd11.\"GSTRegnNo\" END as \"Buyer GSTN\",";
+            retstring = retstring += " CASE WHEN COALESCE(Crd1.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd1.\"GSTRegnNo\" END as \"Shipto GSTN\",";
 
             retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,st.\"Country\" \"CCode\",  ";
 
@@ -899,6 +904,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
 
             retstring = retstring += " CASE WHEN COALESCE(Crd11.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd11.\"GSTRegnNo\" END as \"Buyer GSTN\",";
+            retstring = retstring += " CASE WHEN COALESCE(Crd1.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd1.\"GSTRegnNo\" END as \"Shipto GSTN\",";
 
             retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,st.\"Country\" \"CCode\",  ";
 
@@ -1079,6 +1085,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
 
             retstring = retstring += " CASE WHEN COALESCE(Crd11.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd11.\"GSTRegnNo\" END as \"Buyer GSTN\",";
+            retstring = retstring += " CASE WHEN COALESCE(Crd1.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd1.\"GSTRegnNo\" END as \"Shipto GSTN\",";
 
             retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,st.\"Country\" \"CCode\",  ";
 
@@ -1255,6 +1262,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
 
             retstring = retstring += " CASE WHEN COALESCE(Crd11.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd11.\"GSTRegnNo\" END as \"Buyer GSTN\",";
+            retstring = retstring += " CASE WHEN COALESCE(Crd1.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd1.\"GSTRegnNo\" END as \"Shipto GSTN\",";
 
             retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,st.\"Country\" \"CCode\",  ";
 
@@ -1431,6 +1439,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
 
             retstring = retstring += " CASE WHEN COALESCE(Crd11.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd11.\"GSTRegnNo\" END as \"Buyer GSTN\",";
+            retstring = retstring += " CASE WHEN COALESCE(Crd1.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd1.\"GSTRegnNo\" END as \"Shipto GSTN\",";
 
             retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,st.\"Country\" \"CCode\",  ";
 
