@@ -274,6 +274,7 @@ namespace EInvoicing_Logitax_API.Common
         {
             try
             {
+                WriteErrorLog(StrSQL);
                 SAPbobsCOM.Recordset rset = (SAPbobsCOM.Recordset)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
                 rset.DoQuery(StrSQL);
                 return Convert.ToString((rset.RecordCount) > 0 ? rset.Fields.Item(0).Value.ToString() : "");

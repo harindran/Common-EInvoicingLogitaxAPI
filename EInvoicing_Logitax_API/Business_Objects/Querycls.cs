@@ -489,13 +489,13 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             if (clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_InvTranGetBrnchAdd\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01'; ") == "Y")
             {
-                retstring = retstring + " Cast(COALESCE(FrmLoc.\"Building\",'') AS Varchar(200)) || COALESCE(FrmLoc.\"Street\",'') || COALESCE(FrmLoc.\"Block\",'') || COALESCE(FrmLoc.\"Address\",'')  \"FrmAddres1\",";
+                retstring = retstring + " CONCAT(CONCAT(Cast(COALESCE(FrmLoc.\"Building\",'') AS Varchar(200)), COALESCE(FrmLoc.\"Street\",'')),CONCAT(COALESCE(FrmLoc.\"Block\",'') , COALESCE(FrmLoc.\"Address\",'')))  \"FrmAddres1\",";
                 retstring = retstring + " FrmLoc.\"TaxIdNum\" \"FrmGSTN\", FrmLoc.\"BPLName\" \"FrmTraName\", ";
             }
             else
             {
                 retstring = retstring + " FrmLoc.\"GSTRegnNo\" \"FrmGSTN\", B1.\"CompnyName\"  \"FrmTraName\", ";
-                retstring = retstring + " Cast(COALESCE(FrmLoc.\"Building\",'') AS Varchar(200)) || COALESCE(FrmLoc.\"Street\",'') || COALESCE(FrmLoc.\"Block\",'')  \"FrmAddres1\",";
+                retstring = retstring + " CONCAT(CONCAT(Cast(COALESCE(FrmLoc.\"Building\",'') AS Varchar(200)) , COALESCE(FrmLoc.\"Street\",'') ), COALESCE(FrmLoc.\"Block\",''))  \"FrmAddres1\",";
 
             }
 
@@ -513,9 +513,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
             if (clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_InvTranGetcusAdd\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01'; ") == "Y")
             {
                 retstring += " case when COALESCE(a.\"CardCode\",'') <>'' then ";
-                retstring += " Cast(COALESCE(ToLoc.\"Building\",'') AS Varchar(200)) || ' '||  COALESCE(ToLoc.\"Street\",'') || ' '|| COALESCE(ToLoc.\"Block\",'') || ' '|| COALESCE(ToLoc.\"Address2\",'') || ' '|| COALESCE(ToLoc.\"Address3\",'') ";
+                retstring += " CONCAT(CONCAT(CONCAT(CONCAT(Cast(COALESCE(ToLoc.\"Building\",'') AS Varchar(200)) , ' '), CONCAT(COALESCE(ToLoc.\"Street\",'') , ' ')) , CONCAT(CONCAT( COALESCE(ToLoc.\"Block\",'') , ' '), CONCAT(COALESCE(ToLoc.\"Address2\",'') , ' '))),  COALESCE(ToLoc.\"Address3\",'')) ";
                 retstring += " else ";
-                retstring += " Cast(COALESCE(ToLocSub.\"Building\",'') AS Varchar(200)) || ' '|| COALESCE(ToLocSub.\"Street\",'') || ' '|| COALESCE(ToLocSub.\"Block\",'') ";
+                retstring += " CONCAT(CONCAT(CONCAT(Cast(COALESCE(ToLocSub.\"Building\",'') AS Varchar(200)) ,' '), CONCAT(COALESCE(ToLocSub.\"Street\",'') , ' ')), COALESCE(ToLocSub.\"Block\",'')) ";
                 retstring += " End ";
                 retstring += " \"ToAddres1\",";
 
@@ -568,7 +568,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             }
             else
             {
-                retstring = retstring + " Cast(COALESCE(ToLoc.\"Building\",'') AS Varchar(200)) || ' '|| COALESCE(ToLoc.\"Street\",'') || ' '|| COALESCE(ToLoc.\"Block\",'')  \"ToAddres1\",";
+                retstring = retstring + " CONCAT( CONCAT(CONCAT(Cast(COALESCE(ToLoc.\"Building\",'') AS Varchar(200)) , ' '), CONCAT(COALESCE(ToLoc.\"Street\",'') , ' ')),COALESCE(ToLoc.\"Block\",''))  \"ToAddres1\",";
                 retstring = retstring + " B1.\"CompnyName\" \"ToTraName\",";
 
                 retstring = retstring + " ToLoc.\"GSTRegnNo\" \"ToGSTN\",";

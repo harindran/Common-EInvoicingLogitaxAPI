@@ -177,17 +177,18 @@ namespace EInvoicing_Logitax_API.Business_Objects
             
             oForm = clsModule.objaddon.objapplication.Forms.GetForm("940", pVal.FormTypeCount);
            
-            strSQL = "SELECT \"SubID\" ,\"SubType\" FROM OEST o  ;";
+            strSQL = "SELECT \"SubID\" ,\"SubType\" FROM OEST o  ";
+
             clsModule.objaddon.objglobalmethods.Load_Combo(oForm.UniqueID, ((SAPbouiCOM.ComboBox)oForm.Items.Item("ET0002").Specific), strSQL, new[] { "-,-" });
 
-            strSQL = "SELECT  \"TypeCode\",\"TypeName\" FROM OEDT o;";
+            strSQL = "SELECT  \"TypeCode\",\"TypeName\" FROM OEDT o";
             clsModule.objaddon.objglobalmethods.Load_Combo(oForm.UniqueID, ((SAPbouiCOM.ComboBox)oForm.Items.Item("ET0003").Specific), strSQL, new[] { "-,-" });
 
 
-            strSQL = "SELECT  \"ModeCode\" ,\"ModeName\"  FROM OETM o;";
+            strSQL = "SELECT  \"ModeCode\" ,\"ModeName\"  FROM OETM o";
             clsModule.objaddon.objglobalmethods.Load_Combo(oForm.UniqueID, ((SAPbouiCOM.ComboBox)oForm.Items.Item("ET00012").Specific), strSQL, new[] { "-,-" });
 
-            strSQL = "SELECT  \"TypeCode\",\"TypeName\" FROM OEVT o;";
+            strSQL = "SELECT  \"TypeCode\",\"TypeName\" FROM OEVT o";
             clsModule.objaddon.objglobalmethods.Load_Combo(oForm.UniqueID, ((SAPbouiCOM.ComboBox)oForm.Items.Item("ET00013").Specific), strSQL, new[] { "-,-" });
 
 
@@ -259,7 +260,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             string Tax = Convert.ToString(pCFL.SelectedObjects.Columns.Item("Code").Cells.Item(0).Value);
                             ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_TAXCD").Cells.Item(pVal.Row).Specific).Value = Tax;
 
-                            lstrquery += "SELECT t2.\"EfctivRate\",t2.\"STAType\" FROM ostc t1  LEFT JOIN stc1 t2 ON t1.\"Code\" = t2.\"STCCode\" WHERE t1.\"Code\" = '" + Tax +"'; ";
+                            lstrquery += "SELECT t2.\"EfctivRate\",t2.\"STAType\" FROM ostc t1  LEFT JOIN stc1 t2 ON t1.\"Code\" = t2.\"STCCode\" WHERE t1.\"Code\" = '" + Tax +"' ";
 
                             SAPbobsCOM.Recordset Rc;
                             Rc = clsModule.objaddon.objglobalmethods.GetmultipleRS(lstrquery);

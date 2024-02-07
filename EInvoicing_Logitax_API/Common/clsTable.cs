@@ -86,6 +86,7 @@ namespace EInvoicing_Logitax_API.Common
             AddFields("@ATEICFG", "BillToWare", "Bill To warehouse", SAPbobsCOM.BoFieldTypes.db_Alpha, 30);
             AddFields("@ATEICFG", "ShipToInvName", "Ship To Inventory Name", SAPbobsCOM.BoFieldTypes.db_Alpha, 30);
             AddFields("@ATEICFG", "GettrnShp", "Get  Transaction Ship Address", SAPbobsCOM.BoFieldTypes.db_Alpha, 30);
+            AddFields("@ATEICFG", "NotUseQrcode", "QRcode Enable In Accounts Tab", SAPbobsCOM.BoFieldTypes.db_Alpha, 30);
 
             AddFields("@ATEICFG", "DBType", "SQL Or HANA", SAPbobsCOM.BoFieldTypes.db_Alpha, 5);
             AddFields("@ATEICFG", "EwayNo", "UDF EwayNo", SAPbobsCOM.BoFieldTypes.db_Alpha, 50);

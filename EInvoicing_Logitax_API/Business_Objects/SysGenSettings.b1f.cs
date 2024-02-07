@@ -91,6 +91,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             this.CheckBox6 = ((SAPbouiCOM.CheckBox)(this.GetItem("ChkBTW").Specific));
             this.CheckBox7 = ((SAPbouiCOM.CheckBox)(this.GetItem("ChkSLN").Specific));
             this.CheckBox8 = ((SAPbouiCOM.CheckBox)(this.GetItem("GettrnShp").Specific));
+            this.CheckBox9 = ((SAPbouiCOM.CheckBox)(this.GetItem("NotUseQr").Specific));
             this.OnCustomInitialize();
 
         }
@@ -329,8 +330,14 @@ namespace EInvoicing_Logitax_API.Business_Objects
             {
                 CheckBox8.Checked = true;
             }
-            
 
+            strSQL = clsModule.objaddon.objglobalmethods.getSingleValue("Select \"U_NotUseQrcode\" from \"@ATEICFG\" where \"Code\"='01'");
+            if (strSQL == "Y")
+            {
+                CheckBox9.Checked = true;
+            }
+
+            
         }
 
         private void Folder0_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
@@ -430,6 +437,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 oGeneralData.SetProperty("U_BillToWare", Convert.ToString(((CheckBox6.Checked == true) ? 'Y' : 'N'))); 
                 oGeneralData.SetProperty("U_ShipToInvName", Convert.ToString(((CheckBox7.Checked == true) ? 'Y' : 'N'))); 
                 oGeneralData.SetProperty("U_GettrnShp", Convert.ToString(((CheckBox8.Checked == true) ? 'Y' : 'N'))); 
+                oGeneralData.SetProperty("U_NotUseQrcode", Convert.ToString(((CheckBox9.Checked == true) ? 'Y' : 'N'))); 
 
                 oGeneralData.SetProperty("U_DBType", Convert.ToString(((OptionBtn4.Selected == true) ? 'Y' : 'N')));
                 oGeneralData.SetProperty("U_EwayNo", oForm.DataSources.UserDataSources.Item("EwayNo").Value);
@@ -629,6 +637,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
         private SAPbouiCOM.CheckBox CheckBox6;
         private SAPbouiCOM.CheckBox CheckBox7;
         private SAPbouiCOM.CheckBox CheckBox8;
+        private SAPbouiCOM.CheckBox CheckBox9;
     }
 }
  
