@@ -656,7 +656,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
           
 
 
-            if (clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_InvTranGetBrnchAdd\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01'; ") == "Y")
+            if (clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_InvTranGetBrnchAdd\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01' ") == "Y")
             {
                 
                 retstring = retstring + "LEFT JOIN OBPL FrmLoc ON FrmLoc.\"BPLId\" =FrmAdd.\"BPLid\" ";
@@ -668,7 +668,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             }
 
 
-            if ( clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_InvTranGetcusAdd\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01'; ")=="Y")
+            if ( clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_InvTranGetcusAdd\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01' ")=="Y")
             {
                 retstring = retstring + " LEFT JOIN CRD1 ToLoc on ToLoc.\"CardCode\" =a.\"CardCode\" and ToLoc.\"Address\" =A.\"ShipToCode\" and ToLoc.\"AdresType\"='S'";
             }
