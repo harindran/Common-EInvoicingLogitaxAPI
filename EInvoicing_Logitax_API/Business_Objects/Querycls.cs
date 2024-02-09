@@ -31,8 +31,10 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 retstring = retstring + "T.\"" + clsModule.GSTCol + @""",";
             }
 
-            retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
-
+            retstring = retstring += " CASE WHEN  T.\"ExportType\" in('U','S') THEN case when a.\"DutyStatus\" ='Y' then 'SEZWP' else 'SEZWOP' End ";
+            retstring = retstring += "      WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN  case when a.\"DutyStatus\" ='Y' then 'EXPWP' else 'EXPWOP' End  ";
+            retstring = retstring += "      ELSE 'B2B' END as \"SupTyp\",";
+            
             retstring = retstring + " '' as \"RegRev\",'INV' Type,a.\"DocEntry\",a.\"DocType\",a.\"DocDate\" \"Inv_Doc_Date\",ss.\"GSTRegnNo\" \"Seller GSTN\",";
 
             retstring = retstring + " B1.\"CompnyName\" \"Seller_Legal Name\",ss.\"City\" \"Seller Location Name\"," +
@@ -215,7 +217,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 retstring = retstring + "T.\"" + clsModule.GSTCol + @""",";
             }
 
-            retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
+            retstring = retstring += " CASE WHEN  T.\"ExportType\" in('U','S') THEN case when a.\"DutyStatus\" ='Y' then 'SEZWP' else 'SEZWOP' End ";
+            retstring = retstring += "      WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN  case when a.\"DutyStatus\" ='Y' then 'EXPWP' else 'EXPWOP' End  ";
+            retstring = retstring += "      ELSE 'B2B' END as \"SupTyp\",";
 
             retstring = retstring + " '' as \"RegRev\",'CRN' Type,a.\"DocEntry\",a.\"DocType\",a.\"DocDate\" \"Inv_Doc_Date\",ss.\"GSTRegnNo\" \"Seller GSTN\",";
 
@@ -386,7 +390,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
             {
                 retstring = retstring + "T.\"" + clsModule.GSTCol + @""",";
             }
-            retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
+            retstring = retstring += " CASE WHEN  T.\"ExportType\" in('U','S') THEN case when a.\"DutyStatus\" ='Y' then 'SEZWP' else 'SEZWOP' End ";
+            retstring = retstring += "      WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN  case when a.\"DutyStatus\" ='Y' then 'EXPWP' else 'EXPWOP' End  ";
+            retstring = retstring += "      ELSE 'B2B' END as \"SupTyp\",";
 
             retstring = retstring + " '' as \"RegRev\",'INV' Type,a.\"DocEntry\",a.\"DocType\",a.\"DocDate\" \"Inv_Doc_Date\",ss.\"GSTRegnNo\" \"Seller GSTN\",";
 
@@ -710,7 +716,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 retstring = retstring + "T.\"" + clsModule.GSTCol + @""",";
             }
 
-            retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
+            retstring = retstring += " CASE WHEN  T.\"ExportType\" in('U','S') THEN case when a.\"DutyStatus\" ='Y' then 'SEZWP' else 'SEZWOP' End ";
+            retstring = retstring += "      WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN  case when a.\"DutyStatus\" ='Y' then 'EXPWP' else 'EXPWOP' End  ";
+            retstring = retstring += "      ELSE 'B2B' END as \"SupTyp\",";
 
             retstring = retstring + " '' as \"RegRev\",'INV' Type,a.\"DocEntry\",a.\"DocType\",a.\"DocDate\" \"Inv_Doc_Date\",ss.\"GSTRegnNo\" \"Seller GSTN\",";
 
@@ -890,7 +898,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 retstring = retstring + "T.\"" + clsModule.GSTCol + @""",";
             }
 
-            retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
+            retstring = retstring += " CASE WHEN  T.\"ExportType\" in('U','S') THEN case when a.\"DutyStatus\" ='Y' then 'SEZWP' else 'SEZWOP' End ";
+            retstring = retstring += "      WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN  case when a.\"DutyStatus\" ='Y' then 'EXPWP' else 'EXPWOP' End  ";
+            retstring = retstring += "      ELSE 'B2B' END as \"SupTyp\",";
 
             retstring = retstring + " '' as \"RegRev\",'DBN' Type,a.\"DocEntry\",a.\"DocType\",a.\"DocDate\" \"Inv_Doc_Date\",ss.\"GSTRegnNo\" \"Seller GSTN\",";
 
@@ -1070,7 +1080,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 retstring = retstring + "T.\"" + clsModule.GSTCol + @""",";
             }
 
-            retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
+            retstring = retstring += " CASE WHEN  T.\"ExportType\" in('U','S') THEN case when a.\"DutyStatus\" ='Y' then 'SEZWP' else 'SEZWOP' End ";
+            retstring = retstring += "      WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN  case when a.\"DutyStatus\" ='Y' then 'EXPWP' else 'EXPWOP' End  ";
+            retstring = retstring += "      ELSE 'B2B' END as \"SupTyp\",";
 
             retstring = retstring + " '' as \"RegRev\",'INV' Type,a.\"DocEntry\",a.\"DocType\",a.\"DocDate\" \"Inv_Doc_Date\",ss.\"GSTRegnNo\" \"Seller GSTN\",";
 
@@ -1249,7 +1261,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 retstring = retstring + "T.\"" + clsModule.GSTCol + @""",";
             }
 
-            retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
+            retstring = retstring += " CASE WHEN  T.\"ExportType\" in('U','S') THEN case when a.\"DutyStatus\" ='Y' then 'SEZWP' else 'SEZWOP' End ";
+            retstring = retstring += "      WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN  case when a.\"DutyStatus\" ='Y' then 'EXPWP' else 'EXPWOP' End  ";
+            retstring = retstring += "      ELSE 'B2B' END as \"SupTyp\",";
 
             retstring = retstring + " '' as \"RegRev\",'INV' Type,a.\"DocEntry\",a.\"DocType\",a.\"DocDate\" \"Inv_Doc_Date\",ss.\"GSTRegnNo\" \"Seller GSTN\",";
 
@@ -1424,7 +1438,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 retstring = retstring + "T.\"" + clsModule.GSTCol + @""",";
             }
 
-            retstring = retstring += " CASE WHEN  T.\"ExportType\" = 'U' THEN 'SEZWP' WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN 'EXPWP' ELSE 'B2B' END as \"SupTyp\",";
+            retstring = retstring += " CASE WHEN  T.\"ExportType\" in('U','S') THEN case when a.\"DutyStatus\" ='Y' then 'SEZWP' else 'SEZWOP' End ";
+            retstring = retstring += "      WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN  case when a.\"DutyStatus\" ='Y' then 'EXPWP' else 'EXPWOP' End  ";
+            retstring = retstring += "      ELSE 'B2B' END as \"SupTyp\",";
 
             retstring = retstring + " '' as \"RegRev\",'INV' Type,a.\"DocEntry\",a.\"DocType\",a.\"DocDate\" \"Inv_Doc_Date\",ss.\"GSTRegnNo\" \"Seller GSTN\",";
 

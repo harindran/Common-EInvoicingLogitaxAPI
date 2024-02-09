@@ -1748,9 +1748,11 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                             }
                                             break;
                                         case "EXPWP":                                          
+                                        case "EXPWOP":                                          
                                                 GenerateIRNGetJson.json_data.TranDtls.SupTyp = "IMPG";                                          
                                             break;
                                         case "SEZWP":
+                                        case "SEZWOP":
                                             if (GenerateIRNGetJson.json_data.ValDtls.AssVal == GenerateIRNGetJson.json_data.ValDtls.TotInvVal)
                                             {
                                                 GenerateIRNGetJson.json_data.TranDtls.SupTyp = "IMPGSEZWOP";
