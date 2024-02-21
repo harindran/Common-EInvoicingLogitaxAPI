@@ -1363,6 +1363,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         string BuyerAddress2 = "";
                         string BuyerconcatAddress = string.Concat(invrecordset.Fields.Item("Buyer_Building").Value.ToString(), " ",
                                                             invrecordset.Fields.Item("Buyer_Block").Value.ToString(), " ",
+                                                            invrecordset.Fields.Item("Buyer_StreetNo").Value.ToString(), " ",
                                                             invrecordset.Fields.Item("Buyer_Street").Value.ToString(), " ",
                                                             invrecordset.Fields.Item("Buyer_Address2").Value.ToString(), " ",
                                                             invrecordset.Fields.Item("Buyer_Address3").Value.ToString());
@@ -1403,6 +1404,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             string TBuyerAddress2 = "";
                             string TBuyerconcatAddress = string.Concat(invrecordset.Fields.Item("T_Buyer_Building").Value.ToString(),
                                                                 invrecordset.Fields.Item("T_Buyer_Block").Value.ToString(),
+                                                                invrecordset.Fields.Item("T_Buyer_StreetNo").Value.ToString(),
                                                                 invrecordset.Fields.Item("T_Buyer_Street").Value.ToString(),
                                                                 invrecordset.Fields.Item("T_Buyer_Address2").Value.ToString(),
                                                                 invrecordset.Fields.Item("T_Buyer_Address3").Value.ToString());
@@ -1480,6 +1482,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                         string TshipAddress2 = "";
                                         string TBuyerconcatAddress = string.Concat(invrecordset.Fields.Item("T_Ship_Building").Value.ToString(),
                                                                             invrecordset.Fields.Item("T_Ship_Block").Value.ToString(),
+                                                                            invrecordset.Fields.Item("T_Ship_StreetNo").Value.ToString(),
                                                                             invrecordset.Fields.Item("T_Ship_Street").Value.ToString(),
                                                                             invrecordset.Fields.Item("T_Ship_Address2").Value.ToString(),
                                                                             invrecordset.Fields.Item("T_Ship_Address3").Value.ToString());
