@@ -493,7 +493,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             retstring = retstring + " b.\"DiscPrcnt\",((b.\"PriceBefDi\"*\"Quantity\") * (b.\"DiscPrcnt\"/100)) \"LineDisc\",l.\"InvntryUom\" ,IFNULL(a.\"RoundDif\",0) \"Rounding\", a.\"TaxDate\" \"Cust Order Date\", a.\"TotalExpns\",l.\"FrgnName\",a.\"DocCur\",A.\"VatSum\", a.\"TotalExpns\" \"Freight\",";
             retstring = retstring + " l.\"SalUnitMsr\",IFNULL(b.\"LineTotal\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Line Total\", IFNULL(a.\"TotalExpns\",0) \"Freight Total\",IFNULL(a.\"DiscSum\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Disc Total\",l.\"ItemClass\", ";
 
-            if (clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_InvTranGetBrnchAdd\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01'; ") == "Y")
+            if (clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_InvTranGetBrnchAdd\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01' ") == "Y")
             {
                 retstring = retstring + " CONCAT(CONCAT(Cast(COALESCE(FrmLoc.\"Building\",'') AS Varchar(200)), COALESCE(FrmLoc.\"Street\",'')),CONCAT(COALESCE(FrmLoc.\"Block\",'') , COALESCE(FrmLoc.\"Address\",'')))  \"FrmAddres1\",";
                 retstring = retstring + " FrmLoc.\"TaxIdNum\" \"FrmGSTN\", FrmLoc.\"BPLName\" \"FrmTraName\", ";
@@ -516,7 +516,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=FrmLoc.\"Country\" and \"Code\"=FrmLoc.\"State\") \"FrmState\",";
 
 
-            if (clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_InvTranGetcusAdd\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01'; ") == "Y")
+            if (clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_InvTranGetcusAdd\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01'") == "Y")
             {
                 retstring += " case when COALESCE(a.\"CardCode\",'') <>'' then ";
                 retstring += " CONCAT(CONCAT(CONCAT(CONCAT(Cast(COALESCE(ToLoc.\"Building\",'') AS Varchar(200)) , ' '), CONCAT(COALESCE(ToLoc.\"Street\",'') , ' ')) , CONCAT(CONCAT( COALESCE(ToLoc.\"Block\",'') , ' '), CONCAT(COALESCE(ToLoc.\"Address2\",'') , ' '))),  COALESCE(ToLoc.\"Address3\",'')) ";
