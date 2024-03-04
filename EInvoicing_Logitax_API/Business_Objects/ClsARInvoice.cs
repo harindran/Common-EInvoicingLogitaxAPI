@@ -1104,7 +1104,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                 }
 
                             }
-                            else if (objRs.Fields.Item("U_BillToWare").Value.ToString() == "Y")
+                            else if (objRs.Fields.Item("U_BillToWare").Value.ToString() == "Y" && Isservice=="N")
                             {
                                 string Line1 = "";
                                
