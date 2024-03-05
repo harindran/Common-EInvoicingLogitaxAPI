@@ -539,7 +539,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         { "toPeriodCode", toPeriodCode },
                         { "Json_Data",jsonstring },
                     };
-
+                        clsModule.objaddon.objglobalmethods.WriteErrorLog(jsonstring);
                         datatable = Get_API_Response(formData, fileapi, contenttype: "multipart/form-data", headers: head, formdata1: formData1);
                         if (datatable.Rows.Count > 0)
                         {

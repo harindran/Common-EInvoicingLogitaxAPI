@@ -619,7 +619,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             //strSQL += @"IFNULL((select sum(""TaxSum"") from INV4 where ""DocEntry"" = TF.""DocEntry"" and ""LineNum"" = TF.""LineNum"" and ""staType"" = '-120' AND  ""ExpnsCode"" <> '-1'),0) as IGSTAmt from INV3 TF where TF.""DocEntry"" = " + DocEntry + @" and TF.""ExpnsCode"" <> '-1'";
 
 
-            strSQL = @" Select 'Freight' as Dscription,1 as Quantity,'9965' as HSN,TF.""VatPrcnt"",TF.""LineTotal"",TF.""GrsAmount"" as ""Total Value"",";
+            strSQL = @" Select 'Freight' as Dscription,1 as Quantity,'996511' as HSN,TF.""VatPrcnt"",TF.""LineTotal"",TF.""GrsAmount"" as ""Total Value"",";
             strSQL += @" IFNULL((select sum(""TaxSum"") from " + subtb1 + @" where ""DocEntry"" = TF.""DocEntry"" and ""LineNum"" = TF.""LineNum"" and ""staType"" = '-100'
                         AND ""ExpnsCode"" <> '-1'),0) as CGSTAmt,IFNULL((select sum(""TaxSum"") from " + subtb1 + @" where ""DocEntry"" = TF.""DocEntry"" 
                         and ""LineNum"" = TF.""LineNum"" and ""staType"" = -110 and ""ExpnsCode"" <> '-1'),0) as SGSTAmt,";
@@ -1788,6 +1788,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                             }
                                             break;
                                         case "EXPWP":
+                                        case "EXPWOP":
                                              if (GenerateIRNGetJson.json_data.ValDtls.AssVal == GenerateIRNGetJson.json_data.ValDtls.TotInvVal)
                                             {
                                                 GenerateIRNGetJson.json_data.TranDtls.SupTyp = "WOPAY";
@@ -1799,6 +1800,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
                                             break;
                                         case "SEZWP":
+                                        case "SEZWOP":
                                             if (GenerateIRNGetJson.json_data.ValDtls.AssVal == GenerateIRNGetJson.json_data.ValDtls.TotInvVal)
                                             {
                                                 GenerateIRNGetJson.json_data.TranDtls.SupTyp = "SEWOP";

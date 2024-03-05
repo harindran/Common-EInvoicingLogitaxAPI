@@ -274,13 +274,14 @@ namespace EInvoicing_Logitax_API.Common
         {
             try
             {
-                WriteErrorLog(StrSQL);
+                
                 SAPbobsCOM.Recordset rset = (SAPbobsCOM.Recordset)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
                 rset.DoQuery(StrSQL);
                 return Convert.ToString((rset.RecordCount) > 0 ? rset.Fields.Item(0).Value.ToString() : "");
             }
             catch (Exception ex)
             {
+                WriteErrorLog(StrSQL);
                 clsModule.objaddon.objapplication.StatusBar.SetText(" Get Single Value Function Failed :  " + ex.Message + StrSQL, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
                 return "";
             }
