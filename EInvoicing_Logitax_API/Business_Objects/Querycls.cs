@@ -33,17 +33,22 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" in('U','S') THEN case when a.\"DutyStatus\" ='Y' then 'SEZWP' else 'SEZWOP' End ";
             retstring = retstring += "      WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN  case when a.\"DutyStatus\" ='Y' then 'EXPWP' else 'EXPWOP' End  ";
+            retstring = retstring += "      WHEN  T.\"ExportType\" = 'D' THEN 'DEXP' ";
             retstring = retstring += "      ELSE 'B2B' END as \"SupTyp\",";
             
             retstring = retstring + " '' as \"RegRev\",'INV' Type,a.\"DocEntry\",a.\"DocType\",a.\"DocDate\" \"Inv_Doc_Date\",ss.\"GSTRegnNo\" \"Seller GSTN\",";
 
-            retstring = retstring + " B1.\"CompnyName\" \"Seller_Legal Name\",ss.\"City\" \"Seller Location Name\"," +
-                "Replace(ss.\"ZipCode\",' ','') \"Seller_PIN code\",(select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ss.\"Country\" and \"Code\"=ss.\"State\") \"Seller_State_code\",";
+            retstring = retstring + " B1.\"CompnyName\" \"Seller_Legal Name\",ss.\"City\" \"Seller Location Name\", Replace(ss.\"ZipCode\",' ','') \"Seller_PIN code\", ";
+            
+            retstring = retstring + " (CASE WHEN ss.\"Country\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ss.\"Country\" and \"Code\"=ss.\"State\") ";
+            retstring = retstring + " ELSE '96' END) \"Seller_State_code\",";
 
 
             retstring = retstring + " B3.\"GlblLocNum\" as \"CompnyGSTIN\", ";
             retstring = retstring + " B1.\"CompnyAddr\",Replace(B3.\"ZipCode\",' ','') \"CompnyPincode\",B3.\"City\" \"CompnyCity\", ";
-            retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=B3.\"Country\" and \"Code\"=B3.\"State\") \"Compnystatecode\", ";
+
+            retstring = retstring + " (CASE WHEN B3.\"Country\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=B3.\"Country\" and \"Code\"=B3.\"State\") ";
+            retstring = retstring + " ELSE '96' END ) \"Compnystatecode\", ";
 
             retstring = retstring += " CASE WHEN COALESCE(Crd11.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd11.\"GSTRegnNo\" END as \"Buyer GSTN\",";
             retstring = retstring += " CASE WHEN COALESCE(Crd1.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd1.\"GSTRegnNo\" END as \"Shipto GSTN\",";
@@ -67,17 +72,17 @@ namespace EInvoicing_Logitax_API.Business_Objects
             retstring = retstring += " crd1.\"Building\" \"Ship_Building\",crd1.\"Block\" \"Ship_Block\",crd1.\"StreetNo\" \"Ship_StreetNo\",crd1.\"Street\" \"Ship_Street\",crd1.\"Address2\" \"Ship_Address2\",crd1.\"Address3\" \"Ship_Address3\",";
 
 
-            retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=Crd11.\"State\" and \"Country\"=Crd11.\"Country\") \"Bill to State Code\",";
-            retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=crd1.\"State\" and \"Country\"=crd1.\"Country\") \"Shipp to State Code\",";
+            retstring = retstring + " (case when Crd11.\"Country\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=Crd11.\"State\" and \"Country\"=Crd11.\"Country\") ELSE '96' END) \"Bill to State Code\",";
+            retstring = retstring + " (case when crd1.\"Country\"= 'IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=crd1.\"State\" and \"Country\"=crd1.\"Country\") ELSE '96' END)\"Shipp to State Code\",";
 
 
             retstring = retstring += " T.\"BuildingB\" \"T_Buyer_Building\",T.\"BlockB\" \"T_Buyer_Block\",T.\"StreetNoB\" \"T_Buyer_StreetNo\",T.\"StreetB\" \"T_Buyer_Street\",T.\"Address2B\" \"T_Buyer_Address2\",T.\"Address3B\" \"T_Buyer_Address3\",";
             retstring = retstring += " T.\"CityB\" \"T_BCity\" , CASE WHEN T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN '999999' ELSE Replace(T.\"ZipCodeB\",' ','') END as  \"T_BZipCode\", ";
-            retstring = retstring += " (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateB\" and \"Country\"=T.\"CountryB\") \"T_Bill to State Code\", ";
+            retstring = retstring += " (case when T.\"CountryB\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateB\" and \"Country\"=T.\"CountryB\") ElSE '96' END) \"T_Bill to State Code\", ";
 
             retstring = retstring += " T.\"BuildingS\" \"T_Ship_Building\",T.\"BlockS\" \"T_Ship_Block\",T.\"StreetNoS\" \"T_Ship_StreetNo\",T.\"StreetS\" \"T_Ship_Street\",T.\"Address2S\" \"T_Ship_Address2\",T.\"Address3S\" \"T_Ship_Address3\",";
             retstring = retstring += " T.\"CityS\" \"T_SCity\" , CASE WHEN T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN '999999' ELSE Replace(T.\"ZipCodeS\",' ','') END as  \"T_SZipCode\", ";
-            retstring = retstring += " (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateS\" and \"Country\"=T.\"CountryS\") \"T_Shipp to State Code\", ";
+            retstring = retstring += " (case when T.\"CountryS\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateS\" and \"Country\"=T.\"CountryS\") ELSE '96' END) \"T_Shipp to State Code\", ";
 
 
 
@@ -219,17 +224,20 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" in('U','S') THEN case when a.\"DutyStatus\" ='Y' then 'SEZWP' else 'SEZWOP' End ";
             retstring = retstring += "      WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN  case when a.\"DutyStatus\" ='Y' then 'EXPWP' else 'EXPWOP' End  ";
+            retstring = retstring += "      WHEN  T.\"ExportType\" = 'D' THEN 'DEXP' ";
             retstring = retstring += "      ELSE 'B2B' END as \"SupTyp\",";
 
             retstring = retstring + " '' as \"RegRev\",'CRN' Type,a.\"DocEntry\",a.\"DocType\",a.\"DocDate\" \"Inv_Doc_Date\",ss.\"GSTRegnNo\" \"Seller GSTN\",";
 
-            retstring = retstring + " B1.\"CompnyName\" \"Seller_Legal Name\",ss.\"City\" \"Seller Location Name\"," +
-                "Replace(ss.\"ZipCode\",' ','') \"Seller_PIN code\",(select COALESCE(\"GSTCode\",'96')from OCST where \"Country\"=ss.\"Country\" and \"Code\"=ss.\"State\") \"Seller_State_code\",";
+            retstring = retstring + " B1.\"CompnyName\" \"Seller_Legal Name\",ss.\"City\" \"Seller Location Name\", Replace(ss.\"ZipCode\",' ','') \"Seller_PIN code\", ";        
+            retstring = retstring + " (CASE WHEN ss.\"Country\"='IN' then select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ss.\"Country\" and \"Code\"=ss.\"State\" ";
+            retstring = retstring + " ELSE '96' END) \"Seller_State_code\",";
 
             retstring = retstring + " B3.\"GlblLocNum\" as \"CompnyGSTIN\", ";
             retstring = retstring + " B1.\"CompnyAddr\",Replace(B3.\"ZipCode\",' ','') \"CompnyPincode\",B3.\"City\" \"CompnyCity\", ";
-            retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=B3.\"Country\" and \"Code\"=B3.\"State\") \"Compnystatecode\", ";
 
+            retstring = retstring + " (CASE WHEN B3.\"Country\"='IN' then select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=B3.\"Country\" and \"Code\"=B3.\"State\" ";
+            retstring = retstring + " ELSE '96' END ) \"Compnystatecode\", ";
 
             retstring = retstring += " CASE WHEN COALESCE(Crd11.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd11.\"GSTRegnNo\" END as \"Buyer GSTN\",";
             retstring = retstring += " CASE WHEN COALESCE(Crd1.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd1.\"GSTRegnNo\" END as \"Shipto GSTN\",";
@@ -254,16 +262,17 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring += " T.\"BuildingB\" \"T_Buyer_Building\",T.\"BlockB\" \"T_Buyer_Block\",T.\"StreetNoB\" \"T_Buyer_StreetNo\",T.\"StreetB\" \"T_Buyer_Street\",T.\"Address2B\" \"T_Buyer_Address2\",T.\"Address3B\" \"T_Buyer_Address3\",";
             retstring = retstring += " T.\"CityB\" \"T_BCity\" , CASE WHEN T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN '999999' ELSE Replace(T.\"ZipCodeB\",' ','') END as  \"T_BZipCode\", ";
-            retstring = retstring += " (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateB\" and \"Country\"=T.\"CountryB\") \"T_Bill to State Code\", ";
+            retstring = retstring += " (case when T.\"CountryB\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateB\" and \"Country\"=T.\"CountryB\") ElSE '96' END) \"T_Bill to State Code\", ";
 
             retstring = retstring += " T.\"BuildingS\" \"T_Ship_Building\",T.\"BlockS\" \"T_Ship_Block\",T.\"StreetNoS\" \"T_Ship_StreetNo\",T.\"StreetS\" \"T_Ship_Street\",T.\"Address2S\" \"T_Ship_Address2\",T.\"Address3S\" \"T_Ship_Address3\",";
             retstring = retstring += " T.\"CityS\" \"T_SCity\" , CASE WHEN T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN '999999' ELSE Replace(T.\"ZipCodeS\",' ','') END as  \"T_SZipCode\", ";
-            retstring = retstring += " (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateS\" and \"Country\"=T.\"CountryS\") \"T_Shipp to State Code\", ";
+            retstring = retstring += " (case when T.\"CountryS\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateS\" and \"Country\"=T.\"CountryS\") ELSE '96' END) \"T_Shipp to State Code\", ";
 
 
 
-            retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=Crd11.\"State\" and \"Country\"=Crd11.\"Country\") \"Bill to State Code\",(select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=crd1.\"State\" and \"Country\"=crd1.\"Country\")";
-            retstring = retstring + " \"Shipp to State Code\",b.\"ItemCode\", b.\"Dscription\",Case when a.\"DocType\"='S' then 'Y' Else 'N' End \"IsServc\",";
+            retstring = retstring + " (case when Crd11.\"Country\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=Crd11.\"State\" and \"Country\"=Crd11.\"Country\") ELSE '96' END) \"Bill to State Code\", ";
+            retstring = retstring + " (case when Crd1.\"Country\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=crd1.\"State\" and \"Country\"=crd1.\"Country\") ELSE '96' END) \"Shipp to State Code\",";
+            retstring = retstring + "  b.\"ItemCode\", b.\"Dscription\",Case when a.\"DocType\"='S' then 'Y' Else 'N' End \"IsServc\",";
             retstring = retstring + " Case when a.\"DocType\"='S' then (Select Case when LEft(\"ServCode\",2) like '0%' then Replace(\"ServCode\",'0','') Else \"ServCode\" End from OSAC where b.\"SacEntry\"  = \"AbsEntry\") Else Left(Replace(o.\"ChapterID\",'.','')," + HSNLength + ") End \"HSN\",Case when a.\"DocType\"='S' then 1 Else b.\"Quantity\" End \"Quantity\",b.\"UomCode\" \"Unit\",";
 
             retstring = retstring + " Case when a.\"DocType\"='S' then b.\"Price\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end  else b.\"PriceBefDi\" * a.\"DocRate\" end \"UnitPrice\",";
@@ -392,18 +401,20 @@ namespace EInvoicing_Logitax_API.Business_Objects
             }
             retstring = retstring += " CASE WHEN  T.\"ExportType\" in('U','S') THEN case when a.\"DutyStatus\" ='Y' then 'SEZWP' else 'SEZWOP' End ";
             retstring = retstring += "      WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN  case when a.\"DutyStatus\" ='Y' then 'EXPWP' else 'EXPWOP' End  ";
+            retstring = retstring += "      WHEN  T.\"ExportType\" = 'D' THEN 'DEXP' ";
             retstring = retstring += "      ELSE 'B2B' END as \"SupTyp\",";
 
             retstring = retstring + " '' as \"RegRev\",'INV' Type,a.\"DocEntry\",a.\"DocType\",a.\"DocDate\" \"Inv_Doc_Date\",ss.\"GSTRegnNo\" \"Seller GSTN\",";
 
-            retstring = retstring + " B1.\"CompnyName\" \"Seller_Legal Name\",ss.\"City\" \"Seller Location Name\"," +
-                "Replace(ss.\"ZipCode\",' ','') \"Seller_PIN code\",(select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ss.\"Country\" and \"Code\"=ss.\"State\") \"Seller_State_code\",";
-
+            retstring = retstring + " B1.\"CompnyName\" \"Seller_Legal Name\",ss.\"City\" \"Seller Location Name\", Replace(ss.\"ZipCode\",' ','') \"Seller_PIN code\", ";
+            retstring = retstring + " (CASE WHEN ss.\"Country\"='IN' then select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ss.\"Country\" and \"Code\"=ss.\"State\" ";
+            retstring = retstring + " ELSE '96' END) \"Seller_State_code\",";
 
             retstring = retstring + " B3.\"GlblLocNum\" as \"CompnyGSTIN\", ";
             retstring = retstring + " B1.\"CompnyAddr\",Replace(B3.\"ZipCode\",' ','') \"CompnyPincode\",B3.\"City\" \"CompnyCity\", ";
-            retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=B3.\"Country\" and \"Code\"=B3.\"State\") \"Compnystatecode\", ";
 
+            retstring = retstring + " (CASE WHEN B3.\"Country\"='IN' then select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=B3.\"Country\" and \"Code\"=B3.\"State\" ";
+            retstring = retstring + " ELSE '96' END ) \"Compnystatecode\", ";
 
             retstring = retstring += " CASE WHEN COALESCE(Crd11.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd11.\"GSTRegnNo\" END as \"Buyer GSTN\",";
             retstring = retstring += " CASE WHEN COALESCE(Crd1.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd1.\"GSTRegnNo\" END as \"Shipto GSTN\",";
@@ -429,17 +440,17 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring += " T.\"BuildingB\" \"T_Buyer_Building\",T.\"BlockB\" \"T_Buyer_Block\",T.\"StreetNoB\" \"T_Buyer_StreetNo\",T.\"StreetB\" \"T_Buyer_Street\",T.\"Address2B\" \"T_Buyer_Address2\",T.\"Address3B\" \"T_Buyer_Address3\",";
             retstring = retstring += " T.\"CityB\" \"T_BCity\" , CASE WHEN T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN '999999' ELSE Replace(T.\"ZipCodeB\",' ','') END as  \"T_BZipCode\", ";
-            retstring = retstring += " (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateB\" and \"Country\"=T.\"CountryB\") \"T_Bill to State Code\", ";
+            retstring = retstring += " (case when T.\"CountryB\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateB\" and \"Country\"=T.\"CountryB\") ELSE '96' END) \"T_Bill to State Code\", ";
 
             retstring = retstring += " T.\"BuildingS\" \"T_Ship_Building\",T.\"BlockS\" \"T_Ship_Block\",T.\"StreetNoS\" \"T_Ship_StreetNo\",T.\"StreetS\" \"T_Ship_Street\",T.\"Address2S\" \"T_Ship_Address2\",T.\"Address3S\" \"T_Ship_Address3\",";
             retstring = retstring += " T.\"CityS\" \"T_SCity\" , CASE WHEN T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN '999999' ELSE Replace(T.\"ZipCodeS\",' ','') END as  \"T_SZipCode\", ";
-            retstring = retstring += " (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateS\" and \"Country\"=T.\"CountryS\") \"T_Shipp to State Code\", ";
+            retstring = retstring += " (case when T.\"CountryS\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateS\" and \"Country\"=T.\"CountryS\") ELSE '96' END) \"T_Shipp to State Code\", ";
 
 
 
-            retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=Crd11.\"State\" and \"Country\"=Crd11.\"Country\") \"Bill to State Code\"," +
-                "                       (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=crd1.\"State\" and \"Country\"=crd1.\"Country\")";
-            retstring = retstring + " \"Shipp to State Code\",b.\"ItemCode\", b.\"Dscription\",Case when a.\"DocType\"='S' then 'Y' Else 'N' End \"IsServc\",";
+            retstring = retstring + " (case when Crd11.\"Country\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=Crd11.\"State\" and \"Country\"=Crd11.\"Country\") ELSE '96' END) \"Bill to State Code\",";
+            retstring = retstring + " (case when crd1.\"Country\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=crd1.\"State\" and \"Country\"=crd1.\"Country\") ELSE '96' END ) \"Shipp to State Code\",";
+            retstring = retstring + " b.\"ItemCode\", b.\"Dscription\",Case when a.\"DocType\"='S' then 'Y' Else 'N' End \"IsServc\",";
             retstring = retstring + " Case when a.\"DocType\"='S' then (Select Case when LEft(\"ServCode\",2) like '0%' then Replace(\"ServCode\",'0','') Else \"ServCode\" End from OSAC where b.\"SacEntry\"= \"AbsEntry\") Else Left(Replace(o.\"ChapterID\",'.','')," + HSNLength + ") End \"HSN\",Case when a.\"DocType\"='S' then 1 Else b.\"Quantity\" End \"Quantity\",COALESCE(b.\"unitMsr\",b.\"UomCode\") \"Unit\",";
 
 
@@ -512,8 +523,8 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring + " '' \"FrmAddres2\" , ";
             retstring = retstring + " FrmLoc.\"City\" \"FrmPlace\", Replace(FrmLoc.\"ZipCode\",' ','') \"FrmZipCode\",";
-            retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=FrmLoc.\"Country\" and \"Code\"=FrmLoc.\"State\") \"ActFrmStat\",";
-            retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=FrmLoc.\"Country\" and \"Code\"=FrmLoc.\"State\") \"FrmState\",";
+            retstring = retstring + " (case when FrmLoc.\"Country\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=FrmLoc.\"Country\" and \"Code\"=FrmLoc.\"State\") ELSE '96' END) \"ActFrmStat\",";
+            retstring = retstring + " (case when FrmLoc.\"Country\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=FrmLoc.\"Country\" and \"Code\"=FrmLoc.\"State\") ELSE '96' END) \"FrmState\",";
 
 
             if (clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_InvTranGetcusAdd\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01'") == "Y")
@@ -558,16 +569,16 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
 
                 retstring += " case when COALESCE(a.\"CardCode\",'') <>'' then ";
-                retstring += " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ToLoc.\"Country\" and \"Code\"=ToLoc.\"State\") ";
+                retstring += " (case when ToLoc.\"Country\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ToLoc.\"Country\" and \"Code\"=ToLoc.\"State\")  ELSE '96' END) ";
                 retstring += " else ";
-                retstring += " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ToLocSub.\"Country\" and \"Code\"=ToLocSub.\"State\") ";
+                retstring += " (case when ToLocSub.\"Country\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ToLocSub.\"Country\" and \"Code\"=ToLocSub.\"State\") ";
                 retstring += " End ";
                 retstring += " \"ActToState\", ";
 
                 retstring += " case when COALESCE(a.\"CardCode\",'') <>'' then ";
-                retstring += " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ToLoc.\"Country\" and \"Code\"=ToLoc.\"State\") ";
+                retstring += " (case when ToLoc.\"Country\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ToLoc.\"Country\" and \"Code\"=ToLoc.\"State\") ELSE '96' END) ";
                 retstring += " else ";
-                retstring += " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ToLocSub.\"Country\" and \"Code\"=ToLocSub.\"State\") ";
+                retstring += " (case when ToLocSub.\"Country\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ToLocSub.\"Country\" and \"Code\"=ToLocSub.\"State\")  ELSE '96' END) ";
                 retstring += " End ";
                 retstring += " \"ToState\", ";
              
@@ -580,8 +591,8 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 retstring = retstring + " ToLoc.\"GSTRegnNo\" \"ToGSTN\",";
                 retstring = retstring + " '' \"ToAddres2\", ";
                 retstring = retstring + " ToLoc.\"City\" \"ToPlace\", Replace(ToLoc.\"ZipCode\",' ','') \"ToZipCode\",";
-                retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ToLoc.\"Country\" and \"Code\"=ToLoc.\"State\") \"ActToState\",";
-                retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ToLoc.\"Country\" and \"Code\"=ToLoc.\"State\") \"ToState\",";
+                retstring = retstring + " (case when ToLoc.\"Country\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ToLoc.\"Country\" and \"Code\"=ToLoc.\"State\") ELSE '96' END) \"ActToState\",";
+                retstring = retstring + " (case when ToLoc.\"Country\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ToLoc.\"Country\" and \"Code\"=ToLoc.\"State\") ELSE '96' END) \"ToState\",";
             }
 
 
@@ -718,17 +729,20 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" in('U','S') THEN case when a.\"DutyStatus\" ='Y' then 'SEZWP' else 'SEZWOP' End ";
             retstring = retstring += "      WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN  case when a.\"DutyStatus\" ='Y' then 'EXPWP' else 'EXPWOP' End  ";
+            retstring = retstring += "      WHEN  T.\"ExportType\" = 'D' THEN 'DEXP' ";
             retstring = retstring += "      ELSE 'B2B' END as \"SupTyp\",";
 
             retstring = retstring + " '' as \"RegRev\",'INV' Type,a.\"DocEntry\",a.\"DocType\",a.\"DocDate\" \"Inv_Doc_Date\",ss.\"GSTRegnNo\" \"Seller GSTN\",";
 
-            retstring = retstring + " B1.\"CompnyName\" \"Seller_Legal Name\",ss.\"City\" \"Seller Location Name\"," +
-                "Replace(ss.\"ZipCode\",' ','') \"Seller_PIN code\",(select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ss.\"Country\" and \"Code\"=ss.\"State\") \"Seller_State_code\",";
+            retstring = retstring + " B1.\"CompnyName\" \"Seller_Legal Name\",ss.\"City\" \"Seller Location Name\", Replace(ss.\"ZipCode\",' ','') \"Seller_PIN code\", ";
+            retstring = retstring + " (CASE WHEN ss.\"Country\"='IN' then select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ss.\"Country\" and \"Code\"=ss.\"State\" ";
+            retstring = retstring + " ELSE '96' END) \"Seller_State_code\",";
 
             retstring = retstring + " B3.\"GlblLocNum\" as \"CompnyGSTIN\", ";
             retstring = retstring + " B1.\"CompnyAddr\",Replace(B3.\"ZipCode\",' ','') \"CompnyPincode\",B3.\"City\" \"CompnyCity\", ";
-            retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=B3.\"Country\" and \"Code\"=B3.\"State\") \"Compnystatecode\", ";
 
+            retstring = retstring + " (CASE WHEN B3.\"Country\"='IN' then select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=B3.\"Country\" and \"Code\"=B3.\"State\" ";
+            retstring = retstring + " ELSE '96' END ) \"Compnystatecode\", ";
 
             retstring = retstring += " CASE WHEN COALESCE(Crd11.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd11.\"GSTRegnNo\" END as \"Buyer GSTN\",";
             retstring = retstring += " CASE WHEN COALESCE(Crd1.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd1.\"GSTRegnNo\" END as \"Shipto GSTN\",";
@@ -753,17 +767,17 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring += " T.\"BuildingB\" \"T_Buyer_Building\",T.\"BlockB\" \"T_Buyer_Block\",T.\"StreetNoB\" \"T_Buyer_StreetNo\",T.\"StreetB\" \"T_Buyer_Street\",T.\"Address2B\" \"T_Buyer_Address2\",T.\"Address3B\" \"T_Buyer_Address3\",";
             retstring = retstring += " T.\"CityB\" \"T_BCity\" , CASE WHEN T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN '999999' ELSE Replace(T.\"ZipCodeB\",' ','') END as  \"T_BZipCode\", ";
-            retstring = retstring += " (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateB\" and \"Country\"=T.\"CountryB\") \"T_Bill to State Code\", ";
+            retstring = retstring += " (case when T.\"CountryB\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateB\" and \"Country\"=T.\"CountryB\") ElSE '96' END) \"T_Bill to State Code\", ";
 
             retstring = retstring += " T.\"BuildingS\" \"T_Ship_Building\",T.\"BlockS\" \"T_Ship_Block\",T.\"StreetNoS\" \"T_Ship_StreetNo\",T.\"StreetS\" \"T_Ship_Street\",T.\"Address2S\" \"T_Ship_Address2\",T.\"Address3S\" \"T_Ship_Address3\",";
             retstring = retstring += " T.\"CityS\" \"T_SCity\" , CASE WHEN T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN '999999' ELSE Replace(T.\"ZipCodeS\",' ','') END as  \"T_SZipCode\", ";
-            retstring = retstring += " (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateS\" and \"Country\"=T.\"CountryS\") \"T_Shipp to State Code\", ";
+            retstring = retstring += " (case when T.\"CountryS\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateS\" and \"Country\"=T.\"CountryS\") ELSE '96' END) \"T_Shipp to State Code\", ";
 
 
 
-            retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=Crd11.\"State\" and \"Country\"=Crd11.\"Country\") \"Bill to State Code\"," +
-                "                       (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=crd1.\"State\" and \"Country\"=crd1.\"Country\")";
-            retstring = retstring + " \"Shipp to State Code\",b.\"ItemCode\", b.\"Dscription\",Case when a.\"DocType\"='S' then 'Y' Else 'N' End \"IsServc\",";
+            retstring = retstring + " (case when Crd11.\"Country\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=Crd11.\"State\" and \"Country\"=Crd11.\"Country\") ELSE '96' END) \"Bill to State Code\",";
+            retstring = retstring + " (case when crd1.\"Country\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=crd1.\"State\" and \"Country\"=crd1.\"Country\") ELSE '96' END ) \"Shipp to State Code\",";
+            retstring = retstring + " b.\"ItemCode\", b.\"Dscription\",Case when a.\"DocType\"='S' then 'Y' Else 'N' End \"IsServc\",";
             retstring = retstring + " Case when a.\"DocType\"='S' then (Select Case when LEft(\"ServCode\",2) like '0%' then Replace(\"ServCode\",'0','') Else \"ServCode\" End from OSAC where b.\"SacEntry\"= \"AbsEntry\") Else Left(Replace(o.\"ChapterID\",'.','')," + HSNLength + ") End \"HSN\",Case when a.\"DocType\"='S' then 1 Else b.\"Quantity\" End \"Quantity\",COALESCE(b.\"unitMsr\",b.\"UomCode\") \"Unit\",";
 
             retstring = retstring + " Case when a.\"DocType\"='S' then b.\"Price\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end  else b.\"PriceBefDi\" * a.\"DocRate\" end \"UnitPrice\",";
@@ -900,18 +914,20 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" in('U','S') THEN case when a.\"DutyStatus\" ='Y' then 'SEZWP' else 'SEZWOP' End ";
             retstring = retstring += "      WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN  case when a.\"DutyStatus\" ='Y' then 'EXPWP' else 'EXPWOP' End  ";
+            retstring = retstring += "      WHEN  T.\"ExportType\" = 'D' THEN 'DEXP' ";
             retstring = retstring += "      ELSE 'B2B' END as \"SupTyp\",";
 
             retstring = retstring + " '' as \"RegRev\",'DBN' Type,a.\"DocEntry\",a.\"DocType\",a.\"DocDate\" \"Inv_Doc_Date\",ss.\"GSTRegnNo\" \"Seller GSTN\",";
 
-            retstring = retstring + " B1.\"CompnyName\" \"Seller_Legal Name\",ss.\"City\" \"Seller Location Name\"," +
-                "Replace(ss.\"ZipCode\",' ','') \"Seller_PIN code\",(select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ss.\"Country\" and \"Code\"=ss.\"State\") \"Seller_State_code\",";
-
+            retstring = retstring + " B1.\"CompnyName\" \"Seller_Legal Name\",ss.\"City\" \"Seller Location Name\", Replace(ss.\"ZipCode\",' ','') \"Seller_PIN code\", ";
+            retstring = retstring + " (CASE WHEN ss.\"Country\"='IN' then select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ss.\"Country\" and \"Code\"=ss.\"State\" ";
+            retstring = retstring + " ELSE '96' END) \"Seller_State_code\",";
 
             retstring = retstring + " B3.\"GlblLocNum\" as \"CompnyGSTIN\", ";
             retstring = retstring + " B1.\"CompnyAddr\",Replace(B3.\"ZipCode\",' ','') \"CompnyPincode\",B3.\"City\" \"CompnyCity\", ";
-            retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=B3.\"Country\" and \"Code\"=B3.\"State\") \"Compnystatecode\", ";
 
+            retstring = retstring + " (CASE WHEN B3.\"Country\"='IN' then select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=B3.\"Country\" and \"Code\"=B3.\"State\" ";
+            retstring = retstring + " ELSE '96' END ) \"Compnystatecode\", ";
 
             retstring = retstring += " CASE WHEN COALESCE(Crd11.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd11.\"GSTRegnNo\" END as \"Buyer GSTN\",";
             retstring = retstring += " CASE WHEN COALESCE(Crd1.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd1.\"GSTRegnNo\" END as \"Shipto GSTN\",";
@@ -937,16 +953,16 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring += " T.\"BuildingB\" \"T_Buyer_Building\",T.\"BlockB\" \"T_Buyer_Block\",T.\"StreetNoB\" \"T_Buyer_StreetNo\",T.\"StreetB\" \"T_Buyer_Street\",T.\"Address2B\" \"T_Buyer_Address2\",T.\"Address3B\" \"T_Buyer_Address3\",";
             retstring = retstring += " T.\"CityB\" \"T_BCity\" , CASE WHEN T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN '999999' ELSE Replace(T.\"ZipCodeB\",' ','') END as  \"T_BZipCode\", ";
-            retstring = retstring += " (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateB\" and \"Country\"=T.\"CountryB\") \"T_Bill to State Code\", ";
+            retstring = retstring += " (case when T.\"CountryB\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateB\" and \"Country\"=T.\"CountryB\") ElSE '96' END) \"T_Bill to State Code\", ";
 
             retstring = retstring += " T.\"BuildingS\" \"T_Ship_Building\",T.\"BlockS\" \"T_Ship_Block\",T.\"StreetNoS\" \"T_Ship_StreetNo\",T.\"StreetS\" \"T_Ship_Street\",T.\"Address2S\" \"T_Ship_Address2\",T.\"Address3S\" \"T_Ship_Address3\",";
             retstring = retstring += " T.\"CityS\" \"T_SCity\" , CASE WHEN T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN '999999' ELSE Replace(T.\"ZipCodeS\",' ','') END as  \"T_SZipCode\", ";
-            retstring = retstring += " (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateS\" and \"Country\"=T.\"CountryS\") \"T_Shipp to State Code\", ";
+            retstring = retstring += " (case when T.\"CountryS\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateS\" and \"Country\"=T.\"CountryS\") ELSE '96' END) \"T_Shipp to State Code\", ";
 
 
-            retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=Crd11.\"State\" and \"Country\"=Crd11.\"Country\") \"Bill to State Code\"," +
-                "                       (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=crd1.\"State\" and \"Country\"=crd1.\"Country\")";
-            retstring = retstring + " \"Shipp to State Code\",b.\"ItemCode\", b.\"Dscription\",Case when a.\"DocType\"='S' then 'Y' Else 'N' End \"IsServc\",";
+            retstring = retstring + " (case when Crd11.\"Country\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=Crd11.\"State\" and \"Country\"=Crd11.\"Country\") ELSE '96' END) \"Bill to State Code\",";
+            retstring = retstring + " (case when crd1.\"Country\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=crd1.\"State\" and \"Country\"=crd1.\"Country\") ELSE '96' END ) \"Shipp to State Code\",";
+            retstring = retstring + " b.\"ItemCode\", b.\"Dscription\",Case when a.\"DocType\"='S' then 'Y' Else 'N' End \"IsServc\",";
             retstring = retstring + " Case when a.\"DocType\"='S' then (Select Case when LEft(\"ServCode\",2) like '0%' then Replace(\"ServCode\",'0','') Else \"ServCode\" End from OSAC where b.\"SacEntry\"= \"AbsEntry\") Else Left(Replace(o.\"ChapterID\",'.','')," + HSNLength + ") End \"HSN\",Case when a.\"DocType\"='S' then 1 Else b.\"Quantity\" End \"Quantity\",COALESCE(b.\"unitMsr\",b.\"UomCode\") \"Unit\",";
 
             retstring = retstring + " Case when a.\"DocType\"='S' then b.\"Price\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end  else b.\"PriceBefDi\" * a.\"DocRate\" end \"UnitPrice\",";
@@ -1082,18 +1098,20 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" in('U','S') THEN case when a.\"DutyStatus\" ='Y' then 'SEZWP' else 'SEZWOP' End ";
             retstring = retstring += "      WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN  case when a.\"DutyStatus\" ='Y' then 'EXPWP' else 'EXPWOP' End  ";
+            retstring = retstring += "      WHEN  T.\"ExportType\" = 'D' THEN 'DEXP' ";
             retstring = retstring += "      ELSE 'B2B' END as \"SupTyp\",";
 
             retstring = retstring + " '' as \"RegRev\",'INV' Type,a.\"DocEntry\",a.\"DocType\",a.\"DocDate\" \"Inv_Doc_Date\",ss.\"GSTRegnNo\" \"Seller GSTN\",";
-
-            retstring = retstring + " B1.\"CompnyName\" \"Seller_Legal Name\",ss.\"City\" \"Seller Location Name\"," +
-                "Replace(ss.\"ZipCode\",' ','') \"Seller_PIN code\",(select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ss.\"Country\" and \"Code\"=ss.\"State\") \"Seller_State_code\",";
-
+            retstring = retstring + " B1.\"CompnyName\" \"Seller_Legal Name\",ss.\"City\" \"Seller Location Name\", Replace(ss.\"ZipCode\",' ','') \"Seller_PIN code\", ";
+            retstring = retstring + " (CASE WHEN ss.\"Country\"='IN' then select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ss.\"Country\" and \"Code\"=ss.\"State\" ";
+            retstring = retstring + " ELSE '96' END) \"Seller_State_code\",";
 
 
             retstring = retstring + " B3.\"GlblLocNum\" as \"CompnyGSTIN\", ";
             retstring = retstring + " B1.\"CompnyAddr\",Replace(B3.\"ZipCode\",' ','') \"CompnyPincode\",B3.\"City\" \"CompnyCity\", ";
-            retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=B3.\"Country\" and \"Code\"=B3.\"State\") \"Compnystatecode\", ";
+
+            retstring = retstring + " (CASE WHEN B3.\"Country\"='IN' then select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=B3.\"Country\" and \"Code\"=B3.\"State\" ";
+            retstring = retstring + " ELSE '96' END ) \"Compnystatecode\", ";
 
 
             retstring = retstring += " CASE WHEN COALESCE(Crd11.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd11.\"GSTRegnNo\" END as \"Buyer GSTN\",";
@@ -1119,16 +1137,16 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring += " T.\"BuildingB\" \"T_Buyer_Building\",T.\"BlockB\" \"T_Buyer_Block\",T.\"StreetNoB\" \"T_Buyer_StreetNo\",T.\"StreetB\" \"T_Buyer_Street\",T.\"Address2B\" \"T_Buyer_Address2\",T.\"Address3B\" \"T_Buyer_Address3\",";
             retstring = retstring += " T.\"CityB\" \"T_BCity\" , CASE WHEN T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN '999999' ELSE Replace(T.\"ZipCodeB\",' ','') END as  \"T_BZipCode\", ";
-            retstring = retstring += " (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateB\" and \"Country\"=T.\"CountryB\") \"T_Bill to State Code\", ";
+            retstring = retstring += " (case when T.\"CountryB\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateB\" and \"Country\"=T.\"CountryB\") ElSE '96' END) \"T_Bill to State Code\", ";
 
             retstring = retstring += " T.\"BuildingS\" \"T_Ship_Building\",T.\"BlockS\" \"T_Ship_Block\",T.\"StreetNoS\" \"T_Ship_StreetNo\",T.\"StreetS\" \"T_Ship_Street\",T.\"Address2S\" \"T_Ship_Address2\",T.\"Address3S\" \"T_Ship_Address3\",";
             retstring = retstring += " T.\"CityS\" \"T_SCity\" , CASE WHEN T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN '999999' ELSE Replace(T.\"ZipCodeS\",' ','') END as  \"T_SZipCode\", ";
-            retstring = retstring += " (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateS\" and \"Country\"=T.\"CountryS\") \"T_Shipp to State Code\", ";
+            retstring = retstring += " (case when T.\"CountryS\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateS\" and \"Country\"=T.\"CountryS\") ELSE '96' END) \"T_Shipp to State Code\", ";
 
 
-            retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=Crd11.\"State\" and \"Country\"=Crd11.\"Country\") \"Bill to State Code\"," +
-                "                       (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=crd1.\"State\" and \"Country\"=crd1.\"Country\")";
-            retstring = retstring + " \"Shipp to State Code\",b.\"ItemCode\", b.\"Dscription\",Case when a.\"DocType\"='S' then 'Y' Else 'N' End \"IsServc\",";
+            retstring = retstring + " (case when Crd11.\"Country\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=Crd11.\"State\" and \"Country\"=Crd11.\"Country\") ELSE '96' END) \"Bill to State Code\",";
+            retstring = retstring + " (case when crd1.\"Country\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=crd1.\"State\" and \"Country\"=crd1.\"Country\") ELSE '96' END ) \"Shipp to State Code\",";
+            retstring = retstring + " b.\"ItemCode\", b.\"Dscription\",Case when a.\"DocType\"='S' then 'Y' Else 'N' End \"IsServc\",";
             retstring = retstring + " Case when a.\"DocType\"='S' then (Select Case when LEft(\"ServCode\",2) like '0%' then Replace(\"ServCode\",'0','') Else \"ServCode\" End from OSAC where b.\"SacEntry\"= \"AbsEntry\") Else Left(Replace(o.\"ChapterID\",'.','')," + HSNLength + ") End \"HSN\",Case when a.\"DocType\"='S' then 1 Else b.\"Quantity\" End \"Quantity\",COALESCE(b.\"unitMsr\",b.\"UomCode\") \"Unit\",";
 
 
@@ -1263,16 +1281,20 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" in('U','S') THEN case when a.\"DutyStatus\" ='Y' then 'SEZWP' else 'SEZWOP' End ";
             retstring = retstring += "      WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN  case when a.\"DutyStatus\" ='Y' then 'EXPWP' else 'EXPWOP' End  ";
+            retstring = retstring += "      WHEN  T.\"ExportType\" = 'D' THEN 'DEXP' ";
             retstring = retstring += "      ELSE 'B2B' END as \"SupTyp\",";
 
             retstring = retstring + " '' as \"RegRev\",'INV' Type,a.\"DocEntry\",a.\"DocType\",a.\"DocDate\" \"Inv_Doc_Date\",ss.\"GSTRegnNo\" \"Seller GSTN\",";
 
-            retstring = retstring + " B1.\"CompnyName\" \"Seller_Legal Name\",ss.\"City\" \"Seller Location Name\"," +
-                "Replace(ss.\"ZipCode\",' ','') \"Seller_PIN code\",(select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ss.\"Country\" and \"Code\"=ss.\"State\") \"Seller_State_code\",";
+            retstring = retstring + " B1.\"CompnyName\" \"Seller_Legal Name\",ss.\"City\" \"Seller Location Name\", Replace(ss.\"ZipCode\",' ','') \"Seller_PIN code\", ";
+            retstring = retstring + " (CASE WHEN ss.\"Country\"='IN' then select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ss.\"Country\" and \"Code\"=ss.\"State\" ";
+            retstring = retstring + " ELSE '96' END) \"Seller_State_code\",";
 
             retstring = retstring + " B3.\"GlblLocNum\" as \"CompnyGSTIN\", ";
             retstring = retstring + " B1.\"CompnyAddr\",Replace(B3.\"ZipCode\",' ','') \"CompnyPincode\",B3.\"City\" \"CompnyCity\", ";
-            retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=B3.\"Country\" and \"Code\"=B3.\"State\") \"Compnystatecode\", ";
+
+            retstring = retstring + " (CASE WHEN B3.\"Country\"='IN' then select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=B3.\"Country\" and \"Code\"=B3.\"State\" ";
+            retstring = retstring + " ELSE '96' END ) \"Compnystatecode\", ";
 
 
             retstring = retstring += " CASE WHEN COALESCE(Crd11.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd11.\"GSTRegnNo\" END as \"Buyer GSTN\",";
@@ -1298,16 +1320,16 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring += " T.\"BuildingB\" \"T_Buyer_Building\",T.\"BlockB\" \"T_Buyer_Block\",T.\"StreetNoB\" \"T_Buyer_StreetNo\",T.\"StreetB\" \"T_Buyer_Street\",T.\"Address2B\" \"T_Buyer_Address2\",T.\"Address3B\" \"T_Buyer_Address3\",";
             retstring = retstring += " T.\"CityB\" \"T_BCity\" , CASE WHEN T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN '999999' ELSE Replace(T.\"ZipCodeB\",' ','') END as  \"T_BZipCode\", ";
-            retstring = retstring += " (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateB\" and \"Country\"=T.\"CountryB\") \"T_Bill to State Code\", ";
+            retstring = retstring += " (case when T.\"CountryB\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateB\" and \"Country\"=T.\"CountryB\") ElSE '96' END) \"T_Bill to State Code\", ";
 
             retstring = retstring += " T.\"BuildingS\" \"T_Ship_Building\",T.\"BlockS\" \"T_Ship_Block\",T.\"StreetNoS\" \"T_Ship_StreetNo\",T.\"StreetS\" \"T_Ship_Street\",T.\"Address2S\" \"T_Ship_Address2\",T.\"Address3S\" \"T_Ship_Address3\",";
             retstring = retstring += " T.\"CityS\" \"T_SCity\" , CASE WHEN T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN '999999' ELSE Replace(T.\"ZipCodeS\",' ','') END as  \"T_SZipCode\", ";
-            retstring = retstring += " (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateS\" and \"Country\"=T.\"CountryS\") \"T_Shipp to State Code\", ";
+            retstring = retstring += " (case when T.\"CountryS\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateS\" and \"Country\"=T.\"CountryS\") ELSE '96' END) \"T_Shipp to State Code\", ";
 
 
-            retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=Crd11.\"State\" and \"Country\"=Crd11.\"Country\") \"Bill to State Code\"," +
-                "                       (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=crd1.\"State\" and \"Country\"=crd1.\"Country\")";
-            retstring = retstring + " \"Shipp to State Code\",b.\"ItemCode\", b.\"Dscription\",Case when a.\"DocType\"='S' then 'Y' Else 'N' End \"IsServc\",";
+            retstring = retstring + " (case when Crd11.\"Country\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=Crd11.\"State\" and \"Country\"=Crd11.\"Country\") ELSE '96' END) \"Bill to State Code\",";
+            retstring = retstring + " (case when crd1.\"Country\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=crd1.\"State\" and \"Country\"=crd1.\"Country\") ELSE '96' END ) \"Shipp to State Code\",";
+            retstring = retstring + " b.\"ItemCode\", b.\"Dscription\",Case when a.\"DocType\"='S' then 'Y' Else 'N' End \"IsServc\",";
             retstring = retstring + " Case when a.\"DocType\"='S' then (Select Case when LEft(\"ServCode\",2) like '0%' then Replace(\"ServCode\",'0','') Else \"ServCode\" End from OSAC where b.\"SacEntry\"= \"AbsEntry\") Else Left(Replace(o.\"ChapterID\",'.','')," + HSNLength + ") End \"HSN\",Case when a.\"DocType\"='S' then 1 Else b.\"Quantity\" End \"Quantity\",COALESCE(b.\"unitMsr\",b.\"UomCode\") \"Unit\",";
 
             retstring = retstring + " Case when a.\"DocType\"='S' then b.\"Price\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end  else b.\"PriceBefDi\" * a.\"DocRate\" end \"UnitPrice\",";
@@ -1440,18 +1462,21 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" in('U','S') THEN case when a.\"DutyStatus\" ='Y' then 'SEZWP' else 'SEZWOP' End ";
             retstring = retstring += "      WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN  case when a.\"DutyStatus\" ='Y' then 'EXPWP' else 'EXPWOP' End  ";
+            retstring = retstring += "      WHEN  T.\"ExportType\" = 'D' THEN 'DEXP' ";
             retstring = retstring += "      ELSE 'B2B' END as \"SupTyp\",";
 
             retstring = retstring + " '' as \"RegRev\",'INV' Type,a.\"DocEntry\",a.\"DocType\",a.\"DocDate\" \"Inv_Doc_Date\",ss.\"GSTRegnNo\" \"Seller GSTN\",";
 
-            retstring = retstring + " B1.\"CompnyName\" \"Seller_Legal Name\",ss.\"City\" \"Seller Location Name\"," +
-                "Replace(ss.\"ZipCode\",' ','') \"Seller_PIN code\",(select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ss.\"Country\" and \"Code\"=ss.\"State\") \"Seller_State_code\",";
-
+            retstring = retstring + " B1.\"CompnyName\" \"Seller_Legal Name\",ss.\"City\" \"Seller Location Name\", Replace(ss.\"ZipCode\",' ','') \"Seller_PIN code\", ";
+            retstring = retstring + " (CASE WHEN ss.\"Country\"='IN' then select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=ss.\"Country\" and \"Code\"=ss.\"State\" ";
+            retstring = retstring + " ELSE '96' END) \"Seller_State_code\",";
 
 
             retstring = retstring + " B3.\"GlblLocNum\" as \"CompnyGSTIN\", ";
             retstring = retstring + " B1.\"CompnyAddr\",Replace(B3.\"ZipCode\",' ','') \"CompnyPincode\",B3.\"City\" \"CompnyCity\", ";
-            retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=B3.\"Country\" and \"Code\"=B3.\"State\") \"Compnystatecode\", ";
+
+            retstring = retstring + " (CASE WHEN B3.\"Country\"='IN' then select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=B3.\"Country\" and \"Code\"=B3.\"State\" ";
+            retstring = retstring + " ELSE '96' END ) \"Compnystatecode\", ";
 
 
             retstring = retstring += " CASE WHEN COALESCE(Crd11.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd11.\"GSTRegnNo\" END as \"Buyer GSTN\",";
@@ -1476,16 +1501,16 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             retstring = retstring += " T.\"BuildingB\" \"T_Buyer_Building\",T.\"BlockB\" \"T_Buyer_Block\",T.\"StreetNoB\" \"T_Buyer_StreetNo\",T.\"StreetB\" \"T_Buyer_Street\",T.\"Address2B\" \"T_Buyer_Address2\",T.\"Address3B\" \"T_Buyer_Address3\",";
             retstring = retstring += " T.\"CityB\" \"T_BCity\" , CASE WHEN T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN '999999' ELSE Replace(T.\"ZipCodeB\",' ','') END as  \"T_BZipCode\", ";
-            retstring = retstring += " (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateB\" and \"Country\"=T.\"CountryB\") \"T_Bill to State Code\", ";
+            retstring = retstring += " (case when T.\"CountryB\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateB\" and \"Country\"=T.\"CountryB\") ElSE '96' END) \"T_Bill to State Code\", ";
 
             retstring = retstring += " T.\"BuildingS\" \"T_Ship_Building\",T.\"BlockS\" \"T_Ship_Block\",T.\"StreetNoS\" \"T_Ship_StreetNo\",T.\"StreetS\" \"T_Ship_Street\",T.\"Address2S\" \"T_Ship_Address2\",T.\"Address3S\" \"T_Ship_Address3\",";
             retstring = retstring += " T.\"CityS\" \"T_SCity\" , CASE WHEN T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN '999999' ELSE Replace(T.\"ZipCodeS\",' ','') END as  \"T_SZipCode\", ";
-            retstring = retstring += " (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateS\" and \"Country\"=T.\"CountryS\") \"T_Shipp to State Code\", ";
+            retstring = retstring += " (case when T.\"CountryS\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=T.\"StateS\" and \"Country\"=T.\"CountryS\") ELSE '96' END) \"T_Shipp to State Code\", ";
 
 
-            retstring = retstring + " (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=Crd11.\"State\" and \"Country\"=Crd11.\"Country\") \"Bill to State Code\"," +
-                "                       (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=crd1.\"State\" and \"Country\"=crd1.\"Country\")";
-            retstring = retstring + " \"Shipp to State Code\",b.\"ItemCode\", b.\"Dscription\",Case when a.\"DocType\"='S' then 'Y' Else 'N' End \"IsServc\",";
+            retstring = retstring + " (case when Crd11.\"Country\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=Crd11.\"State\" and \"Country\"=Crd11.\"Country\") ELSE '96' END) \"Bill to State Code\",";
+            retstring = retstring + " (case when crd1.\"Country\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Code\"=crd1.\"State\" and \"Country\"=crd1.\"Country\") ELSE '96' END ) \"Shipp to State Code\",";
+            retstring = retstring + " b.\"ItemCode\", b.\"Dscription\",Case when a.\"DocType\"='S' then 'Y' Else 'N' End \"IsServc\",";
             retstring = retstring + " Case when a.\"DocType\"='S' then (Select Case when LEft(\"ServCode\",2) like '0%' then Replace(\"ServCode\",'0','') Else \"ServCode\" End from OSAC where b.\"SacEntry\"= \"AbsEntry\") Else Left(Replace(o.\"ChapterID\",'.','')," + HSNLength + ") End \"HSN\",Case when a.\"DocType\"='S' then 1 Else b.\"Quantity\" End \"Quantity\",COALESCE(b.\"unitMsr\",b.\"UomCode\") \"Unit\",";
 
 

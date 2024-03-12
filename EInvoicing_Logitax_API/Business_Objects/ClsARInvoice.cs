@@ -1879,13 +1879,27 @@ namespace EInvoicing_Logitax_API.Business_Objects
                     {
                         decimal Calcdistance = 0;
                         strSQL = @"Select T1.""LineId"",T0.""U_UATUrl"",T1.""U_URLType"",T1.""U_Type"",Case when T0.""U_Live""='N' then CONCAT(T0.""U_UATUrl"",T1.""U_URL"") Else CONCAT(T0.""U_LIVEUrl"",T1.""U_URL"") End as URL";
-                        strSQL += @" ,Case when T0.""U_Live""='N' then T0.""U_UATUrl"" Else T0.""U_LIVEUrl"" End as BaseURL";
+                        strSQL += @" ,Case when T0.""U_Live""='N' then T0.""U_UATUrl"" Else T0.""U_LIVEUrl"" End as BaseURL,";
+                        strSQL += @" ""U_BlockEway"" " ;
                         strSQL += @" from ""@ATEICFG"" T0 join ""@ATEICFG1"" T1 on T0.""Code""=T1.""Code"" where T0.""Code""='01' and T1.""U_URLType"" ='Generate IRN' and T1.""U_Type""='E-Way' Order by ""LineId"" Desc";
                         objRs.DoQuery(strSQL);
                         if (objRs.RecordCount == 0)
                         {
                             clsModule.objaddon.objapplication.StatusBar.SetText("API is Missing for \"Create IRN\". Please up  in general settings... ", SAPbouiCOM.BoMessageTime.bmt_Long, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
                             return false;
+                        }
+
+                        switch (TransType)
+                        {
+                            case "INV":                        
+                            case "CRN":
+                                string ds = invrecordset.Fields.Item("U_IRNNo").Value.ToString();
+                                if (objRs.Fields.Item("U_BlockEway").Value.ToString() == "Y" && string.IsNullOrEmpty(invrecordset.Fields.Item("U_IRNNo").Value.ToString()))
+                                {
+                                    clsModule.objaddon.objapplication.StatusBar.SetText("Kindly Generate Einvoice", SAPbouiCOM.BoMessageTime.bmt_Long, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                                    return false;
+                                }
+                                break;
                         }
 
                         if (string.IsNullOrEmpty(invrecordset.Fields.Item("FrmGSTN").Value.ToString()) && !fromGst)
