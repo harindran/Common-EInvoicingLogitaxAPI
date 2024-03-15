@@ -30,7 +30,10 @@ namespace EInvoicing_Logitax_API.Business_Objects
             {
                 retstring = retstring + "T.\"" + clsModule.GSTCol + @""",";
             }
-
+            if (!string.IsNullOrEmpty(clsModule.HSNCol))
+            {
+                retstring = retstring + "b.\"" + clsModule.HSNCol + @""",";
+            }
             retstring = retstring += " CASE WHEN  T.\"ExportType\" in('U','S') THEN case when a.\"DutyStatus\" ='Y' then 'SEZWP' else 'SEZWOP' End ";
             retstring = retstring += "      WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN  case when a.\"DutyStatus\" ='Y' then 'EXPWP' else 'EXPWOP' End  ";
             retstring = retstring += "      WHEN  T.\"ExportType\" = 'D' THEN 'DEXP' ";
@@ -53,7 +56,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             retstring = retstring += " CASE WHEN COALESCE(Crd11.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd11.\"GSTRegnNo\" END as \"Buyer GSTN\",";
             retstring = retstring += " CASE WHEN COALESCE(Crd1.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd1.\"GSTRegnNo\" END as \"Shipto GSTN\",";
 
-            retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,st.\"Country\" \"CCode\",  ";
+            retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,COALESCE(st.\"Country\",cy.\"Code\") \"CCode\",  ";
 
             retstring = retstring += " a.\"BPLId\" ,";
 
@@ -221,7 +224,10 @@ namespace EInvoicing_Logitax_API.Business_Objects
             {
                 retstring = retstring + "T.\"" + clsModule.GSTCol + @""",";
             }
-
+            if (!string.IsNullOrEmpty(clsModule.HSNCol))
+            {
+                retstring = retstring + "b.\"" + clsModule.HSNCol + @""",";
+            }
             retstring = retstring += " CASE WHEN  T.\"ExportType\" in('U','S') THEN case when a.\"DutyStatus\" ='Y' then 'SEZWP' else 'SEZWOP' End ";
             retstring = retstring += "      WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN  case when a.\"DutyStatus\" ='Y' then 'EXPWP' else 'EXPWOP' End  ";
             retstring = retstring += "      WHEN  T.\"ExportType\" = 'D' THEN 'DEXP' ";
@@ -242,7 +248,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             retstring = retstring += " CASE WHEN COALESCE(Crd11.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd11.\"GSTRegnNo\" END as \"Buyer GSTN\",";
             retstring = retstring += " CASE WHEN COALESCE(Crd1.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd1.\"GSTRegnNo\" END as \"Shipto GSTN\",";
 
-            retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,st.\"Country\" \"CCode\", ";
+            retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,COALESCE(st.\"Country\",cy.\"Code\") \"CCode\",  ";
 
             retstring = retstring += " a.\"BPLId\" ,";
 
@@ -399,6 +405,10 @@ namespace EInvoicing_Logitax_API.Business_Objects
             {
                 retstring = retstring + "T.\"" + clsModule.GSTCol + @""",";
             }
+            if (!string.IsNullOrEmpty(clsModule.HSNCol))
+            {
+                retstring = retstring + "b.\"" + clsModule.HSNCol + @""",";
+            }
             retstring = retstring += " CASE WHEN  T.\"ExportType\" in('U','S') THEN case when a.\"DutyStatus\" ='Y' then 'SEZWP' else 'SEZWOP' End ";
             retstring = retstring += "      WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN  case when a.\"DutyStatus\" ='Y' then 'EXPWP' else 'EXPWOP' End  ";
             retstring = retstring += "      WHEN  T.\"ExportType\" = 'D' THEN 'DEXP' ";
@@ -420,7 +430,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             retstring = retstring += " CASE WHEN COALESCE(Crd1.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd1.\"GSTRegnNo\" END as \"Shipto GSTN\",";
 
 
-            retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,st.\"Country\" \"CCode\",  ";
+            retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,COALESCE(st.\"Country\",cy.\"Code\") \"CCode\",  ";
 
             retstring = retstring += " a.\"BPLId\" ,";
 
@@ -726,6 +736,10 @@ namespace EInvoicing_Logitax_API.Business_Objects
             {
                 retstring = retstring + "T.\"" + clsModule.GSTCol + @""",";
             }
+            if (!string.IsNullOrEmpty(clsModule.HSNCol))
+            {
+                retstring = retstring + "b.\"" + clsModule.HSNCol + @""",";
+            }
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" in('U','S') THEN case when a.\"DutyStatus\" ='Y' then 'SEZWP' else 'SEZWOP' End ";
             retstring = retstring += "      WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN  case when a.\"DutyStatus\" ='Y' then 'EXPWP' else 'EXPWOP' End  ";
@@ -747,7 +761,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             retstring = retstring += " CASE WHEN COALESCE(Crd11.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd11.\"GSTRegnNo\" END as \"Buyer GSTN\",";
             retstring = retstring += " CASE WHEN COALESCE(Crd1.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd1.\"GSTRegnNo\" END as \"Shipto GSTN\",";
 
-            retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,st.\"Country\" \"CCode\",  ";
+            retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,COALESCE(st.\"Country\",cy.\"Code\") \"CCode\",   ";
 
             retstring = retstring += " a.\"BPLId\" ,";
 
@@ -911,6 +925,10 @@ namespace EInvoicing_Logitax_API.Business_Objects
             {
                 retstring = retstring + "T.\"" + clsModule.GSTCol + @""",";
             }
+            if (!string.IsNullOrEmpty(clsModule.HSNCol))
+            {
+                retstring = retstring + "b.\"" + clsModule.HSNCol + @""",";
+            }
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" in('U','S') THEN case when a.\"DutyStatus\" ='Y' then 'SEZWP' else 'SEZWOP' End ";
             retstring = retstring += "      WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN  case when a.\"DutyStatus\" ='Y' then 'EXPWP' else 'EXPWOP' End  ";
@@ -932,7 +950,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             retstring = retstring += " CASE WHEN COALESCE(Crd11.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd11.\"GSTRegnNo\" END as \"Buyer GSTN\",";
             retstring = retstring += " CASE WHEN COALESCE(Crd1.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd1.\"GSTRegnNo\" END as \"Shipto GSTN\",";
 
-            retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,st.\"Country\" \"CCode\",  ";
+            retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,COALESCE(st.\"Country\",cy.\"Code\") \"CCode\",  ";
 
             retstring = retstring += " a.\"BPLId\" ,";
 
@@ -1095,6 +1113,10 @@ namespace EInvoicing_Logitax_API.Business_Objects
             {
                 retstring = retstring + "T.\"" + clsModule.GSTCol + @""",";
             }
+            if (!string.IsNullOrEmpty(clsModule.HSNCol))
+            {
+                retstring = retstring + "b.\"" + clsModule.HSNCol + @""",";
+            }
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" in('U','S') THEN case when a.\"DutyStatus\" ='Y' then 'SEZWP' else 'SEZWOP' End ";
             retstring = retstring += "      WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN  case when a.\"DutyStatus\" ='Y' then 'EXPWP' else 'EXPWOP' End  ";
@@ -1117,7 +1139,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             retstring = retstring += " CASE WHEN COALESCE(Crd11.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd11.\"GSTRegnNo\" END as \"Buyer GSTN\",";
             retstring = retstring += " CASE WHEN COALESCE(Crd1.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd1.\"GSTRegnNo\" END as \"Shipto GSTN\",";
 
-            retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,st.\"Country\" \"CCode\",  ";
+            retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\", COALESCE(st.\"Country\",cy.\"Code\") \"CCode\",   ";
 
             retstring = retstring += " a.\"BPLId\" ,";
 
@@ -1278,6 +1300,10 @@ namespace EInvoicing_Logitax_API.Business_Objects
             {
                 retstring = retstring + "T.\"" + clsModule.GSTCol + @""",";
             }
+            if (!string.IsNullOrEmpty(clsModule.HSNCol))
+            {
+                retstring = retstring + "b.\"" + clsModule.HSNCol + @""",";
+            }
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" in('U','S') THEN case when a.\"DutyStatus\" ='Y' then 'SEZWP' else 'SEZWOP' End ";
             retstring = retstring += "      WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN  case when a.\"DutyStatus\" ='Y' then 'EXPWP' else 'EXPWOP' End  ";
@@ -1300,7 +1326,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             retstring = retstring += " CASE WHEN COALESCE(Crd11.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd11.\"GSTRegnNo\" END as \"Buyer GSTN\",";
             retstring = retstring += " CASE WHEN COALESCE(Crd1.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd1.\"GSTRegnNo\" END as \"Shipto GSTN\",";
 
-            retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,st.\"Country\" \"CCode\",  ";
+            retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,COALESCE(st.\"Country\",cy.\"Code\") \"CCode\",   ";
 
             retstring = retstring += " a.\"BPLId\" ,";
 
@@ -1459,6 +1485,10 @@ namespace EInvoicing_Logitax_API.Business_Objects
             {
                 retstring = retstring + "T.\"" + clsModule.GSTCol + @""",";
             }
+            if (!string.IsNullOrEmpty(clsModule.HSNCol))
+            {
+                retstring = retstring + "b.\"" + clsModule.HSNCol + @""",";
+            }
 
             retstring = retstring += " CASE WHEN  T.\"ExportType\" in('U','S') THEN case when a.\"DutyStatus\" ='Y' then 'SEZWP' else 'SEZWOP' End ";
             retstring = retstring += "      WHEN  T.\"ExportType\" = 'E' AND T.\"ImpORExp\" = 'Y' THEN  case when a.\"DutyStatus\" ='Y' then 'EXPWP' else 'EXPWOP' End  ";
@@ -1482,7 +1512,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             retstring = retstring += " CASE WHEN COALESCE(Crd11.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd11.\"GSTRegnNo\" END as \"Buyer GSTN\",";
             retstring = retstring += " CASE WHEN COALESCE(Crd1.\"GSTRegnNo\",'') = '' THEN CASE WHEN T.\"ImpORExp\" = 'Y' THEN 'URP' ELSE '' END ELSE Crd1.\"GSTRegnNo\" END as \"Shipto GSTN\",";
 
-            retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,st.\"Country\" \"CCode\",  ";
+            retstring = retstring += " T.\"PortCode\",T.\"ImpExpNo\" ,T.\"ImpExpDate\" ,COALESCE(st.\"Country\",cy.\"Code\") \"CCode\",  ";
 
             retstring = retstring += " a.\"BPLId\" ,"; 
 

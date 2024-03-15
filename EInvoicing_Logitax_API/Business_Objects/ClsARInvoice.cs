@@ -959,18 +959,18 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
                         string AssignEinvunit = invrecordset.Fields.Item("Unit").Value.ToString();
                         string Isservice = "N";
-                        string ServiceHSN = invrecordset.Fields.Item("HSN").Value.ToString();
+                   
                         if (invrecordset.Fields.Item("IsServc").Value.ToString() == "Y")
                         {
                             Isservice = "Y";
-                            ServiceHSN = invrecordset.Fields.Item("SacCode").Value.ToString();
+                            
                         }
                         else
                         {
                             if (invrecordset.Fields.Item("ItemClass").Value.ToString() == "1")
                             {
                                 Isservice = "Y";
-                                ServiceHSN = invrecordset.Fields.Item("SacCode").Value.ToString();
+                               
                             }
                         }
 
@@ -1530,13 +1530,38 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                 prdouctdesc = invrecordset.Fields.Item("Dscription").Value.ToString();
                             }
 
+                            string ServiceHSN = "";
+
+                            if (!string.IsNullOrEmpty(clsModule.HSNCol))
+                            {
+                                ServiceHSN = invrecordset.Fields.Item(clsModule.HSNCol).Value.ToString();
+                            }
+
+                            if (string.IsNullOrEmpty(ServiceHSN))
+                            {
+                                ServiceHSN = invrecordset.Fields.Item("HSN").Value.ToString();
+                            }
+
+                            if (invrecordset.Fields.Item("IsServc").Value.ToString() == "Y")
+                            {
+                                Isservice = "Y";
+                                ServiceHSN = invrecordset.Fields.Item("SacCode").Value.ToString();
+                            }
+                            else
+                            {
+                                if (invrecordset.Fields.Item("ItemClass").Value.ToString() == "1")
+                                {
+                                    Isservice = "Y";
+                                    ServiceHSN = invrecordset.Fields.Item("SacCode").Value.ToString();
+                                }
+                            }
 
                             GenerateIRNGetJson.json_data.ItemList.Add(new ItemList
                             {
                                 SlNo = invrecordset.Fields.Item("SINo").Value.ToString(),
                                 PrdDesc = prdouctdesc,
                                 IsServc = Isservice,
-                                HsnCd = ServiceHSN,//"9965" for Service Invoice,
+                                HsnCd = ServiceHSN,
                                 Qty =invrecordset.Fields.Item("Quantity").Value.ToString(),
                                 Discount =invrecordset.Fields.Item("LineDiscountAmt").Value.ToString().StartsWith("-")?"0": Math.Round(Convert.ToDecimal(invrecordset.Fields.Item("LineDiscountAmt").Value),4).ToString(),//LineDisc
                                 Unit = AssignEinvunit,
@@ -1765,6 +1790,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                                 GenerateIRNGetJson.json_data.TranDtls.SupTyp = "IMPGSEZWP";
                                             }
                                             break;
+                                        case "DEXP":
+                                            GenerateIRNGetJson.json_data.TranDtls.SupTyp = "DE";
+                                            break;
 
                                     }
                                     break;
@@ -1809,6 +1837,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                             {
                                                 GenerateIRNGetJson.json_data.TranDtls.SupTyp = "SEWP";
                                             }
+                                            break;
+                                        case "DEXP":
+                                            GenerateIRNGetJson.json_data.TranDtls.SupTyp = "DE";
                                             break;
 
                                     }
