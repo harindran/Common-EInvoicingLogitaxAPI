@@ -111,7 +111,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             if (!string.IsNullOrEmpty(odbdhead.GetValue("DocEntry", 0)))
             {
                 Table = "INV26";
-                identify = false;
+                return;
               
             }
 
@@ -121,13 +121,12 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 if (!string.IsNullOrEmpty(odbdhead.GetValue("DocEntry", 0)))
                 {
                     Table = "RIN26";
-                    identify = true;
-
+                    if (odbdhead.GetValue("U_Dispatch_Eway", 0) == "Y")
+                    { CheckBox0.Item.Click(); }
                 }
             }
 
-            if (odbdhead.GetValue("U_Dispatch_Eway", 0)=="Y")
-            { CheckBox0.Item.Click(); }
+        
 
 
 
