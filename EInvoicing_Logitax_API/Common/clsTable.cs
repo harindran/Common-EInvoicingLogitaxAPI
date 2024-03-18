@@ -81,7 +81,8 @@ namespace EInvoicing_Logitax_API.Common
             AddFields("@ATEICFG", "GetDisAddWare", "Dispatch Address WareHouse", SAPbobsCOM.BoFieldTypes.db_Alpha,100);
             AddFields("@ATEICFG", "Gettran", "Get  Transaction Customer Address", SAPbobsCOM.BoFieldTypes.db_Alpha,100);
             AddFields("@ATEICFG", "GSTCol", "GST Column", SAPbobsCOM.BoFieldTypes.db_Alpha, 100);
-            AddFields("@ATEICFG", "HSNCol", "HSN Column", SAPbobsCOM.BoFieldTypes.db_Alpha, 100);
+            AddFields("@ATEICFG", "HSNCol","HSN Column", SAPbobsCOM.BoFieldTypes.db_Alpha, 100);
+            AddFields("@ATEICFG", "INVTranItemCal", "Inventory Item Calaculation", SAPbobsCOM.BoFieldTypes.db_Alpha, 100);
             AddFields("@ATEICFG", "AddTCSOth", "Add TCS Amount in Other Charge", SAPbobsCOM.BoFieldTypes.db_Alpha, 100);
 
             AddFields("@ATEICFG", "BillToWare", "Bill To warehouse", SAPbobsCOM.BoFieldTypes.db_Alpha, 30);

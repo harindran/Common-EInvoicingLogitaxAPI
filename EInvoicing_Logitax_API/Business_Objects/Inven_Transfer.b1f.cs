@@ -13,6 +13,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
     {
        
         private string FormName = "940";
+        private string ColName = "11";
         private string strSQL;
         public  SAPbouiCOM.Form oForm;
         SAPbouiCOM.ISBOChooseFromListEventArg pCFL;
@@ -274,7 +275,13 @@ namespace EInvoicing_Logitax_API.Business_Objects
             {
                 oForm.Freeze(true);
                 columnEdit(true, Matrix0);
-               
+                ColName = clsModule.objaddon.objglobalmethods.getSingleValue(" SELECT \"U_INVTranItemCal\" FROM \"@ATEICFG\" a WHERE \"Code\" = 01 ");
+
+                if (string.IsNullOrEmpty(ColName))
+                {
+                    ColName = "11";
+                }
+
                 string Tax =((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_TAXCD").Cells.Item(pVal.Row).Specific).Value  ;
                 if (string.IsNullOrEmpty(Tax)) return;
                  string  lstrquery = "SELECT t2.\"EfctivRate\",t2.\"STAType\" FROM ostc t1  LEFT JOIN stc1 t2 ON t1.\"Code\" = t2.\"STCCode\" WHERE t1.\"Code\" = '" + Tax + "' ";
@@ -291,7 +298,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
                 for (int i = 0; i < Rc.RecordCount; i++)
                 {
-                    decimal Amount = clsModule.objaddon.objglobalmethods.GetDecimalVal(((SAPbouiCOM.EditText)Matrix0.Columns.Item("11").Cells.Item(pVal.Row).Specific).Value);
+                    decimal Amount = clsModule.objaddon.objglobalmethods.GetDecimalVal(((SAPbouiCOM.EditText)Matrix0.Columns.Item(ColName).Cells.Item(pVal.Row).Specific).Value);
                     Amount = clsModule.objaddon.objglobalmethods.GetDecimalVal(((SAPbouiCOM.EditText)Matrix0.Columns.Item("10").Cells.Item(pVal.Row).Specific).Value) * Amount;
 
                     switch (Rc.Fields.Item("STAType").Value.ToString())
@@ -372,23 +379,33 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
         private void Matrix0_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
-            switch (pVal.ColUID)
+            bool gridcheck = true;
+            if (pVal.ColUID == ColName)
             {
-                case "10":
-                case "11":
-                case "1":
 
-
-
-                    GridCalculation(pVal);
-
-                    break;
-                default:
-                    break;
+                GridCalculation(pVal);
+                gridcheck = false;
             }
+          if (gridcheck)
+            {
+                switch (pVal.ColUID)
+                {
+                    case "10":
+                    case "11":
+                    case "1":
 
+
+
+                        GridCalculation(pVal);
+
+                        break;
+                    default:
+                        break;
+                }
+
+            }
+          
         }
-
         private void Matrix0_ValidateAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
            

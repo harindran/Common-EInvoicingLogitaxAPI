@@ -1540,22 +1540,21 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             if (string.IsNullOrEmpty(ServiceHSN))
                             {
                                 ServiceHSN = invrecordset.Fields.Item("HSN").Value.ToString();
-                            }
-
-                            if (invrecordset.Fields.Item("IsServc").Value.ToString() == "Y")
-                            {
-                                Isservice = "Y";
-                                ServiceHSN = invrecordset.Fields.Item("SacCode").Value.ToString();
-                            }
-                            else
-                            {
-                                if (invrecordset.Fields.Item("ItemClass").Value.ToString() == "1")
+                          
+                                if (invrecordset.Fields.Item("IsServc").Value.ToString() == "Y")
                                 {
                                     Isservice = "Y";
                                     ServiceHSN = invrecordset.Fields.Item("SacCode").Value.ToString();
                                 }
+                                else
+                                {
+                                    if (invrecordset.Fields.Item("ItemClass").Value.ToString() == "1")
+                                    {
+                                        Isservice = "Y";
+                                        ServiceHSN = invrecordset.Fields.Item("SacCode").Value.ToString();
+                                    }
+                                }
                             }
-
                             GenerateIRNGetJson.json_data.ItemList.Add(new ItemList
                             {
                                 SlNo = invrecordset.Fields.Item("SINo").Value.ToString(),

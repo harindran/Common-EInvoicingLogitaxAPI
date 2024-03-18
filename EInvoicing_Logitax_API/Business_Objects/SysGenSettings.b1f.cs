@@ -95,6 +95,8 @@ namespace EInvoicing_Logitax_API.Business_Objects
             this.CheckBox10 = ((SAPbouiCOM.CheckBox)(this.GetItem("BlockEway").Specific));
             this.StaticText22 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_9").Specific));
             this.EditText22 = ((SAPbouiCOM.EditText)(this.GetItem("item_21").Specific));
+            this.StaticText23 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_11").Specific));
+            this.EditText21 = ((SAPbouiCOM.EditText)(this.GetItem("Item_12").Specific));
             this.OnCustomInitialize();
 
         }
@@ -157,7 +159,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 strSQL = @"Select T0.""U_ClientCode"",T0.""U_UserCode"",T0.""U_Password"",T0.""U_Live"",T0.""U_UATUrl"",T0.""U_LIVEUrl"",
                               T1.""LineId"",T1.""U_URLType"",T1.""U_Type"",T1.""U_URL"",T0.""U_HSNL"",T0.""U_SERCONFIG"",";
                 strSQL += @" ""U_DBType"" ,""U_EwayNo"" ,""U_VehNo"" ,""U_TransID"" ,""U_Distance"",""U_TransName"",""U_ItemDesc"",""U_BtnPos"",";
-                strSQL += @" ""U_GSTCol"", ""U_HSNCol"",";
+                strSQL += @" ""U_GSTCol"", ""U_HSNCol"", ""U_INVTranItemCal"", ";
 
                 strSQL += " \"U_GST_ClientCode\",\"U_GST_UserCode\",\"U_GST_Password\",\"U_GST_Live\",\"U_GST_UATUrl\",\"U_GST_LIVEUrl\",\"U_GST_Token\"";
                 strSQL += @" from ""@ATEICFG"" T0 join ""@ATEICFG1"" T1 on T0.""Code""=T1.""Code"" where T0.""Code""='01'";
@@ -192,6 +194,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         oForm.DataSources.UserDataSources.Item("ItemDesc").Value = Drow["U_ItemDesc"].ToString();
                         oForm.DataSources.UserDataSources.Item("GSTCol").Value = Drow["U_GSTCol"].ToString();
                         oForm.DataSources.UserDataSources.Item("HSNCol").Value = Drow["U_HSNCol"].ToString();
+                        oForm.DataSources.UserDataSources.Item("TrnItmCal").Value = Drow["U_INVTranItemCal"].ToString();
                         oForm.DataSources.UserDataSources.Item("BtnPos").Value = Drow["U_BtnPos"].ToString();
                 
 
@@ -458,6 +461,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 oGeneralData.SetProperty("U_ItemDesc", oForm.DataSources.UserDataSources.Item("ItemDesc").Value);
                 oGeneralData.SetProperty("U_GSTCol", oForm.DataSources.UserDataSources.Item("GSTCol").Value);
                 oGeneralData.SetProperty("U_HSNCol", oForm.DataSources.UserDataSources.Item("HSNCol").Value);
+                oGeneralData.SetProperty("U_INVTranItemCal", oForm.DataSources.UserDataSources.Item("TrnItmCal").Value);
                 oGeneralData.SetProperty("U_BtnPos", oForm.DataSources.UserDataSources.Item("BtnPos").Value);
   
 
@@ -652,6 +656,8 @@ namespace EInvoicing_Logitax_API.Business_Objects
         private SAPbouiCOM.CheckBox CheckBox10;
         private SAPbouiCOM.StaticText StaticText22;
         private SAPbouiCOM.EditText EditText22;
+        private SAPbouiCOM.StaticText StaticText23;
+        private SAPbouiCOM.EditText EditText21;
     }
 }
  
