@@ -74,6 +74,12 @@ namespace EInvoicing_Logitax_API.Business_Objects
             this.Matrix0.KeyDownAfter += new SAPbouiCOM._IMatrixEvents_KeyDownAfterEventHandler(this.Matrix0_KeyDownAfter);
             this.Matrix0.ChooseFromListAfter += new SAPbouiCOM._IMatrixEvents_ChooseFromListAfterEventHandler(this.Matrix0_ChooseFromListAfter);
             this.Matrix0.KeyDownBefore += new SAPbouiCOM._IMatrixEvents_KeyDownBeforeEventHandler(this.Matrix0_KeyDownBefore);
+            this.ComboBox0 = ((SAPbouiCOM.ComboBox)(this.GetItem("254000004").Specific));
+            this.ComboBox0.ComboSelectAfter += new SAPbouiCOM._IComboBoxEvents_ComboSelectAfterEventHandler(this.ComboBox0_ComboSelectAfter);
+            this.EditText11 = ((SAPbouiCOM.EditText)(this.GetItem("18").Specific));
+            this.EditText11.ChooseFromListAfter += new SAPbouiCOM._IEditTextEvents_ChooseFromListAfterEventHandler(this.EditText11_ChooseFromListAfter);
+            this.EditText12 = ((SAPbouiCOM.EditText)(this.GetItem("1470000101").Specific));
+            this.EditText12.ChooseFromListAfter += new SAPbouiCOM._IEditTextEvents_ChooseFromListAfterEventHandler(this.EditText12_ChooseFromListAfter);
             this.OnCustomInitialize();
 
         }
@@ -260,7 +266,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         string Tax = Convert.ToString(pCFL.SelectedObjects.Columns.Item("Code").Cells.Item(0).Value);
                          ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_TAXCD").Cells.Item(pVal.Row).Specific).Value = Tax;
 
-                        GridCalculation(pVal);
+                        GridCalculation(pVal.Row);
                     }
                     break;
                 default:
@@ -269,12 +275,70 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
         }
 
-        private void GridCalculation(SAPbouiCOM.SBOItemEventArg pVal)
+        private void GridCalculation(int Row)
         {
+            string cardcode = "";
+            string Frmwarehouse = "";
+            string Towarehouse = "";
+            string shipto = "";
+            string frmgstreg = "";
+            string Togstreg = "";
+            string itemcode = "";
+            string taxrate = "";
             try
             {
                 oForm.Freeze(true);
                 columnEdit(true, Matrix0);
+
+                string Taxratecol = clsModule.objaddon.objglobalmethods.getSingleValue(" SELECT \"U_InvTaxrt\" FROM \"@ATEICFG\" a WHERE \"Code\" = 01 ");
+
+                if (!string.IsNullOrEmpty(Taxratecol))
+                { 
+                 cardcode = ((SAPbouiCOM.EditText)oForm.Items.Item("3").Specific).Value;
+                 Frmwarehouse = ((SAPbouiCOM.EditText)oForm.Items.Item("18").Specific).Value;
+                 Towarehouse = ((SAPbouiCOM.EditText)oForm.Items.Item("1470000101").Specific).Value;
+                 shipto = ((SAPbouiCOM.ComboBox)oForm.Items.Item("254000004").Specific).Value;
+                 itemcode = ((SAPbouiCOM.EditText)Matrix0.Columns.Item("1").Cells.Item(Row).Specific).Value;
+
+                    string lstr = "";
+                if (!string.IsNullOrEmpty(cardcode))
+                {
+                    lstr = " SELECT crd1.\"GSTRegnNo\"  FROM OCRD LEFT JOIN CRD1 ON CRD1.\"CardCode\" = OCRD.\"CardCode\" AND CRD1.\"AdresType\" = 'S' ";
+                    lstr += " WHERE OCRD.\"CardCode\" = '" + cardcode + "' AND CRD1.\"Address\" = '" + shipto + "' ";
+                    frmgstreg = clsModule.objaddon.objglobalmethods.getSingleValue(lstr);
+                }
+                else
+                {
+                    lstr = " SELECT OLCT.\"GSTRegnNo\"  FROM OWHS LEFT JOIN OLCT ON OLCT.\"Code\" = OWHS.\"Location\" ";
+                    lstr += " WHERE \"WhsCode\" = '" + Frmwarehouse + "'  ";
+                    frmgstreg = clsModule.objaddon.objglobalmethods.getSingleValue(lstr);
+                }
+
+                lstr = " SELECT OLCT.\"GSTRegnNo\"  FROM OWHS LEFT JOIN OLCT ON OLCT.\"Code\" = OWHS.\"Location\" ";
+                lstr += " WHERE \"WhsCode\" = '" + Towarehouse + "' ";
+                Togstreg = clsModule.objaddon.objglobalmethods.getSingleValue(lstr);
+
+
+                 lstr = " SELECT \"" + Taxratecol + "\"  FROM OITM o WHERE o.\"ItemCode\" = '" + itemcode + "'";
+
+                 taxrate = clsModule.objaddon.objglobalmethods.getSingleValue(lstr);
+
+
+                  lstr="SELECT t1.\"Code\"  FROM ostc t1 LEFT JOIN stc1 t2 ON t1.\"Code\" = t2.\"STCCode\" WHERE \"Rate\" = " +taxrate;
+                    
+                  if (frmgstreg.Substring(0,frmgstreg.Length>2?2:0) == Togstreg.Substring(0, Togstreg.Length > 2 ? 2 : 0))
+                    {
+                        lstr += " and \"STAType\"=-100 ";
+                    }
+                    else
+                    {
+                        lstr += " and \"STAType\"=-120 ";
+                    }
+
+                  ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_TAXCD").Cells.Item(Row).Specific).Value= clsModule.objaddon.objglobalmethods.getSingleValue(lstr);
+
+                }
+
                 ColName = clsModule.objaddon.objglobalmethods.getSingleValue(" SELECT \"U_INVTranItemCal\" FROM \"@ATEICFG\" a WHERE \"Code\" = 01 ");
 
                 if (string.IsNullOrEmpty(ColName))
@@ -282,53 +346,53 @@ namespace EInvoicing_Logitax_API.Business_Objects
                     ColName = "11";
                 }
 
-                string Tax =((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_TAXCD").Cells.Item(pVal.Row).Specific).Value  ;
+                string Tax =((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_TAXCD").Cells.Item(Row).Specific).Value  ;
                 if (string.IsNullOrEmpty(Tax)) return;
                  string  lstrquery = "SELECT t2.\"EfctivRate\",t2.\"STAType\" FROM ostc t1  LEFT JOIN stc1 t2 ON t1.\"Code\" = t2.\"STCCode\" WHERE t1.\"Code\" = '" + Tax + "' ";
 
                 SAPbobsCOM.Recordset Rc;
                 Rc = clsModule.objaddon.objglobalmethods.GetmultipleRS(lstrquery);
 
-                ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_CGST").Cells.Item(pVal.Row).Specific).Value = "0";
-                ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_CGAMT").Cells.Item(pVal.Row).Specific).Value = "0";
-                ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_SGST").Cells.Item(pVal.Row).Specific).Value = "0";
-                ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_SGAMT").Cells.Item(pVal.Row).Specific).Value = "0";
-                ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_IGST").Cells.Item(pVal.Row).Specific).Value = "0";
-                ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_IGAMT").Cells.Item(pVal.Row).Specific).Value = "0";
+                ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_CGST").Cells.Item(Row).Specific).Value = "0";
+                ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_CGAMT").Cells.Item(Row).Specific).Value = "0";
+                ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_SGST").Cells.Item(Row).Specific).Value = "0";
+                ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_SGAMT").Cells.Item(Row).Specific).Value = "0";
+                ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_IGST").Cells.Item(Row).Specific).Value = "0";
+                ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_IGAMT").Cells.Item(Row).Specific).Value = "0";
 
                 for (int i = 0; i < Rc.RecordCount; i++)
                 {
-                    decimal Amount = clsModule.objaddon.objglobalmethods.GetDecimalVal(((SAPbouiCOM.EditText)Matrix0.Columns.Item(ColName).Cells.Item(pVal.Row).Specific).Value);
-                    Amount = clsModule.objaddon.objglobalmethods.GetDecimalVal(((SAPbouiCOM.EditText)Matrix0.Columns.Item("10").Cells.Item(pVal.Row).Specific).Value) * Amount;
+                    decimal Amount = clsModule.objaddon.objglobalmethods.GetDecimalVal(((SAPbouiCOM.EditText)Matrix0.Columns.Item(ColName).Cells.Item(Row).Specific).Value);
+                    Amount = clsModule.objaddon.objglobalmethods.GetDecimalVal(((SAPbouiCOM.EditText)Matrix0.Columns.Item("10").Cells.Item(Row).Specific).Value) * Amount;
 
                     switch (Rc.Fields.Item("STAType").Value.ToString())
                     {
 
                         case "-100":
-                            ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_CGST").Cells.Item(pVal.Row).Specific).Value = (clsModule.objaddon.objglobalmethods.GetDecimalVal(Rc.Fields.Item("EfctivRate").Value)).ToString();
-                            ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_CGAMT").Cells.Item(pVal.Row).Specific).Value = (TaxCalculation(Amount, (clsModule.objaddon.objglobalmethods.GetDecimalVal(Rc.Fields.Item("EfctivRate").Value)))).ToString();
+                            ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_CGST").Cells.Item(Row).Specific).Value = (clsModule.objaddon.objglobalmethods.GetDecimalVal(Rc.Fields.Item("EfctivRate").Value)).ToString();
+                            ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_CGAMT").Cells.Item(Row).Specific).Value = (TaxCalculation(Amount, (clsModule.objaddon.objglobalmethods.GetDecimalVal(Rc.Fields.Item("EfctivRate").Value)))).ToString();
                             break;
                         case "-110":
-                            ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_SGST").Cells.Item(pVal.Row).Specific).Value = (clsModule.objaddon.objglobalmethods.GetDecimalVal(Rc.Fields.Item("EfctivRate").Value)).ToString();
-                            ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_SGAMT").Cells.Item(pVal.Row).Specific).Value = (TaxCalculation(Amount, (clsModule.objaddon.objglobalmethods.GetDecimalVal(Rc.Fields.Item("EfctivRate").Value)))).ToString();
+                            ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_SGST").Cells.Item(Row).Specific).Value = (clsModule.objaddon.objglobalmethods.GetDecimalVal(Rc.Fields.Item("EfctivRate").Value)).ToString();
+                            ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_SGAMT").Cells.Item(Row).Specific).Value = (TaxCalculation(Amount, (clsModule.objaddon.objglobalmethods.GetDecimalVal(Rc.Fields.Item("EfctivRate").Value)))).ToString();
                             break;
                         case "-120":
-                            ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_IGST").Cells.Item(pVal.Row).Specific).Value = (clsModule.objaddon.objglobalmethods.GetDecimalVal(Rc.Fields.Item("EfctivRate").Value)).ToString();
-                            ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_IGAMT").Cells.Item(pVal.Row).Specific).Value = (TaxCalculation(Amount, (clsModule.objaddon.objglobalmethods.GetDecimalVal(Rc.Fields.Item("EfctivRate").Value)))).ToString();
+                            ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_IGST").Cells.Item(Row).Specific).Value = (clsModule.objaddon.objglobalmethods.GetDecimalVal(Rc.Fields.Item("EfctivRate").Value)).ToString();
+                            ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_IGAMT").Cells.Item(Row).Specific).Value = (TaxCalculation(Amount, (clsModule.objaddon.objglobalmethods.GetDecimalVal(Rc.Fields.Item("EfctivRate").Value)))).ToString();
                             break;
 
                     }
                     decimal LineTotal = 0;
-                    LineTotal += Amount;
-                    LineTotal += clsModule.objaddon.objglobalmethods.GetDecimalVal(((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_CGAMT").Cells.Item(pVal.Row).Specific).Value);
-                    LineTotal += clsModule.objaddon.objglobalmethods.GetDecimalVal(((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_SGAMT").Cells.Item(pVal.Row).Specific).Value);
-                    LineTotal += clsModule.objaddon.objglobalmethods.GetDecimalVal(((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_IGAMT").Cells.Item(pVal.Row).Specific).Value);
+                    LineTotal += clsModule.objaddon.objglobalmethods.GetDecimalVal(((SAPbouiCOM.EditText)Matrix0.Columns.Item(ColName).Cells.Item(Row).Specific).Value);
+                    LineTotal += clsModule.objaddon.objglobalmethods.GetDecimalVal(((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_CGAMT").Cells.Item(Row).Specific).Value);
+                    LineTotal += clsModule.objaddon.objglobalmethods.GetDecimalVal(((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_SGAMT").Cells.Item(Row).Specific).Value);
+                    LineTotal += clsModule.objaddon.objglobalmethods.GetDecimalVal(((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_IGAMT").Cells.Item(Row).Specific).Value);
 
-                    ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_LINETOTAL").Cells.Item(pVal.Row).Specific).Value = LineTotal.ToString();
+                    ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_LINETOTAL").Cells.Item(Row).Specific).Value = LineTotal.ToString();
                     Rc.MoveNext();
                 }
 
-                ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_TAXCD").Cells.Item(pVal.Row).Specific).Value = Tax;
+                ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_TAXCD").Cells.Item(Row).Specific).Value = Tax;
                 columnEdit(false, Matrix0);
             }
             catch (Exception ex)
@@ -383,7 +447,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             if (pVal.ColUID == ColName)
             {
 
-                GridCalculation(pVal);
+                GridCalculation(pVal.Row);
                 gridcheck = false;
             }
           if (gridcheck)
@@ -396,7 +460,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
 
 
-                        GridCalculation(pVal);
+                        GridCalculation(pVal.Row);
 
                         break;
                     default:
@@ -409,6 +473,38 @@ namespace EInvoicing_Logitax_API.Business_Objects
         private void Matrix0_ValidateAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
            
+
+        }
+
+        private SAPbouiCOM.ComboBox ComboBox0;
+
+        private void ComboBox0_ComboSelectAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            GetMatrix();
+
+        }
+
+        private void GetMatrix()
+        {
+            for (int i = 1; i <= Matrix0.RowCount; i++)
+            {
+                GridCalculation(i);
+            }
+        }
+
+        private SAPbouiCOM.EditText EditText11;
+
+        private void EditText11_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            GetMatrix();
+
+        }
+
+        private SAPbouiCOM.EditText EditText12;
+
+        private void EditText12_ChooseFromListAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            GetMatrix();
 
         }
     }
