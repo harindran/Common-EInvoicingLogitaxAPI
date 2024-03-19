@@ -474,12 +474,19 @@ namespace EInvoicing_Logitax_API.Business_Objects
             //retstring = retstring + " IFNULL((select sum(\"TaxSum\") from WTR4 where \"DocEntry\"=a.\"DocEntry\" and \"LineNum\"=b.\"LineNum\" and \"staType\"=-100 and \"ExpnsCode\"='-1'),0) as \"CGSTAmt\", IFNULL((select sum(\"TaxSum\") from WTR4 where \"DocEntry\"=a.\"DocEntry\" and \"LineNum\"=b.\"LineNum\" and \"staType\"=-110 and \"ExpnsCode\"='-1'),0) as \"SGSTAmt\",";
             //retstring = retstring + " IFNULL((select sum(\"TaxSum\") from WTR4 where \"DocEntry\"=a.\"DocEntry\" and \"LineNum\"=b.\"LineNum\" and \"staType\"=-120 and \"ExpnsCode\"='-1'),0) as \"IGSTAmt\",";
 
+            string Pricecol = "PriceBefDi";
+
+            string Dbcol =clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_INVTranItemDB\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01'");
+            if (!string.IsNullOrEmpty(Dbcol))
+            {
+                Pricecol = Dbcol;
+            }
 
 
-            retstring = retstring + "  b.\"PriceBefDi\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end  \"UnitPrice\",";
-            retstring = retstring + "  COALESCE(b.\"PriceBefDi\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end,0)*b.\"Quantity\"  \"Tot Amt\",";
-            retstring = retstring + "  COALESCE(b.\"INMPrice\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end,0)*b.\"Quantity\"  \"Tot Amt1\",";
-            retstring = retstring + "  COALESCE(b.\"INMPrice\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end,0)*b.\"Quantity\"  \"AssAmt\",";
+            retstring = retstring + "  b.\"" + Pricecol + "\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end  \"UnitPrice\",";
+            retstring = retstring + "  COALESCE( b.\"" + Pricecol + "\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end,0)*b.\"Quantity\"  \"Tot Amt\",";
+            retstring = retstring + "  COALESCE( b.\"" + Pricecol + "\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end,0)*b.\"Quantity\"  \"Tot Amt1\",";
+            retstring = retstring + "  COALESCE( b.\"" + Pricecol + "\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end,0)*b.\"Quantity\"  \"AssAmt\",";
 
 
             retstring = retstring + " U_UTL_ST_CGST+U_UTL_ST_SGST+U_UTL_ST_IGST as \"GSTRATE\",";
@@ -499,7 +506,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
             // retstring = retstring + " (a.\"DocTotal\" +a.\"DpmAmnt\") - COALESCE((Select Sum(WTR5.\"WTAmnt\") from WTR5 where WTR5.\"AbsEntry\"=a.\"DocEntry\"),0.0) \"Doc Total\" ,";
 
-            retstring = retstring + " (Select Sum(COALESCE(\"INMPrice\",0)*\"Quantity\")* case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end from WTR1 where \"DocEntry\"=b.\"DocEntry\")  \"AssVal\",";
+            retstring = retstring + " (Select Sum(COALESCE(\""+ Pricecol  +"\",0)*\"Quantity\")* case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end from WTR1 where \"DocEntry\"=b.\"DocEntry\")  \"AssVal\",";
 
             retstring = retstring + " (case when (select sum(\"U_UTL_ST_LINETOTAL\") from WTR1 where \"DocEntry\"=a.\"DocEntry\") =0 then a.\"DocTotal\"  ";
             retstring += " else  (select sum(\"U_UTL_ST_LINETOTAL\") from WTR1 where \"DocEntry\"=a.\"DocEntry\") end  +a.\"DpmAmnt\") - ";

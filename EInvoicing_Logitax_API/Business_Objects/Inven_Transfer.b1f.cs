@@ -301,23 +301,26 @@ namespace EInvoicing_Logitax_API.Business_Objects
                  itemcode = ((SAPbouiCOM.EditText)Matrix0.Columns.Item("1").Cells.Item(Row).Specific).Value;
 
                     string lstr = "";
-                if (!string.IsNullOrEmpty(cardcode))
+
+                    lstr = " SELECT OLCT.\"GSTRegnNo\"  FROM OWHS LEFT JOIN OLCT ON OLCT.\"Code\" = OWHS.\"Location\" ";
+                    lstr += " WHERE \"WhsCode\" = '" + Frmwarehouse + "' ";
+                    frmgstreg = clsModule.objaddon.objglobalmethods.getSingleValue(lstr);
+
+
+                    if (!string.IsNullOrEmpty(cardcode))
                 {
                     lstr = " SELECT crd1.\"GSTRegnNo\"  FROM OCRD LEFT JOIN CRD1 ON CRD1.\"CardCode\" = OCRD.\"CardCode\" AND CRD1.\"AdresType\" = 'S' ";
                     lstr += " WHERE OCRD.\"CardCode\" = '" + cardcode + "' AND CRD1.\"Address\" = '" + shipto + "' ";
-                    frmgstreg = clsModule.objaddon.objglobalmethods.getSingleValue(lstr);
+                    Togstreg = clsModule.objaddon.objglobalmethods.getSingleValue(lstr);
                 }
                 else
                 {
                     lstr = " SELECT OLCT.\"GSTRegnNo\"  FROM OWHS LEFT JOIN OLCT ON OLCT.\"Code\" = OWHS.\"Location\" ";
-                    lstr += " WHERE \"WhsCode\" = '" + Frmwarehouse + "'  ";
-                    frmgstreg = clsModule.objaddon.objglobalmethods.getSingleValue(lstr);
+                    lstr += " WHERE \"WhsCode\" = '" + Towarehouse + "'  ";
+                        Togstreg = clsModule.objaddon.objglobalmethods.getSingleValue(lstr);
                 }
 
-                lstr = " SELECT OLCT.\"GSTRegnNo\"  FROM OWHS LEFT JOIN OLCT ON OLCT.\"Code\" = OWHS.\"Location\" ";
-                lstr += " WHERE \"WhsCode\" = '" + Towarehouse + "' ";
-                Togstreg = clsModule.objaddon.objglobalmethods.getSingleValue(lstr);
-
+              
 
                  lstr = " SELECT \"" + Taxratecol + "\"  FROM OITM o WHERE o.\"ItemCode\" = '" + itemcode + "'";
 
