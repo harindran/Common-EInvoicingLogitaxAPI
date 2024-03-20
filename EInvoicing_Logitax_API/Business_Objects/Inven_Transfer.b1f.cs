@@ -18,6 +18,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
         public  SAPbouiCOM.Form oForm;
         SAPbouiCOM.ISBOChooseFromListEventArg pCFL;
         public SAPbouiCOM.DBDataSource Matrix1DB;
+       
         public Inven_Transfer()
         {
         }
@@ -287,10 +288,12 @@ namespace EInvoicing_Logitax_API.Business_Objects
             string taxrate = "";
             try
             {
+                if (clsModule.objaddon.objglobalmethods.getSingleValue(" SELECT \"U_InvUseQry\" FROM \"@ATEICFG\" a WHERE \"Code\" = 01 ") =="Y") { return; }
                 oForm.Freeze(true);
                 columnEdit(true, Matrix0);
 
                 string Taxratecol = clsModule.objaddon.objglobalmethods.getSingleValue(" SELECT \"U_InvTaxrt\" FROM \"@ATEICFG\" a WHERE \"Code\" = 01 ");
+        
 
                 if (!string.IsNullOrEmpty(Taxratecol))
                 { 
@@ -317,7 +320,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 {
                     lstr = " SELECT OLCT.\"GSTRegnNo\"  FROM OWHS LEFT JOIN OLCT ON OLCT.\"Code\" = OWHS.\"Location\" ";
                     lstr += " WHERE \"WhsCode\" = '" + Towarehouse + "'  ";
-                        Togstreg = clsModule.objaddon.objglobalmethods.getSingleValue(lstr);
+                     Togstreg = clsModule.objaddon.objglobalmethods.getSingleValue(lstr);
                 }
 
               
@@ -325,20 +328,22 @@ namespace EInvoicing_Logitax_API.Business_Objects
                  lstr = " SELECT \"" + Taxratecol + "\"  FROM OITM o WHERE o.\"ItemCode\" = '" + itemcode + "'";
 
                  taxrate = clsModule.objaddon.objglobalmethods.getSingleValue(lstr);
-
-
-                  lstr="SELECT t1.\"Code\"  FROM ostc t1 LEFT JOIN stc1 t2 ON t1.\"Code\" = t2.\"STCCode\" WHERE \"Rate\" = " +taxrate;
-                    
-                  if (frmgstreg.Substring(0,frmgstreg.Length>2?2:0) == Togstreg.Substring(0, Togstreg.Length > 2 ? 2 : 0))
+                    if (!string.IsNullOrEmpty(taxrate))
                     {
-                        lstr += " and \"STAType\"=-100 ";
-                    }
-                    else
-                    {
-                        lstr += " and \"STAType\"=-120 ";
-                    }
 
-                  ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_TAXCD").Cells.Item(Row).Specific).Value= clsModule.objaddon.objglobalmethods.getSingleValue(lstr);
+                        lstr = "SELECT t1.\"Code\"  FROM ostc t1 LEFT JOIN stc1 t2 ON t1.\"Code\" = t2.\"STCCode\" WHERE \"Rate\" = " + taxrate;
+
+                        if (frmgstreg.Substring(0, frmgstreg.Length > 2 ? 2 : 0) == Togstreg.Substring(0, Togstreg.Length > 2 ? 2 : 0))
+                        {
+                            lstr += " and \"STAType\"=-100 ";
+                        }
+                        else
+                        {
+                            lstr += " and \"STAType\"=-120 ";
+                        }
+                                   
+                            ((SAPbouiCOM.EditText)Matrix0.Columns.Item("U_UTL_ST_TAXCD").Cells.Item(Row).Specific).Value = clsModule.objaddon.objglobalmethods.getSingleValue(lstr);
+                    }
 
                 }
 
@@ -438,39 +443,34 @@ namespace EInvoicing_Logitax_API.Business_Objects
         {
             if (pVal.CharPressed ==9)
             {
-                
 
+                bool gridcheck = true;
+                if (pVal.ColUID == ColName)
+                {
+
+                    GridCalculation(pVal.Row);
+                    gridcheck = false;
+                }
+                if (gridcheck)
+                {
+                    switch (pVal.ColUID)
+                    {
+                        case "10":
+                        case "11":                   
+                            GridCalculation(pVal.Row);
+                            break;
+                        default:
+                            break;
+                    }
+
+                }
             }
 
         }
 
         private void Matrix0_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
-            bool gridcheck = true;
-            if (pVal.ColUID == ColName)
-            {
-
-                GridCalculation(pVal.Row);
-                gridcheck = false;
-            }
-          if (gridcheck)
-            {
-                switch (pVal.ColUID)
-                {
-                    case "10":
-                    case "11":
-                    case "1":
-
-
-
-                        GridCalculation(pVal.Row);
-
-                        break;
-                    default:
-                        break;
-                }
-
-            }
+           
           
         }
         private void Matrix0_ValidateAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)

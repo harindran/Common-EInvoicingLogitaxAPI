@@ -474,6 +474,14 @@ namespace EInvoicing_Logitax_API.Business_Objects
             //retstring = retstring + " IFNULL((select sum(\"TaxSum\") from WTR4 where \"DocEntry\"=a.\"DocEntry\" and \"LineNum\"=b.\"LineNum\" and \"staType\"=-100 and \"ExpnsCode\"='-1'),0) as \"CGSTAmt\", IFNULL((select sum(\"TaxSum\") from WTR4 where \"DocEntry\"=a.\"DocEntry\" and \"LineNum\"=b.\"LineNum\" and \"staType\"=-110 and \"ExpnsCode\"='-1'),0) as \"SGSTAmt\",";
             //retstring = retstring + " IFNULL((select sum(\"TaxSum\") from WTR4 where \"DocEntry\"=a.\"DocEntry\" and \"LineNum\"=b.\"LineNum\" and \"staType\"=-120 and \"ExpnsCode\"='-1'),0) as \"IGSTAmt\",";
 
+
+            retstring = retstring + " (SELECT MAX(\"BatchNum\") from IBT1 where \"ItemCode\"=b.\"ItemCode\" and \"WhsCode\"=b.\"WhsCode\" and";
+            retstring = retstring + " \"BaseType\" in ('67') and \"BaseEntry\"= CASE WHEN  b.\"BaseType\" =-1 THEN b.\"DocEntry\" ELSE b.\"BaseEntry\"  end  ) AS \"BatchNum\",";
+
+            retstring += " (CASE WHEN (SELECT \"U_AddTCSOth\"  FROM \"@ATEICFG\" e WHERE e.\"Code\" ='01')='Y' ";
+            retstring += " THEN   COALESCE((Select Sum(WTR5.\"WTAmnt\") from WTR5 where WTR5.\"AbsEntry\" = a.\"DocEntry\"),0.0) ELSE 0 END ) AS \"OthrAmt\", ";
+
+      
             string Pricecol = "PriceBefDi";
 
             string Dbcol =clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_INVTranItemDB\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01'");
@@ -482,6 +490,8 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 Pricecol = Dbcol;
             }
 
+            retstring = retstring + " (Select Sum(COALESCE(\"" + Pricecol + "\",0)*\"Quantity\")* case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end from WTR1 where \"DocEntry\"=b.\"DocEntry\")  \"AssVal\",";
+
 
             retstring = retstring + "  b.\"" + Pricecol + "\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end  \"UnitPrice\",";
             retstring = retstring + "  COALESCE( b.\"" + Pricecol + "\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end,0)*b.\"Quantity\"  \"Tot Amt\",";
@@ -489,36 +499,78 @@ namespace EInvoicing_Logitax_API.Business_Objects
             retstring = retstring + "  COALESCE( b.\"" + Pricecol + "\" * case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end,0)*b.\"Quantity\"  \"AssAmt\",";
 
 
-            retstring = retstring + " U_UTL_ST_CGST+U_UTL_ST_SGST+U_UTL_ST_IGST as \"GSTRATE\",";
-            retstring = retstring + " (select sum(\"U_UTL_ST_CGAMT\") from WTR1 where \"DocEntry\"=a.\"DocEntry\") as \"CGSTVal\",  ";
-            retstring = retstring + " (select sum(\"U_UTL_ST_SGAMT\") from WTR1 where \"DocEntry\"=a.\"DocEntry\") as \"SGSTVal\",  ";
-            retstring = retstring + " (select sum(\"U_UTL_ST_IGAMT\") from WTR1 where \"DocEntry\"=a.\"DocEntry\") as \"IGSTVal\",  ";
-            retstring = retstring + " U_UTL_ST_CGAMT as  \"CGSTAmt\", U_UTL_ST_SGAMT as  \"SGSTAmt\", U_UTL_ST_IGAMT as  \"IGSTAmt\",";
+            if (clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_InvUseQry\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01'") != "Y")
+            {
+
+                retstring = retstring + " \"U_UTL_ST_CGST\"+\"U_UTL_ST_SGST\"+\"U_UTL_ST_IGST\" as \"GSTRATE\",";
+                retstring = retstring + " (select sum(\"U_UTL_ST_CGAMT\") from WTR1 where \"DocEntry\"=a.\"DocEntry\") as \"CGSTVal\",  ";
+                retstring = retstring + " (select sum(\"U_UTL_ST_SGAMT\") from WTR1 where \"DocEntry\"=a.\"DocEntry\") as \"SGSTVal\",  ";
+                retstring = retstring + " (select sum(\"U_UTL_ST_IGAMT\") from WTR1 where \"DocEntry\"=a.\"DocEntry\") as \"IGSTVal\",  ";
+                retstring = retstring + " \"U_UTL_ST_CGAMT\" as  \"CGSTAmt\", \"U_UTL_ST_SGAMT\" as  \"SGSTAmt\",\"U_UTL_ST_IGAMT\" as  \"IGSTAmt\",";
+                retstring = retstring + " (case when (select sum(\"U_UTL_ST_LINETOTAL\") from WTR1 where \"DocEntry\"=a.\"DocEntry\") =0 then a.\"DocTotal\"  ";
+                retstring += " else  (select sum(\"U_UTL_ST_LINETOTAL\") from WTR1 where \"DocEntry\"=a.\"DocEntry\") end  +a.\"DpmAmnt\") - ";
+                retstring += " (CASE WHEN (SELECT \"U_AddTCSOth\"  FROM \"@ATEICFG\" e WHERE e.\"Code\" ='01')='Y' ";
+                retstring += " THEN  0 ELSE COALESCE((Select Sum(WTR5.\"WTAmnt\") from WTR5 where WTR5.\"AbsEntry\" = a.\"DocEntry\"),0.0) END ) AS \"Doc Total\", ";
+            }
+            else
+            {
+                string taxrateccol = clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_InvTaxrt\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01'");
+
+                retstring = retstring + " l.\"" + taxrateccol + "\"  as \"GSTRATE\", " ;
+
+
+                retstring += " (SELECT sum( COALESCE(  b1.\"" + Pricecol + "\" * case when a1.\"DocRate\"=0 then 1 else a1.\"DocRate\" end,0)* b1.\"Quantity\")* ";
+                retstring += " (CASE WHEN LEFT(FrmLoc.\"GSTRegnNo\", 2) = " +
+                                         "LEFT(CASE WHEN COALESCE(a.\"CardCode\", '') = '' THEN  ToLoc.\"GSTRegnNo\" ELSE  ToLocSub.\"GSTRegnNo\"  END, 2) ";
+                retstring += " THEN (CAST(l.\"" + taxrateccol + "\" AS Decimal(18, 6)) / 100) / 2  ELSE 0 END) ";
+                retstring += "  from OWTR a1 INNER JOIN WTR1 b1 on b1.\"DocEntry\" = a1.\"DocEntry\"  where a1.\"DocEntry\" = a.\"DocEntry\") AS \"CGSTVal\", ";
+
+                retstring += " (SELECT sum( COALESCE(  b1.\"" + Pricecol + "\" * case when a1.\"DocRate\"=0 then 1 else a1.\"DocRate\" end,0)* b1.\"Quantity\")* ";
+                retstring += " (CASE WHEN LEFT(FrmLoc.\"GSTRegnNo\", 2) = " +
+                                         "LEFT(CASE WHEN COALESCE(a.\"CardCode\", '') = '' THEN  ToLoc.\"GSTRegnNo\" ELSE  ToLocSub.\"GSTRegnNo\"  END, 2) ";
+                retstring += " THEN (CAST(l.\"" + taxrateccol + "\" AS Decimal(18, 6)) / 100) / 2  ELSE 0 END) ";
+                retstring += "  from OWTR a1 INNER JOIN WTR1 b1 on b1.\"DocEntry\" = a1.\"DocEntry\"  where a1.\"DocEntry\" = a.\"DocEntry\") AS \"SGSTVal\", ";
+
+                retstring += " (SELECT sum( COALESCE(  b1.\"" + Pricecol + "\" * case when a1.\"DocRate\"=0 then 1 else a1.\"DocRate\" end,0)* b1.\"Quantity\")* ";
+                retstring += " (CASE WHEN LEFT(FrmLoc.\"GSTRegnNo\", 2) = " +
+                                         "LEFT(CASE WHEN COALESCE(a.\"CardCode\", '') = '' THEN  ToLoc.\"GSTRegnNo\" ELSE  ToLocSub.\"GSTRegnNo\"  END, 2) ";
+                retstring += " THEN 0 ELSE (CAST(l.\"" + taxrateccol + "\" AS Decimal(18, 6)) / 100) END) ";
+                retstring += "  from OWTR a1 INNER JOIN WTR1 b1 on b1.\"DocEntry\" = a1.\"DocEntry\"  where a1.\"DocEntry\" = a.\"DocEntry\") AS \"IGSTVal\", ";
+
+                retstring += " ((COALESCE(b.\"" + Pricecol + "\" * case when a.\"DocRate\" = 0 then 1 else a.\"DocRate\" end, 0) * b.\"Quantity\")* ";
+                retstring += " (CASE WHEN LEFT(FrmLoc.\"GSTRegnNo\",2)= " +
+                                        " LEFT(CASE WHEN COALESCE(a.\"CardCode\", '') = '' THEN  ToLoc.\"GSTRegnNo\" ELSE  ToLocSub.\"GSTRegnNo\"  END, 2) ";
+                retstring += " THEN (CAST(l.\"" + taxrateccol + "\"  AS Decimal(18, 6)) / 100) / 2  ELSE  0 END ) ) \"CGSTAmt\",";
+
+                retstring += " ((COALESCE(b.\"" + Pricecol + "\" * case when a.\"DocRate\" = 0 then 1 else a.\"DocRate\" end, 0) * b.\"Quantity\")* ";
+                retstring += " (CASE WHEN LEFT(FrmLoc.\"GSTRegnNo\",2)= " +
+                                        " LEFT(CASE WHEN COALESCE(a.\"CardCode\", '') = '' THEN  ToLoc.\"GSTRegnNo\" ELSE  ToLocSub.\"GSTRegnNo\"  END, 2) ";
+                retstring += " THEN (CAST(l.\"" + taxrateccol + "\"  AS Decimal(18, 6)) / 100) / 2  ELSE  0 END ) ) \"SGSTAmt\",";
+
+                retstring += " ((COALESCE(b.\"" + Pricecol + "\" * case when a.\"DocRate\" = 0 then 1 else a.\"DocRate\" end, 0) * b.\"Quantity\")* ";
+                retstring += " (CASE WHEN LEFT(FrmLoc.\"GSTRegnNo\",2)= " +
+                                        " LEFT(CASE WHEN COALESCE(a.\"CardCode\", '') = '' THEN  ToLoc.\"GSTRegnNo\" ELSE  ToLocSub.\"GSTRegnNo\"  END, 2) ";
+                retstring += " THEN 0 ELSE  (CAST(l.\"" + taxrateccol + "\"  AS Decimal(18, 6)) / 100)  END ) ) \"IGSTAmt\",";
 
 
 
-            retstring = retstring + " (SELECT MAX(\"BatchNum\") from IBT1 where \"ItemCode\"=b.\"ItemCode\" and \"WhsCode\"=b.\"WhsCode\" and";
-            retstring = retstring + " \"BaseType\" in ('67') and \"BaseEntry\"= CASE WHEN  b.\"BaseType\" =-1 THEN b.\"DocEntry\" ELSE b.\"BaseEntry\"  end  ) AS \"BatchNum\",";
+                retstring += " (((SELECT sum(COALESCE(b1.\"" + Pricecol + "\" * case when a1.\"DocRate\" = 0 then 1 else a1.\"DocRate\" end, 0) * b1.\"Quantity\") ";
+                retstring += "  from OWTR a1 INNER JOIN WTR1 b1 on b1.\"DocEntry\" = a1.\"DocEntry\"  where a1.\"DocEntry\" = a.\"DocEntry\") +";
+                retstring += " (SELECT sum(COALESCE(b1.\"" + Pricecol + "\" * case when a1.\"DocRate\" = 0 then 1 else a1.\"DocRate\" end, 0) * b1.\"Quantity\") * ";
+                retstring += " (CAST(l.\"" + taxrateccol + "\"  AS Decimal(18, 6)) / 100) ";
+                retstring += "  from OWTR a1 INNER JOIN WTR1 b1 on b1.\"DocEntry\" = a1.\"DocEntry\"  where a1.\"DocEntry\" = a.\"DocEntry\" )) ";
+                retstring += " + a.\"DpmAmnt\") -(CASE WHEN(SELECT \"U_AddTCSOth\"  FROM \"@ATEICFG\" e WHERE e.\"Code\" = '01') = 'Y' ";
+                retstring += "   THEN  0 ELSE COALESCE((Select Sum(WTR5.\"WTAmnt\") from WTR5 where WTR5.\"AbsEntry\" = a.\"DocEntry\"),0.0) END ) AS \"Doc Total\", ";
+
+            }
+           
 
 
-            //retstring = retstring + " Case when a.\"DocType\"='S' then  (Select Sum(IFNULL(\"LineTotal\",0))* case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end from WTR1 where \"DocEntry\"=b.\"DocEntry\") " +
-            //                       "Else (Select Sum(IFNULL(\"INMPrice\",0)*\"Quantity\")* case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end from WTR1 where \"DocEntry\"=b.\"DocEntry\") End \"AssVal\",";
 
-            // retstring = retstring + " (a.\"DocTotal\" +a.\"DpmAmnt\") - COALESCE((Select Sum(WTR5.\"WTAmnt\") from WTR5 where WTR5.\"AbsEntry\"=a.\"DocEntry\"),0.0) \"Doc Total\" ,";
-
-            retstring = retstring + " (Select Sum(COALESCE(\""+ Pricecol  +"\",0)*\"Quantity\")* case when a.\"DocRate\"=0 then 1 else a.\"DocRate\" end from WTR1 where \"DocEntry\"=b.\"DocEntry\")  \"AssVal\",";
-
-            retstring = retstring + " (case when (select sum(\"U_UTL_ST_LINETOTAL\") from WTR1 where \"DocEntry\"=a.\"DocEntry\") =0 then a.\"DocTotal\"  ";
-            retstring += " else  (select sum(\"U_UTL_ST_LINETOTAL\") from WTR1 where \"DocEntry\"=a.\"DocEntry\") end  +a.\"DpmAmnt\") - ";
-
-            retstring += " (CASE WHEN (SELECT \"U_AddTCSOth\"  FROM \"@ATEICFG\" e WHERE e.\"Code\" ='01')='Y' ";
-            retstring += " THEN  0 ELSE COALESCE((Select Sum(WTR5.\"WTAmnt\") from WTR5 where WTR5.\"AbsEntry\" = a.\"DocEntry\"),0.0) END ) AS \"Doc Total\", ";
-            retstring += " (CASE WHEN (SELECT \"U_AddTCSOth\"  FROM \"@ATEICFG\" e WHERE e.\"Code\" ='01')='Y' ";
-            retstring += " THEN   COALESCE((Select Sum(WTR5.\"WTAmnt\") from WTR5 where WTR5.\"AbsEntry\" = a.\"DocEntry\"),0.0) ELSE 0 END ) AS \"OthrAmt\", ";
 
 
             retstring = retstring + " a.\"DocDueDate\" \"Inv Due Date\", a.\"NumAtCard\", a.\"Printed\",a.\"PayToCode\", a.\"ShipToCode\", a.\"Comments\" ,Left(Replace(o.\"ChapterID\",'.','')," + HSNLength + ") \"ChapterID\" , A.\"DiscSum\", A.\"RoundDif\",";
-            retstring = retstring + " b.\"DiscPrcnt\",((b.\"PriceBefDi\"*\"Quantity\") * (b.\"DiscPrcnt\"/100)) \"LineDisc\",l.\"InvntryUom\" ,IFNULL(a.\"RoundDif\",0) \"Rounding\", a.\"TaxDate\" \"Cust Order Date\", a.\"TotalExpns\",l.\"FrgnName\",a.\"DocCur\",A.\"VatSum\", a.\"TotalExpns\" \"Freight\",";
+            retstring = retstring + " b.\"DiscPrcnt\",((b.\"" + Pricecol + "\"*\"Quantity\") * (b.\"DiscPrcnt\"/100)) \"LineDisc\",l.\"InvntryUom\" ,IFNULL(a.\"RoundDif\",0) \"Rounding\", a.\"TaxDate\" \"Cust Order Date\", a.\"TotalExpns\",l.\"FrgnName\",a.\"DocCur\",A.\"VatSum\", a.\"TotalExpns\" \"Freight\",";
             retstring = retstring + " l.\"SalUnitMsr\",IFNULL(b.\"LineTotal\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Line Total\", IFNULL(a.\"TotalExpns\",0) \"Freight Total\",IFNULL(a.\"DiscSum\"/case when a.\"DocRate\" =0 then 1 else a.\"DocRate\" End,0) \"Disc Total\",l.\"ItemClass\", ";
 
             if (clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_InvTranGetBrnchAdd\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01' ") == "Y")
@@ -543,7 +595,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             retstring = retstring + " (case when FrmLoc.\"Country\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=FrmLoc.\"Country\" and \"Code\"=FrmLoc.\"State\") ELSE '96' END) \"ActFrmStat\",";
             retstring = retstring + " (case when FrmLoc.\"Country\"='IN' then (select COALESCE(\"GSTCode\",'96') from OCST where \"Country\"=FrmLoc.\"Country\" and \"Code\"=FrmLoc.\"State\") ELSE '96' END) \"FrmState\",";
 
-
+            
             if (clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_InvTranGetcusAdd\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01'") == "Y")
             {
                 retstring += " case when COALESCE(a.\"CardCode\",'') <>'' then ";

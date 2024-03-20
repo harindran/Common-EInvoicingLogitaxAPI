@@ -101,6 +101,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
             this.EditText23 = ((SAPbouiCOM.EditText)(this.GetItem("Item_14").Specific));
             this.StaticText25 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_17").Specific));
             this.EditText24 = ((SAPbouiCOM.EditText)(this.GetItem("Item_18").Specific));
+            this.CheckBox11 = ((SAPbouiCOM.CheckBox)(this.GetItem("InvUseQry").Specific));
             this.OnCustomInitialize();
 
         }
@@ -356,6 +357,12 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 CheckBox10.Checked = true;
             }
 
+            strSQL = clsModule.objaddon.objglobalmethods.getSingleValue("Select \"U_InvUseQry\" from \"@ATEICFG\" where \"Code\"='01'");
+            if (strSQL == "Y")
+            {
+                CheckBox11.Checked = true;
+            }
+            
         }
 
         private void Folder0_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
@@ -457,6 +464,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 oGeneralData.SetProperty("U_GettrnShp", Convert.ToString(((CheckBox8.Checked == true) ? 'Y' : 'N'))); 
                 oGeneralData.SetProperty("U_NotUseQrcode", Convert.ToString(((CheckBox9.Checked == true) ? 'Y' : 'N'))); 
                 oGeneralData.SetProperty("U_BlockEway", Convert.ToString(((CheckBox10.Checked == true) ? 'Y' : 'N'))); 
+                oGeneralData.SetProperty("U_InvUseQry", Convert.ToString(((CheckBox11.Checked == true) ? 'Y' : 'N'))); 
 
                 oGeneralData.SetProperty("U_DBType", Convert.ToString(((OptionBtn4.Selected == true) ? 'Y' : 'N')));
                 oGeneralData.SetProperty("U_EwayNo", oForm.DataSources.UserDataSources.Item("EwayNo").Value);
@@ -670,6 +678,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
         private SAPbouiCOM.EditText EditText23;
         private SAPbouiCOM.StaticText StaticText25;
         private SAPbouiCOM.EditText EditText24;
+        private SAPbouiCOM.CheckBox CheckBox11;
     }
 }
  

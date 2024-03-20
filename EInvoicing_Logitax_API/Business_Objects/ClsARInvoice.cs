@@ -1903,8 +1903,8 @@ namespace EInvoicing_Logitax_API.Business_Objects
                     invrecordset = (SAPbobsCOM.Recordset)clsModule.objaddon.objcompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
                     invrecordset.DoQuery(strSQL);
 
-                    DataTable dt = new DataTable();
-                    dt = clsModule.objaddon.objglobalmethods.GetmultipleValue(strSQL);
+                    //DataTable dt = new DataTable();
+                    //dt = clsModule.objaddon.objglobalmethods.GetmultipleValue(strSQL);
                     if (invrecordset.RecordCount > 0)
                     {
                         decimal Calcdistance = 0;
