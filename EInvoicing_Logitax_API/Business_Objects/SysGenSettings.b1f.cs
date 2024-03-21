@@ -104,6 +104,15 @@ namespace EInvoicing_Logitax_API.Business_Objects
             this.CheckBox11 = ((SAPbouiCOM.CheckBox)(this.GetItem("InvUseQry").Specific));
             this.StaticText26 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_19").Specific));
             this.EditText25 = ((SAPbouiCOM.EditText)(this.GetItem("Item_20").Specific));
+            this.CheckBox12 = ((SAPbouiCOM.CheckBox)(this.GetItem("Item_21").Specific));
+            this.StaticText27 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_22").Specific));
+            this.StaticText28 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_23").Specific));
+            this.StaticText29 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_24").Specific));
+            this.EditText26 = ((SAPbouiCOM.EditText)(this.GetItem("Item_26").Specific));
+            this.EditText28 = ((SAPbouiCOM.EditText)(this.GetItem("Item_28").Specific));
+            this.EditText29 = ((SAPbouiCOM.EditText)(this.GetItem("Item_29").Specific));
+            this.StaticText31 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_30").Specific));
+            this.EditText30 = ((SAPbouiCOM.EditText)(this.GetItem("Item_31").Specific));
             this.OnCustomInitialize();
 
         }
@@ -167,6 +176,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                               T1.""LineId"",T1.""U_URLType"",T1.""U_Type"",T1.""U_URL"",T0.""U_HSNL"",T0.""U_SERCONFIG"",";
                 strSQL += @" ""U_DBType"" ,""U_EwayNo"" ,""U_VehNo"" ,""U_TransID"" ,""U_Distance"",""U_TransName"",""U_ItemDesc"",""U_BtnPos"",";
                 strSQL += @" ""U_GSTCol"", ""U_HSNCol"", ""U_INVTranItemCal"", ""U_InvTaxrt"",""U_INVTranItemDB"",""U_ItmgrpMat"", ";
+                strSQL += @" ""U_DeliVendor"", ""U_DeliShip"", ""U_DeliWhse"",""U_RDCcol"", ";
 
                 strSQL += " \"U_GST_ClientCode\",\"U_GST_UserCode\",\"U_GST_Password\",\"U_GST_Live\",\"U_GST_UATUrl\",\"U_GST_LIVEUrl\",\"U_GST_Token\"";
                 strSQL += @" from ""@ATEICFG"" T0 join ""@ATEICFG1"" T1 on T0.""Code""=T1.""Code"" where T0.""Code""='01'";
@@ -206,6 +216,11 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         oForm.DataSources.UserDataSources.Item("TrnItmCal").Value = Drow["U_INVTranItemCal"].ToString();
                         oForm.DataSources.UserDataSources.Item("INVTrnDB").Value = Drow["U_INVTranItemDB"].ToString();
                         oForm.DataSources.UserDataSources.Item("BtnPos").Value = Drow["U_BtnPos"].ToString();
+
+                        oForm.DataSources.UserDataSources.Item("DeliVendor").Value = Drow["U_DeliVendor"].ToString();
+                        oForm.DataSources.UserDataSources.Item("DeliShip").Value = Drow["U_DeliShip"].ToString();
+                        oForm.DataSources.UserDataSources.Item("DeliWhse").Value = Drow["U_DeliWhse"].ToString();
+                        oForm.DataSources.UserDataSources.Item("RDCcol").Value = Drow["U_RDCcol"].ToString();
                 
 
                         oForm.DataSources.UserDataSources.Item("UD_GClcode").Value = Drow["U_GST_ClientCode"].ToString();
@@ -365,6 +380,14 @@ namespace EInvoicing_Logitax_API.Business_Objects
             {
                 CheckBox11.Checked = true;
             }
+
+
+            strSQL = clsModule.objaddon.objglobalmethods.getSingleValue("Select \"U_UseDeliRDC\" from \"@ATEICFG\" where \"Code\"='01'");
+            if (strSQL == "Y")
+            {
+                CheckBox12.Checked = true;
+            }
+
             
         }
 
@@ -468,6 +491,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 oGeneralData.SetProperty("U_NotUseQrcode", Convert.ToString(((CheckBox9.Checked == true) ? 'Y' : 'N'))); 
                 oGeneralData.SetProperty("U_BlockEway", Convert.ToString(((CheckBox10.Checked == true) ? 'Y' : 'N'))); 
                 oGeneralData.SetProperty("U_InvUseQry", Convert.ToString(((CheckBox11.Checked == true) ? 'Y' : 'N'))); 
+                oGeneralData.SetProperty("U_UseDeliRDC", Convert.ToString(((CheckBox12.Checked == true) ? 'Y' : 'N'))); 
 
                 oGeneralData.SetProperty("U_DBType", Convert.ToString(((OptionBtn4.Selected == true) ? 'Y' : 'N')));
                 oGeneralData.SetProperty("U_EwayNo", oForm.DataSources.UserDataSources.Item("EwayNo").Value);
@@ -479,6 +503,14 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 oGeneralData.SetProperty("U_GSTCol", oForm.DataSources.UserDataSources.Item("GSTCol").Value);
                 oGeneralData.SetProperty("U_HSNCol", oForm.DataSources.UserDataSources.Item("HSNCol").Value);
                 oGeneralData.SetProperty("U_ItmgrpMat", oForm.DataSources.UserDataSources.Item("ItmgrpMat").Value);
+
+                oGeneralData.SetProperty("U_DeliVendor", oForm.DataSources.UserDataSources.Item("DeliVendor").Value);
+                oGeneralData.SetProperty("U_DeliShip", oForm.DataSources.UserDataSources.Item("DeliShip").Value);
+                oGeneralData.SetProperty("U_DeliWhse", oForm.DataSources.UserDataSources.Item("DeliWhse").Value);
+                oGeneralData.SetProperty("U_RDCcol", oForm.DataSources.UserDataSources.Item("RDCcol").Value);
+
+
+
                 oGeneralData.SetProperty("U_InvTaxrt", oForm.DataSources.UserDataSources.Item("InvTaxrt").Value);
                 oGeneralData.SetProperty("U_INVTranItemCal", oForm.DataSources.UserDataSources.Item("TrnItmCal").Value);
                 oGeneralData.SetProperty("U_INVTranItemDB", oForm.DataSources.UserDataSources.Item("INVTrnDB").Value);
@@ -685,6 +717,15 @@ namespace EInvoicing_Logitax_API.Business_Objects
         private SAPbouiCOM.CheckBox CheckBox11;
         private SAPbouiCOM.StaticText StaticText26;
         private SAPbouiCOM.EditText EditText25;
+        private SAPbouiCOM.CheckBox CheckBox12;
+        private SAPbouiCOM.StaticText StaticText27;
+        private SAPbouiCOM.StaticText StaticText28;
+        private SAPbouiCOM.StaticText StaticText29;
+        private SAPbouiCOM.EditText EditText26;
+        private SAPbouiCOM.EditText EditText28;
+        private SAPbouiCOM.EditText EditText29;
+        private SAPbouiCOM.StaticText StaticText31;
+        private SAPbouiCOM.EditText EditText30;
     }
 }
  

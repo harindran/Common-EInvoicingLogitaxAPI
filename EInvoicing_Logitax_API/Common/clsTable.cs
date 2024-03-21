@@ -95,6 +95,11 @@ namespace EInvoicing_Logitax_API.Common
             AddFields("@ATEICFG", "NotUseQrcode", "QRcode Enable In Accounts Tab", SAPbobsCOM.BoFieldTypes.db_Alpha, 30);
             AddFields("@ATEICFG", "BlockEway", "Block Eway Without Einvoice", SAPbobsCOM.BoFieldTypes.db_Alpha, 30);
             AddFields("@ATEICFG", "InvUseQry", "Inventory Transfer Use Query", SAPbobsCOM.BoFieldTypes.db_Alpha, 30);
+            AddFields("@ATEICFG", "UseDeliRDC", "Use Delivery RDC And NRDC", SAPbobsCOM.BoFieldTypes.db_Alpha, 30);
+            AddFields("@ATEICFG", "DeliVendor", "Delivery Vendor", SAPbobsCOM.BoFieldTypes.db_Alpha, 30);
+            AddFields("@ATEICFG", "DeliShip", "Delivery Ship", SAPbobsCOM.BoFieldTypes.db_Alpha, 30);
+            AddFields("@ATEICFG", "DeliWhse", "Delivery Ware House", SAPbobsCOM.BoFieldTypes.db_Alpha, 30);
+            AddFields("@ATEICFG", "RDCcol", "RDC and NRDC Col", SAPbobsCOM.BoFieldTypes.db_Alpha, 30);
 
             AddFields("@ATEICFG", "DBType", "SQL Or HANA", SAPbobsCOM.BoFieldTypes.db_Alpha, 5);
             AddFields("@ATEICFG", "EwayNo", "UDF EwayNo", SAPbobsCOM.BoFieldTypes.db_Alpha, 50);
