@@ -102,6 +102,8 @@ namespace EInvoicing_Logitax_API.Business_Objects
             this.StaticText25 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_17").Specific));
             this.EditText24 = ((SAPbouiCOM.EditText)(this.GetItem("Item_18").Specific));
             this.CheckBox11 = ((SAPbouiCOM.CheckBox)(this.GetItem("InvUseQry").Specific));
+            this.StaticText26 = ((SAPbouiCOM.StaticText)(this.GetItem("Item_19").Specific));
+            this.EditText25 = ((SAPbouiCOM.EditText)(this.GetItem("Item_20").Specific));
             this.OnCustomInitialize();
 
         }
@@ -164,7 +166,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 strSQL = @"Select T0.""U_ClientCode"",T0.""U_UserCode"",T0.""U_Password"",T0.""U_Live"",T0.""U_UATUrl"",T0.""U_LIVEUrl"",
                               T1.""LineId"",T1.""U_URLType"",T1.""U_Type"",T1.""U_URL"",T0.""U_HSNL"",T0.""U_SERCONFIG"",";
                 strSQL += @" ""U_DBType"" ,""U_EwayNo"" ,""U_VehNo"" ,""U_TransID"" ,""U_Distance"",""U_TransName"",""U_ItemDesc"",""U_BtnPos"",";
-                strSQL += @" ""U_GSTCol"", ""U_HSNCol"", ""U_INVTranItemCal"", ""U_InvTaxrt"",""U_INVTranItemDB"", ";
+                strSQL += @" ""U_GSTCol"", ""U_HSNCol"", ""U_INVTranItemCal"", ""U_InvTaxrt"",""U_INVTranItemDB"",""U_ItmgrpMat"", ";
 
                 strSQL += " \"U_GST_ClientCode\",\"U_GST_UserCode\",\"U_GST_Password\",\"U_GST_Live\",\"U_GST_UATUrl\",\"U_GST_LIVEUrl\",\"U_GST_Token\"";
                 strSQL += @" from ""@ATEICFG"" T0 join ""@ATEICFG1"" T1 on T0.""Code""=T1.""Code"" where T0.""Code""='01'";
@@ -199,6 +201,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         oForm.DataSources.UserDataSources.Item("ItemDesc").Value = Drow["U_ItemDesc"].ToString();
                         oForm.DataSources.UserDataSources.Item("GSTCol").Value = Drow["U_GSTCol"].ToString();
                         oForm.DataSources.UserDataSources.Item("HSNCol").Value = Drow["U_HSNCol"].ToString();
+                        oForm.DataSources.UserDataSources.Item("ItmgrpMat").Value = Drow["U_ItmgrpMat"].ToString();
                         oForm.DataSources.UserDataSources.Item("InvTaxrt").Value = Drow["U_InvTaxrt"].ToString();
                         oForm.DataSources.UserDataSources.Item("TrnItmCal").Value = Drow["U_INVTranItemCal"].ToString();
                         oForm.DataSources.UserDataSources.Item("INVTrnDB").Value = Drow["U_INVTranItemDB"].ToString();
@@ -475,6 +478,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 oGeneralData.SetProperty("U_ItemDesc", oForm.DataSources.UserDataSources.Item("ItemDesc").Value);
                 oGeneralData.SetProperty("U_GSTCol", oForm.DataSources.UserDataSources.Item("GSTCol").Value);
                 oGeneralData.SetProperty("U_HSNCol", oForm.DataSources.UserDataSources.Item("HSNCol").Value);
+                oGeneralData.SetProperty("U_ItmgrpMat", oForm.DataSources.UserDataSources.Item("ItmgrpMat").Value);
                 oGeneralData.SetProperty("U_InvTaxrt", oForm.DataSources.UserDataSources.Item("InvTaxrt").Value);
                 oGeneralData.SetProperty("U_INVTranItemCal", oForm.DataSources.UserDataSources.Item("TrnItmCal").Value);
                 oGeneralData.SetProperty("U_INVTranItemDB", oForm.DataSources.UserDataSources.Item("INVTrnDB").Value);
@@ -679,6 +683,8 @@ namespace EInvoicing_Logitax_API.Business_Objects
         private SAPbouiCOM.StaticText StaticText25;
         private SAPbouiCOM.EditText EditText24;
         private SAPbouiCOM.CheckBox CheckBox11;
+        private SAPbouiCOM.StaticText StaticText26;
+        private SAPbouiCOM.EditText EditText25;
     }
 }
  

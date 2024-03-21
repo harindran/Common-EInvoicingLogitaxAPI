@@ -83,6 +83,7 @@ namespace EInvoicing_Logitax_API.Common
             AddFields("@ATEICFG", "GSTCol", "GST Column", SAPbobsCOM.BoFieldTypes.db_Alpha, 100);
             AddFields("@ATEICFG", "HSNCol","HSN Column", SAPbobsCOM.BoFieldTypes.db_Alpha, 100);
             AddFields("@ATEICFG", "InvTaxrt", "Tax Rate Column", SAPbobsCOM.BoFieldTypes.db_Alpha, 100);
+            AddFields("@ATEICFG", "ItmgrpMat", "Item group Consider Item", SAPbobsCOM.BoFieldTypes.db_Alpha, 100);
             AddFields("@ATEICFG", "INVTranItemCal", "Inventory Item Calculation", SAPbobsCOM.BoFieldTypes.db_Alpha, 100);
             AddFields("@ATEICFG", "INVTranItemDB", "Inventory  Calculation DB column Name", SAPbobsCOM.BoFieldTypes.db_Alpha, 100);
             

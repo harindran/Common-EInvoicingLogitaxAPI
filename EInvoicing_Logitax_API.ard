@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<AddOnRegData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" SlientInstallation="No" SlientUpgrade="No" Partnernmsp="ATPL" SchemaVersion="3.0" Type="" MultipleVersion="false" OnDemand="" OnPremise="" ExtName="EInvoiceV5.44.6" ExtVersion="5.44.6" Contdata="www.altrockstech.com" Partner="Altrocks Tech Pvt Ltd" DBType="Both" ClientType="A">
+<AddOnRegData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" SlientInstallation="No" SlientUpgrade="No" Partnernmsp="ATPL" SchemaVersion="3.0" Type="" MultipleVersion="false" OnDemand="" OnPremise="" ExtName="EInvoiceV5.44.7" ExtVersion="5.44.7" Contdata="www.altrockstech.com" Partner="Altrocks Tech Pvt Ltd" DBType="Both" ClientType="A">
   <Validity>
     <SBOCompatibility>
       <Version From="100.120.01" To="100.210.08" />

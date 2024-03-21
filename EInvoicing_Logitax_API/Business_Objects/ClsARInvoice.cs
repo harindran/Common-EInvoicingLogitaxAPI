@@ -1567,6 +1567,22 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                 }
                             }
 
+                            string ItmgrpMat = clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_ItmgrpMat\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01'");
+                            if (!string.IsNullOrEmpty(ItmgrpMat))
+                            {
+                                string[] ss = ItmgrpMat.Split(',');
+
+                                foreach (string item in ss)
+                                {
+                                    string output=  clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"ItmsGrpCod\" FROM \"OITM\" a  WHERE \"ItemCode\" ='" + invrecordset.Fields.Item("ItemCode").Value.ToString() + "'");
+                                  
+                                    if (output== item)
+                                    {
+                                        Isservice = "N";
+                                        break;
+                                    }
+                                }
+                            }
                             GenerateIRNGetJson.json_data.ItemList.Add(new ItemList
                             {
                                 SlNo = invrecordset.Fields.Item("SINo").Value.ToString(),
