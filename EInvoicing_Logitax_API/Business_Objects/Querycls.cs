@@ -521,35 +521,35 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
                 retstring += " (SELECT sum( COALESCE(  b1.\"" + Pricecol + "\" * case when a1.\"DocRate\"=0 then 1 else a1.\"DocRate\" end,0)* b1.\"Quantity\")* ";
                 retstring += " (CASE WHEN LEFT(FrmLoc.\"GSTRegnNo\", 2) = " +
-                                         "LEFT(CASE WHEN COALESCE(a.\"CardCode\", '') = '' THEN  ToLoc.\"GSTRegnNo\" ELSE  ToLocSub.\"GSTRegnNo\"  END, 2) ";
+                                         "LEFT(CASE WHEN COALESCE(a.\"CardCode\", '') = '' THEN  ToLocSub.\"GSTRegnNo\" ELSE  ToLoc.\"GSTRegnNo\"  END, 2) ";
                 retstring += " THEN (CAST(l.\"" + taxrateccol + "\" AS Decimal(18, 6)) / 100) / 2  ELSE 0 END) ";
                 retstring += "  from OWTR a1 INNER JOIN WTR1 b1 on b1.\"DocEntry\" = a1.\"DocEntry\"  where a1.\"DocEntry\" = a.\"DocEntry\") AS \"CGSTVal\", ";
 
                 retstring += " (SELECT sum( COALESCE(  b1.\"" + Pricecol + "\" * case when a1.\"DocRate\"=0 then 1 else a1.\"DocRate\" end,0)* b1.\"Quantity\")* ";
                 retstring += " (CASE WHEN LEFT(FrmLoc.\"GSTRegnNo\", 2) = " +
-                                         "LEFT(CASE WHEN COALESCE(a.\"CardCode\", '') = '' THEN  ToLoc.\"GSTRegnNo\" ELSE  ToLocSub.\"GSTRegnNo\"  END, 2) ";
+                                         "LEFT(CASE WHEN COALESCE(a.\"CardCode\", '') = '' THEN  ToLocSub.\"GSTRegnNo\" ELSE  ToLoc.\"GSTRegnNo\"  END, 2) ";
                 retstring += " THEN (CAST(l.\"" + taxrateccol + "\" AS Decimal(18, 6)) / 100) / 2  ELSE 0 END) ";
                 retstring += "  from OWTR a1 INNER JOIN WTR1 b1 on b1.\"DocEntry\" = a1.\"DocEntry\"  where a1.\"DocEntry\" = a.\"DocEntry\") AS \"SGSTVal\", ";
 
                 retstring += " (SELECT sum( COALESCE(  b1.\"" + Pricecol + "\" * case when a1.\"DocRate\"=0 then 1 else a1.\"DocRate\" end,0)* b1.\"Quantity\")* ";
                 retstring += " (CASE WHEN LEFT(FrmLoc.\"GSTRegnNo\", 2) = " +
-                                         "LEFT(CASE WHEN COALESCE(a.\"CardCode\", '') = '' THEN  ToLoc.\"GSTRegnNo\" ELSE  ToLocSub.\"GSTRegnNo\"  END, 2) ";
+                                         "LEFT(CASE WHEN COALESCE(a.\"CardCode\", '') = '' THEN  ToLocSub.\"GSTRegnNo\" ELSE  ToLoc.\"GSTRegnNo\"  END, 2) ";
                 retstring += " THEN 0 ELSE (CAST(l.\"" + taxrateccol + "\" AS Decimal(18, 6)) / 100) END) ";
                 retstring += "  from OWTR a1 INNER JOIN WTR1 b1 on b1.\"DocEntry\" = a1.\"DocEntry\"  where a1.\"DocEntry\" = a.\"DocEntry\") AS \"IGSTVal\", ";
 
                 retstring += " ((COALESCE(b.\"" + Pricecol + "\" * case when a.\"DocRate\" = 0 then 1 else a.\"DocRate\" end, 0) * b.\"Quantity\")* ";
                 retstring += " (CASE WHEN LEFT(FrmLoc.\"GSTRegnNo\",2)= " +
-                                        " LEFT(CASE WHEN COALESCE(a.\"CardCode\", '') = '' THEN  ToLoc.\"GSTRegnNo\" ELSE  ToLocSub.\"GSTRegnNo\"  END, 2) ";
+                                        " LEFT(CASE WHEN COALESCE(a.\"CardCode\", '') = '' THEN  ToLocSub.\"GSTRegnNo\" ELSE  ToLoc.\"GSTRegnNo\"  END, 2) ";
                 retstring += " THEN (CAST(l.\"" + taxrateccol + "\"  AS Decimal(18, 6)) / 100) / 2  ELSE  0 END ) ) \"CGSTAmt\",";
 
                 retstring += " ((COALESCE(b.\"" + Pricecol + "\" * case when a.\"DocRate\" = 0 then 1 else a.\"DocRate\" end, 0) * b.\"Quantity\")* ";
                 retstring += " (CASE WHEN LEFT(FrmLoc.\"GSTRegnNo\",2)= " +
-                                        " LEFT(CASE WHEN COALESCE(a.\"CardCode\", '') = '' THEN  ToLoc.\"GSTRegnNo\" ELSE  ToLocSub.\"GSTRegnNo\"  END, 2) ";
+                                        " LEFT(CASE WHEN COALESCE(a.\"CardCode\", '') = '' THEN  ToLocSub.\"GSTRegnNo\" ELSE  ToLoc.\"GSTRegnNo\"  END, 2) ";
                 retstring += " THEN (CAST(l.\"" + taxrateccol + "\"  AS Decimal(18, 6)) / 100) / 2  ELSE  0 END ) ) \"SGSTAmt\",";
 
                 retstring += " ((COALESCE(b.\"" + Pricecol + "\" * case when a.\"DocRate\" = 0 then 1 else a.\"DocRate\" end, 0) * b.\"Quantity\")* ";
                 retstring += " (CASE WHEN LEFT(FrmLoc.\"GSTRegnNo\",2)= " +
-                                        " LEFT(CASE WHEN COALESCE(a.\"CardCode\", '') = '' THEN  ToLoc.\"GSTRegnNo\" ELSE  ToLocSub.\"GSTRegnNo\"  END, 2) ";
+                                        " LEFT(CASE WHEN COALESCE(a.\"CardCode\", '') = '' THEN  ToLocSub.\"GSTRegnNo\" ELSE  ToLoc.\"GSTRegnNo\"  END, 2) ";
                 retstring += " THEN 0 ELSE  (CAST(l.\"" + taxrateccol + "\"  AS Decimal(18, 6)) / 100)  END ) ) \"IGSTAmt\",";
 
 
