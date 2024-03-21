@@ -957,38 +957,14 @@ namespace EInvoicing_Logitax_API.Business_Objects
                           
                         }
 
-                        string AssignEinvunit = invrecordset.Fields.Item("Unit").Value.ToString();
+                    
                         string Isservice = "N";
                    
                         if (invrecordset.Fields.Item("IsServc").Value.ToString() == "Y")
                         {
                             Isservice = "Y";
-                            
                         }
-                        else
-                        {
-                            if (invrecordset.Fields.Item("ItemClass").Value.ToString() == "1")
-                            {
-                                Isservice = "Y";
-                               
-                            }
-                        }
-
-                        if (Isservice == "N")
-                        {
-                            strSQL = "SELECT \"U_GUnitCod\"  FROM \"@UOMMAP\" u WHERE u.\"U_UOMCod\" ='" + AssignEinvunit + "'";
-                            DataTable dt1 = new DataTable();
-                            dt1 = clsModule.objaddon.objglobalmethods.GetmultipleValue(strSQL);
-                            if (dt1.Rows.Count > 0 && AssignEinvunit != "")
-                            {
-                                AssignEinvunit = dt1.Rows[0]["U_GUnitCod"].ToString();
-                            }
-                            else
-                            {
-                                clsModule.objaddon.objapplication.StatusBar.SetText("Unit UOM Name(" + AssignEinvunit + ") Not Mapped please Map Unit... ", SAPbouiCOM.BoMessageTime.bmt_Long, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-                                return false;
-                            }
-                        }
+                       
                         if (String.IsNullOrEmpty(clsModule.EwayNo))
                         {
 
@@ -1530,6 +1506,41 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                 prdouctdesc = invrecordset.Fields.Item("Dscription").Value.ToString();
                             }
 
+                            string AssignEinvunit = invrecordset.Fields.Item("Unit").Value.ToString();
+                            Isservice = "N";
+
+                            if (invrecordset.Fields.Item("IsServc").Value.ToString() == "Y")
+                            {
+                                Isservice = "Y";
+
+                            }
+                            else
+                            {
+                                if (invrecordset.Fields.Item("ItemClass").Value.ToString() == "1")
+                                {
+                                    Isservice = "Y";
+
+                                }
+                            }
+
+                            if (Isservice == "N")
+                            {
+                                strSQL = "SELECT \"U_GUnitCod\"  FROM \"@UOMMAP\" u WHERE u.\"U_UOMCod\" ='" + AssignEinvunit + "'";
+                                DataTable dt1 = new DataTable();
+                                dt1 = clsModule.objaddon.objglobalmethods.GetmultipleValue(strSQL);
+                                if (dt1.Rows.Count > 0 && AssignEinvunit != "")
+                                {
+                                    AssignEinvunit = dt1.Rows[0]["U_GUnitCod"].ToString();
+                                }
+                                else
+                                {
+                                    clsModule.objaddon.objapplication.StatusBar.SetText("Unit UOM Name(" + AssignEinvunit + ") Not Mapped please Map Unit... ", SAPbouiCOM.BoMessageTime.bmt_Long, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                                    return false;
+                                }
+                            }
+
+
+
                             string ServiceHSN = "";
 
                             if (!string.IsNullOrEmpty(clsModule.HSNCol))
@@ -1555,6 +1566,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                     }
                                 }
                             }
+
                             GenerateIRNGetJson.json_data.ItemList.Add(new ItemList
                             {
                                 SlNo = invrecordset.Fields.Item("SINo").Value.ToString(),
