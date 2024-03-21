@@ -1988,21 +1988,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                     
                         Calcdistance = clsModule.objaddon.objglobalmethods.CtoD(invrecordset.Fields.Item("Distance").Value);
 
-                        string AssignEwayunit = invrecordset.Fields.Item("Unit").Value.ToString();
-
-                        strSQL = "SELECT \"U_GUnitCod\"  FROM \"@UOMMAP\" u WHERE u.\"U_UOMCod\" ='" + AssignEwayunit + "'";
-                        DataTable dt1 = new DataTable();
-                        dt1 = clsModule.objaddon.objglobalmethods.GetmultipleValue(strSQL);
-                        if (dt1.Rows.Count > 0)
-                        {
-                            AssignEwayunit = dt1.Rows[0]["U_GUnitCod"].ToString();
-                        }
-                        else
-                        {
-                            clsModule.objaddon.objapplication.StatusBar.SetText("Unit(" + AssignEwayunit + ") Not Mapped please Map Unit... ", SAPbouiCOM.BoMessageTime.bmt_Long, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
-                            return false;
-                        }
-
+                 
                         GenerateIRNGetJson.CLIENTCODE = ClientCode;
                         GenerateIRNGetJson.USERCODE = UserCode;
                         GenerateIRNGetJson.PASSWORD = Password;
@@ -2110,13 +2096,27 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             {
                                 prdouctdesc = invrecordset.Fields.Item("Dscription").Value.ToString();
                             }
+                            string AssignEwayunit = invrecordset.Fields.Item("Unit").Value.ToString();
+
+                            strSQL = "SELECT \"U_GUnitCod\"  FROM \"@UOMMAP\" u WHERE u.\"U_UOMCod\" ='" + AssignEwayunit + "'";
+                            DataTable dt1 = new DataTable();
+                            dt1 = clsModule.objaddon.objglobalmethods.GetmultipleValue(strSQL);
+                            if (dt1.Rows.Count > 0)
+                            {
+                                AssignEwayunit = dt1.Rows[0]["U_GUnitCod"].ToString();
+                            }
+                            else
+                            {
+                                clsModule.objaddon.objapplication.StatusBar.SetText("Unit(" + AssignEwayunit + ") Not Mapped please Map Unit... ", SAPbouiCOM.BoMessageTime.bmt_Long, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                                return false;
+                            }
 
                             GenerateIRNGetJson.billLists[0].itemList.Add(new Generate_EWay.Ewayitemlist
                             {
                                 itemNo = clsModule.objaddon.objglobalmethods.Ctoint(invrecordset.Fields.Item("SINo").Value),
                                 productName = prdouctdesc,
                                 productDesc = prdouctdesc,
-                                hsnCode = invrecordset.Fields.Item("HSN").Value.ToString(),//"9965" for Service Invoice,
+                                hsnCode = invrecordset.Fields.Item("HSN").Value.ToString(),
                                 quantity = invrecordset.Fields.Item("Quantity").Value.ToString(),
                                 qtyUnit = AssignEwayunit,
                                 taxableAmount = invrecordset.Fields.Item("AssAmt").Value.ToString(),
@@ -2140,7 +2140,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         string msg = datatable.Rows[0]["message"].ToString();
                         if (datatable.Rows[0]["error_log_id"].ToString() == string.Empty)
                         {
-                            clsModule.objaddon.objapplication.StatusBar.SetText("Generate: " + msg, SAPbouiCOM.BoMessageTime.bmt_Medium, SAPbouiCOM.BoStatusBarMessageType.smt_Success);
+                            clsModule.objaddon.objapplication.StatusBar.SetText("Generate: " + msg, SAPbouiCOM.BoMessageTime.bmt_Medium, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
                         }
                         else
                         {
