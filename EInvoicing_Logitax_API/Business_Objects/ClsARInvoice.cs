@@ -1703,7 +1703,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             {
                                 GenerateIRNGetJson.json_data.ExpDtls.RefClm = invrecordset.Fields.Item("ClaimRefun").Value.ToString();
 
-                                GenerateIRNGetJson.json_data.EwbDtls.Distance = clsModule.objaddon.objglobalmethods.Ctoint(Calcdistance);
+                                GenerateIRNGetJson.json_data.EwbDtls.Distance = clsModule.objaddon.objglobalmethods.Ctoint(Calcdistance).ToString();
                                 GenerateIRNGetJson.json_data.EwbDtls.TransDocDt = clsModule.objaddon.objglobalmethods.Getdateformat(invrecordset.Fields.Item("TransDate").Value.ToString());
                                 GenerateIRNGetJson.json_data.EwbDtls.TransDocNo = invrecordset.Fields.Item("TransDocNo").Value.ToString();
                                 GenerateIRNGetJson.json_data.EwbDtls.TransId = invrecordset.Fields.Item("TransID").Value.ToString();
@@ -1746,7 +1746,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                     GenerateIRNGetJson.json_data.EwbDtls.TransName = Convert.ToString(invrecordset.Fields.Item(clsModule.EwayTransportName).Value);
                                 }
                             }
-                            GenerateIRNGetJson.json_data.EwbDtls.Distance = distance;
+                            GenerateIRNGetJson.json_data.EwbDtls.Distance = distance.ToString();
                         }
 
                     
@@ -2139,7 +2139,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
                         string msg = datatable.Rows[0]["message"].ToString();
                         if (datatable.Rows[0]["error_log_id"].ToString() == string.Empty)
-                        {
+                        {                          
                             clsModule.objaddon.objapplication.StatusBar.SetText("Generate: " + msg, SAPbouiCOM.BoMessageTime.bmt_Medium, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
                         }
                         else

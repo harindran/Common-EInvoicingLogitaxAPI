@@ -17,6 +17,15 @@ namespace EInvoicing_Logitax_API.Common
         public static string ItemDsc = "";
         public static string GSTCol = "";
         public static string HSNCol = "";
+
+        public static string NRDCCol = "";
+        public static string DelivendorCol = "";
+        public static string DelishipCol = "";
+        public static string Deliwhse = "";
+
+
+
+
         public static bool HANA = false;
 
         [STAThread()]

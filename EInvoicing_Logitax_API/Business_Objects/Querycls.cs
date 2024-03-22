@@ -515,27 +515,51 @@ namespace EInvoicing_Logitax_API.Business_Objects
             else
             {
                 string taxrateccol = clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_InvTaxrt\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01'");
-
+                          
                 retstring = retstring + " l.\"" + taxrateccol + "\"  as \"GSTRATE\", " ;
 
 
-                retstring += " (SELECT sum( COALESCE(  b1.\"" + Pricecol + "\" * case when a1.\"DocRate\"=0 then 1 else a1.\"DocRate\" end,0)* b1.\"Quantity\")* ";
-                retstring += " (CASE WHEN LEFT(FrmLoc.\"GSTRegnNo\", 2) = " +
-                                         "LEFT(CASE WHEN COALESCE(a.\"CardCode\", '') = '' THEN  ToLocSub.\"GSTRegnNo\" ELSE  ToLoc.\"GSTRegnNo\"  END, 2) ";
-                retstring += " THEN (CAST(l.\"" + taxrateccol + "\" AS Decimal(18, 6)) / 100) / 2  ELSE 0 END) ";
-                retstring += "  from OWTR a1 INNER JOIN WTR1 b1 on b1.\"DocEntry\" = a1.\"DocEntry\"  where a1.\"DocEntry\" = a.\"DocEntry\") AS \"CGSTVal\", ";
+                string TolocQuery = "";
+                TolocQuery = TolocQuery + " Left Join OITM l1 on l1.\"ItemCode\"=b1.\"ItemCode\" ";
+                TolocQuery = TolocQuery + " LEFT JOIN OWHS FrmAdd1 ON FrmAdd1.\"WhsCode\" =a1.\"Filler\"";
+                TolocQuery = TolocQuery + " LEFT JOIN OWHS ToAdd1 ON ToAdd1.\"WhsCode\" =a1.\"ToWhsCode\"";
+                if (clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_InvTranGetBrnchAdd\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01' ") == "Y")
+                {
+                    TolocQuery = TolocQuery + "LEFT JOIN OBPL FrmLoc1 ON FrmLoc1.\"BPLId\" =FrmAdd1.\"BPLid\" ";
+                }
+                else
+                {
+                    TolocQuery = TolocQuery + " LEFT JOIN OLCT FrmLoc1 ON FrmLoc1.\"Code\" =FrmAdd1.\"Location\"";
+                }
+                if (clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_InvTranGetcusAdd\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01' ") == "Y")
+                {
+                    TolocQuery = TolocQuery + " LEFT JOIN CRD1 ToLoc1 on ToLoc1.\"CardCode\" =a1.\"CardCode\" and ToLoc1.\"Address\" =A1.\"ShipToCode\" and ToLoc1.\"AdresType\"='S'";
+                }
+                else
+                {
+                    TolocQuery = TolocQuery + " LEFT JOIN OLCT ToLoc1 ON ToLoc1.\"Code\" =ToAdd1.\"Location\"";
+                }
+                TolocQuery = TolocQuery + " LEFT JOIN OLCT ToLocSub1 ON ToLocSub1.\"Code\" =ToAdd1.\"Location\"";
 
-                retstring += " (SELECT sum( COALESCE(  b1.\"" + Pricecol + "\" * case when a1.\"DocRate\"=0 then 1 else a1.\"DocRate\" end,0)* b1.\"Quantity\")* ";
-                retstring += " (CASE WHEN LEFT(FrmLoc.\"GSTRegnNo\", 2) = " +
-                                         "LEFT(CASE WHEN COALESCE(a.\"CardCode\", '') = '' THEN  ToLocSub.\"GSTRegnNo\" ELSE  ToLoc.\"GSTRegnNo\"  END, 2) ";
-                retstring += " THEN (CAST(l.\"" + taxrateccol + "\" AS Decimal(18, 6)) / 100) / 2  ELSE 0 END) ";
-                retstring += "  from OWTR a1 INNER JOIN WTR1 b1 on b1.\"DocEntry\" = a1.\"DocEntry\"  where a1.\"DocEntry\" = a.\"DocEntry\") AS \"SGSTVal\", ";
 
-                retstring += " (SELECT sum( COALESCE(  b1.\"" + Pricecol + "\" * case when a1.\"DocRate\"=0 then 1 else a1.\"DocRate\" end,0)* b1.\"Quantity\")* ";
-                retstring += " (CASE WHEN LEFT(FrmLoc.\"GSTRegnNo\", 2) = " +
-                                         "LEFT(CASE WHEN COALESCE(a.\"CardCode\", '') = '' THEN  ToLocSub.\"GSTRegnNo\" ELSE  ToLoc.\"GSTRegnNo\"  END, 2) ";
-                retstring += " THEN 0 ELSE (CAST(l.\"" + taxrateccol + "\" AS Decimal(18, 6)) / 100) END) ";
-                retstring += "  from OWTR a1 INNER JOIN WTR1 b1 on b1.\"DocEntry\" = a1.\"DocEntry\"  where a1.\"DocEntry\" = a.\"DocEntry\") AS \"IGSTVal\", ";
+
+                retstring += " (SELECT sum(( COALESCE(  b1.\"" + Pricecol + "\" * case when a1.\"DocRate\"=0 then 1 else a1.\"DocRate\" end,0)* b1.\"Quantity\")* ";
+                retstring += " (CASE WHEN LEFT(FrmLoc1.\"GSTRegnNo\", 2) = " +
+                                         "LEFT(CASE WHEN COALESCE(a1.\"CardCode\", '') = '' THEN  ToLocSub1.\"GSTRegnNo\" ELSE  ToLoc1.\"GSTRegnNo\"  END, 2) ";
+                retstring += " THEN (CAST(l1.\"" + taxrateccol + "\" AS Decimal(18, 6)) / 100) / 2  ELSE 0 END) )";
+                retstring += "  from OWTR a1 INNER JOIN WTR1 b1 on b1.\"DocEntry\" = a1.\"DocEntry\"  "+ TolocQuery + " where a1.\"DocEntry\" = a.\"DocEntry\") AS \"CGSTVal\", ";
+
+                retstring += " (SELECT sum(( COALESCE(  b1.\"" + Pricecol + "\" * case when a1.\"DocRate\"=0 then 1 else a1.\"DocRate\" end,0)* b1.\"Quantity\")* ";
+                retstring += " (CASE WHEN LEFT(FrmLoc1.\"GSTRegnNo\", 2) = " +
+                                         "LEFT(CASE WHEN COALESCE(a1.\"CardCode\", '') = '' THEN  ToLocSub1.\"GSTRegnNo\" ELSE  ToLoc1.\"GSTRegnNo\"  END, 2) ";
+                retstring += " THEN (CAST(l1.\"" + taxrateccol + "\" AS Decimal(18, 6)) / 100) / 2  ELSE 0 END)) ";
+                retstring += "  from OWTR a1 INNER JOIN WTR1 b1 on b1.\"DocEntry\" = a1.\"DocEntry\" " + TolocQuery + "  where a1.\"DocEntry\" = a.\"DocEntry\") AS \"SGSTVal\", ";
+
+                retstring += " (SELECT sum(( COALESCE(  b1.\"" + Pricecol + "\" * case when a1.\"DocRate\"=0 then 1 else a1.\"DocRate\" end,0)* b1.\"Quantity\")* ";
+                retstring += " (CASE WHEN LEFT(FrmLoc1.\"GSTRegnNo\", 2) = " +
+                                         "LEFT(CASE WHEN COALESCE(a1.\"CardCode\", '') = '' THEN  ToLocSub1.\"GSTRegnNo\" ELSE  ToLoc1.\"GSTRegnNo\"  END, 2) ";
+                retstring += " THEN 0 ELSE (CAST(l1.\"" + taxrateccol + "\" AS Decimal(18, 6)) / 100) END)) ";
+                retstring += "  from OWTR a1 INNER JOIN WTR1 b1 on b1.\"DocEntry\" = a1.\"DocEntry\" " + TolocQuery + "  where a1.\"DocEntry\" = a.\"DocEntry\") AS \"IGSTVal\", ";
 
                 retstring += " ((COALESCE(b.\"" + Pricecol + "\" * case when a.\"DocRate\" = 0 then 1 else a.\"DocRate\" end, 0) * b.\"Quantity\")* ";
                 retstring += " (CASE WHEN LEFT(FrmLoc.\"GSTRegnNo\",2)= " +
@@ -556,9 +580,9 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
                 retstring += " (((SELECT sum(COALESCE(b1.\"" + Pricecol + "\" * case when a1.\"DocRate\" = 0 then 1 else a1.\"DocRate\" end, 0) * b1.\"Quantity\") ";
                 retstring += "  from OWTR a1 INNER JOIN WTR1 b1 on b1.\"DocEntry\" = a1.\"DocEntry\"  where a1.\"DocEntry\" = a.\"DocEntry\") +";
-                retstring += " (SELECT sum(COALESCE(b1.\"" + Pricecol + "\" * case when a1.\"DocRate\" = 0 then 1 else a1.\"DocRate\" end, 0) * b1.\"Quantity\") * ";
-                retstring += " (CAST(l.\"" + taxrateccol + "\"  AS Decimal(18, 6)) / 100) ";
-                retstring += "  from OWTR a1 INNER JOIN WTR1 b1 on b1.\"DocEntry\" = a1.\"DocEntry\"  where a1.\"DocEntry\" = a.\"DocEntry\" )) ";
+                retstring += " (SELECT sum((COALESCE(b1.\"" + Pricecol + "\" * case when a1.\"DocRate\" = 0 then 1 else a1.\"DocRate\" end, 0) * b1.\"Quantity\") * ";
+                retstring += " (CAST(l1.\"" + taxrateccol + "\"  AS Decimal(18, 6)) / 100) )";
+                retstring += "  from OWTR a1 INNER JOIN WTR1 b1 on b1.\"DocEntry\" = a1.\"DocEntry\"  " + TolocQuery + "  where a1.\"DocEntry\" = a.\"DocEntry\" )) ";
                 retstring += " + a.\"DpmAmnt\") -(CASE WHEN(SELECT \"U_AddTCSOth\"  FROM \"@ATEICFG\" e WHERE e.\"Code\" = '01') = 'Y' ";
                 retstring += "   THEN  0 ELSE COALESCE((Select Sum(WTR5.\"WTAmnt\") from WTR5 where WTR5.\"AbsEntry\" = a.\"DocEntry\"),0.0) END ) AS \"Doc Total\", ";
 
@@ -889,13 +913,17 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 retstring = retstring + " i.\"TransID\" ,i.\"TransName\" ,i.\"TransDocNo\" ,i.\"Distance\" ,i.\"TransMode\" ,i.\"VehicleNo\" ,i.\"VehicleTyp\",";
                 retstring = retstring + " i.\"TransType\",i.\"TransDate\",i.\"SuplyType\",";
                 retstring = retstring + " i.\"FrmGSTN\" ,i.\"FrmTraName\" ,i.\"FrmAddres1\" ,i.\"FrmAddres2\" ,i.\"FrmPlace\" ,Replace(i.\"FrmZipCode\",' ','') as \"FrmZipCode\" ,";
-                retstring = retstring + " i.\"ActFrmStat\" ,i.\"ToGSTN\" ,i.\"ToTraName\" ,i.\"ToAddres1\" ,i.\"ToAddres2\" ,i.\"ToPlace\" ,Replace(i.\"ToZipCode\",' ','') as \"ToZipCode\"  ,";
-                retstring = retstring + " i.\"ActToState\",i.\"SubSplyTyp\",ES.\"SubType\" \"SubtypeDescription\", i.\"DocType\" \"EDocType\" ,";
+                retstring = retstring + " i.\"ActFrmStat\" ,";
+                retstring = retstring + " i.\"SubSplyTyp\",ES.\"SubType\" \"SubtypeDescription\", i.\"DocType\" \"EDocType\" ,i.\"FrmState\" \"FrmState\",";
+
+                retstring = retstring + " i.\"ToGSTN\" ,i.\"ToTraName\" ,i.\"ToAddres1\" ,i.\"ToAddres2\" ,i.\"ToPlace\" ,Replace(i.\"ToZipCode\",' ','') as \"ToZipCode\"  ,";
+                retstring = retstring + " i.\"ActToState\",i.\"ToState\" \"ToState\" ,";
+
 
                 retstring += " i.\"U_Dispatch_Eway\" as \"DisEway\" ,";
                 retstring += " i.\"U_Dispatch_Name\" as \"DisName\" ,";
                 retstring = retstring + " i.\"EwbDate\" \"EwbDate\" ,i.\"EWayBillNo\" \"EwayNo\" ,";
-                retstring = retstring + " i.\"FrmState\" \"FrmState\" ,i.\"ToState\" \"ToState\" ,";
+   
 
                 retstring = retstring + " T.\"ClaimRefun\",";
             }

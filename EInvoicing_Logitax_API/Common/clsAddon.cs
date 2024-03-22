@@ -49,7 +49,8 @@ namespace EInvoicing_Logitax_API.Common
 
 
 
-                    string strSQL = @"Select  ""U_DBType"" ,""U_EwayNo"" ,""U_VehNo"" ,""U_TransID"" ,""U_TransName"",""U_Distance"",""U_ItemDesc"",""U_GSTCol"",""U_HSNCol"" ";
+                    string strSQL = @"Select  ""U_DBType"" ,""U_EwayNo"" ,""U_VehNo"" ,""U_TransID"" ,""U_TransName"",""U_Distance"",""U_ItemDesc"",""U_GSTCol"",""U_HSNCol"", ";
+                    strSQL += " \"U_DeliVendor\", \"U_DeliShip\",\"U_DeliWhse\",\"U_RDCcol\" ";
                     strSQL += @" from ""@ATEICFG"" where ""Code""='01'";
 
                     DataTable dt = objglobalmethods.GetmultipleValue(strSQL);
@@ -64,6 +65,11 @@ namespace EInvoicing_Logitax_API.Common
                         clsModule.ItemDsc = Convert.ToString(dt.Rows[0]["U_ItemDesc"]);
                         clsModule.GSTCol = Convert.ToString(dt.Rows[0]["U_GSTCol"]);
                         clsModule.HSNCol = Convert.ToString(dt.Rows[0]["U_HSNCol"]);
+
+                        clsModule.DelivendorCol = Convert.ToString(dt.Rows[0]["U_DeliVendor"]);
+                        clsModule.DelishipCol = Convert.ToString(dt.Rows[0]["U_DeliShip"]);
+                        clsModule.Deliwhse = Convert.ToString(dt.Rows[0]["U_DeliWhse"]);
+                        clsModule.NRDCCol = Convert.ToString(dt.Rows[0]["U_RDCcol"]);
 
                     }
 
