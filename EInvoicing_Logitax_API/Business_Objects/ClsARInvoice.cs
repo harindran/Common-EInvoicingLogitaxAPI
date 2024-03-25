@@ -1716,7 +1716,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         }
                         else
                         {
-                            decimal distance = 0;
+                            int distance = 0;
                             if (GenerateIRNGetJson.json_data.BuyerDtls.Pin.ToString() == GenerateIRNGetJson.json_data.SellerDtls.Pin.ToString())
                             {
                                 distance = 1;
@@ -1726,7 +1726,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             {
                                 if (!string.IsNullOrEmpty(invrecordset.Fields.Item(clsModule.EwayDistance).Value.ToString()))
                                 {
-                                    distance = clsModule.objaddon.objglobalmethods.CtoD(invrecordset.Fields.Item(clsModule.EwayDistance).Value);
+                                    distance = clsModule.objaddon.objglobalmethods.Ctoint(invrecordset.Fields.Item(clsModule.EwayDistance).Value);
                                 }
                             }
                             if (!string.IsNullOrEmpty(clsModule.EwayUDF))
@@ -1936,7 +1936,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                     //dt = clsModule.objaddon.objglobalmethods.GetmultipleValue(strSQL);
                     if (invrecordset.RecordCount > 0)
                     {
-                        decimal Calcdistance = 0;
+                        int Calcdistance = 0;
                         strSQL = @"Select T1.""LineId"",T0.""U_UATUrl"",T1.""U_URLType"",T1.""U_Type"",Case when T0.""U_Live""='N' then CONCAT(T0.""U_UATUrl"",T1.""U_URL"") Else CONCAT(T0.""U_LIVEUrl"",T1.""U_URL"") End as URL";
                         strSQL += @" ,Case when T0.""U_Live""='N' then T0.""U_UATUrl"" Else T0.""U_LIVEUrl"" End as BaseURL,";
                         strSQL += @" ""U_BlockEway"" " ;
@@ -1986,7 +1986,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             Calcdistance = 1;
                         }
                     
-                        Calcdistance = clsModule.objaddon.objglobalmethods.CtoD(invrecordset.Fields.Item("Distance").Value);
+                        Calcdistance = clsModule.objaddon.objglobalmethods.Ctoint(invrecordset.Fields.Item("Distance").Value);
 
                  
                         GenerateIRNGetJson.CLIENTCODE = ClientCode;
@@ -2486,7 +2486,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             }
                             else
                             {
-                                decimal CalcDistance = 0;
+                                int CalcDistance = 0;
                                 Generate_EWay distanceEway = new Generate_EWay();
                                 distanceEway.CLIENTCODE = ClientCode;
                                 distanceEway.USERCODE = UserCode;
@@ -2501,7 +2501,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                 
                                 if (clsModule.objaddon.objglobalmethods.Ctoint(invrecordset.Fields.Item("Distance").Value.ToString()) > 0)
                                 {
-                                    CalcDistance = clsModule.objaddon.objglobalmethods.CtoD(invrecordset.Fields.Item("Distance").Value.ToString());
+                                    CalcDistance = clsModule.objaddon.objglobalmethods.Ctoint(invrecordset.Fields.Item("Distance").Value.ToString());
                                 }
 
                                 clienCred_GetIRN_DocNum.ewbeinvoicelist.Add(new Ewbeinvoicelist
