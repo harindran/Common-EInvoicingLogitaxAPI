@@ -919,7 +919,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 bool recordst = false;
                 if (clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_UseDeliRDC\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01' ") == "Y")
                 {
-                    string lstr = " SELECT \"" + clsModule.DelishipCol + "\" ,\"" + clsModule.DelivendorCol + "\" ,\"" + clsModule.Deliwhse + "\"  FROM ODLN WHERE \"DocEntry\" = '" + Docentry + "'";
+                    string lstr = " SELECT \"" + clsModule.DelishipCol + "\" ,\"" + clsModule.DelivendorCol + "\" , Replace(\"" + clsModule.Deliwhse + "\",'-','') as \"" + clsModule.Deliwhse + "\"   FROM ODLN WHERE \"DocEntry\" = '" + Docentry + "'";
                     SAPbobsCOM.Recordset rsv = clsModule.objaddon.objglobalmethods.GetmultipleRS(lstr);
 
                     if (rsv.RecordCount > 0)
