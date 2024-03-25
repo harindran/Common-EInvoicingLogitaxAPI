@@ -939,7 +939,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         {
                             retstring += " RDCloc.\"GSTRegnNo\" as \"ToGSTN\" ,  B1.\"CompnyName\"  AS \"ToTraName\", ";
                             retstring += " CONCAT(CONCAT(CONCAT(CONCAT(Cast(COALESCE(RDCTo.\"Building\",'') AS Varchar(200)) , ' '), CONCAT(COALESCE(RDCTo.\"Street\",'') , ' ')) , ";
-                            retstring += " CONCAT(CONCAT(COALESCE(RDCTo.\"Block\",'') , ' '), CONCAT(COALESCE(RDCTo.\"Address2\",'') , ' '))), COALESCE(RDCTo.\"Address3\",'')) AS \"ToAddres1\", ";
+                            retstring += " CONCAT(CONCAT(COALESCE(RDCTo.\"Block\",'') , ' '), CONCAT(COALESCE(RDCTo.\"Address2\",'') , ' '))), COALESCE(RDCTo.\"Address3\",'')) AS \"ToAddres1\",'' as  \"ToAddres2\" , ";
                             retstring += " RDCTo.\"City\"  AS \"ToPlace\",RDCTo.\"ZipCode\" AS \"ToZipCode\" , ";
                             retstring += " COALESCE(RDCst.\"GSTCode\",96)  \"ActToState\", ";
                             retstring += " COALESCE(RDCst.\"GSTCode\",96)  \"ToState\", ";

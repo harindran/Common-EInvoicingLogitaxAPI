@@ -2126,7 +2126,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             GenerateIRNGetJson.billLists[0].itemList.Add(new Generate_EWay.Ewayitemlist
                             {
                                 itemNo = clsModule.objaddon.objglobalmethods.Ctoint(invrecordset.Fields.Item("SINo").Value),
-                                productName = prdouctdesc,
+                                //productName = prdouctdesc,
                                 productDesc = prdouctdesc,
                                 hsnCode = ServiceHSN,
                                 quantity = invrecordset.Fields.Item("Quantity").Value.ToString(),
@@ -2150,15 +2150,18 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         E_Invoice_Logs(DocEntry, datatable, TransType, "Create", Type, requestParams);
 
                         string msg = datatable.Rows[0]["message"].ToString();
+                        string flag = columnFind(datatable, "flag", 0);
                         if (datatable.Rows[0]["error_log_id"].ToString() == string.Empty)
-                        {                          
-                            clsModule.objaddon.objapplication.StatusBar.SetText("Generate: " + msg, SAPbouiCOM.BoMessageTime.bmt_Medium, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                        {
+
+
+                            clsModule.objaddon.objapplication.StatusBar.SetText("Generate: " + msg, SAPbouiCOM.BoMessageTime.bmt_Medium, flag == "true" ? SAPbouiCOM.BoStatusBarMessageType.smt_Success: SAPbouiCOM.BoStatusBarMessageType.smt_Error);
                         }
                         else
                         {
                             if (!blnRefresh)
                             {
-                                clsModule.objaddon.objapplication.StatusBar.SetText("Generate: " + msg, SAPbouiCOM.BoMessageTime.bmt_Medium, SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                                clsModule.objaddon.objapplication.StatusBar.SetText("Generate: " + msg, SAPbouiCOM.BoMessageTime.bmt_Medium, flag == "true" ? SAPbouiCOM.BoStatusBarMessageType.smt_Success : SAPbouiCOM.BoStatusBarMessageType.smt_Error);
                                 clsModule.objaddon.objapplication.MessageBox("Generate: " + msg);
                             }
                         }
