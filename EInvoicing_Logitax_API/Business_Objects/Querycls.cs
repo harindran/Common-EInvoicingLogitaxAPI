@@ -916,9 +916,43 @@ namespace EInvoicing_Logitax_API.Business_Objects
                 retstring = retstring + " i.\"ActFrmStat\" ,";
                 retstring = retstring + " i.\"SubSplyTyp\",ES.\"SubType\" \"SubtypeDescription\", i.\"DocType\" \"EDocType\" ,i.\"FrmState\" \"FrmState\",";
 
-                retstring = retstring + " i.\"ToGSTN\" ,i.\"ToTraName\" ,i.\"ToAddres1\" ,i.\"ToAddres2\" ,i.\"ToPlace\" ,Replace(i.\"ToZipCode\",' ','') as \"ToZipCode\"  ,";
-                retstring = retstring + " i.\"ActToState\",i.\"ToState\" \"ToState\" ,";
+                bool recordst = false;
+                if (clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_UseDeliRDC\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01' ") == "Y")
+                {
+                    string lstr = " SELECT \"" + clsModule.DelishipCol + "\" ,\"" + clsModule.DelivendorCol + "\" ,\"" + clsModule.Deliwhse + "\"  FROM ODLN WHERE \"DocEntry\" = '" + Docentry + "'";
+                    SAPbobsCOM.Recordset rsv = clsModule.objaddon.objglobalmethods.GetmultipleRS(lstr);
 
+                    if (rsv.RecordCount > 0)
+                    {
+                        if (!(string.IsNullOrEmpty(rsv.Fields.Item(clsModule.DelivendorCol).Value.ToString()) || string.IsNullOrEmpty(rsv.Fields.Item(clsModule.DelishipCol).Value.ToString())))
+                        {
+                            retstring += " RDCTo.\"GSTRegnNo\" AS \"ToGSTN\", RDCTo.\"Address\" AS \"ToTraName\" ,";
+                            retstring += " CONCAT(CONCAT(CONCAT(CONCAT(Cast(COALESCE(RDCTo.\"Building\",'') AS Varchar(200)) , ' '), CONCAT(COALESCE(RDCTo.\"Street\",'') , ' ')) , ";
+                            retstring += " CONCAT(CONCAT(COALESCE(RDCTo.\"Block\",'') , ' '), CONCAT(COALESCE(RDCTo.\"Address2\",'') , ' '))), ";
+                            retstring += " COALESCE(RDCTo.\"Address3\",'')) AS \"ToAddres1\", '' as  \"ToAddres2\" ,";
+                            retstring += " RDCTo.\"City\" AS \"ToPlace\",RDCTo.\"ZipCode\" AS \"ToZipCode\" , ";
+                            retstring += " COALESCE(RDCst.\"GSTCode\",96)  \"ActToState\", ";
+                            retstring += " COALESCE(RDCst.\"GSTCode\",96)  \"ToState\", ";
+                            recordst = true;
+                        }
+                        else if (!string.IsNullOrEmpty(rsv.Fields.Item(clsModule.Deliwhse).Value.ToString()))
+                        {
+                            retstring += " RDCloc.\"GSTRegnNo\" as \"ToGSTN\" ,  B1.\"CompnyName\"  AS \"ToTraName\", ";
+                            retstring += " CONCAT(CONCAT(CONCAT(CONCAT(Cast(COALESCE(RDCTo.\"Building\",'') AS Varchar(200)) , ' '), CONCAT(COALESCE(RDCTo.\"Street\",'') , ' ')) , ";
+                            retstring += " CONCAT(CONCAT(COALESCE(RDCTo.\"Block\",'') , ' '), CONCAT(COALESCE(RDCTo.\"Address2\",'') , ' '))), COALESCE(RDCTo.\"Address3\",'')) AS \"ToAddres1\", ";
+                            retstring += " RDCTo.\"City\"  AS \"ToPlace\",RDCTo.\"ZipCode\" AS \"ToZipCode\" , ";
+                            retstring += " COALESCE(RDCst.\"GSTCode\",96)  \"ActToState\", ";
+                            retstring += " COALESCE(RDCst.\"GSTCode\",96)  \"ToState\", ";
+                            recordst = true;
+                        }
+                    }
+                }
+
+                if (!recordst)
+                {
+                    retstring = retstring + " i.\"ToGSTN\" ,i.\"ToTraName\" ,i.\"ToAddres1\" ,i.\"ToAddres2\" ,i.\"ToPlace\" ,Replace(i.\"ToZipCode\",' ','') as \"ToZipCode\"  ,";
+                    retstring = retstring + " i.\"ActToState\",i.\"ToState\" \"ToState\" ,";
+                }
 
                 retstring += " i.\"U_Dispatch_Eway\" as \"DisEway\" ,";
                 retstring += " i.\"U_Dispatch_Name\" as \"DisName\" ,";
@@ -981,6 +1015,31 @@ namespace EInvoicing_Logitax_API.Business_Objects
             {
                 retstring = retstring + " LEFT JOIN OEST ES ON ES.\"SubID\" =i.\"SubSplyTyp\"";
             }
+
+            if (clsModule.objaddon.objglobalmethods.getSingleValue("SELECT \"U_UseDeliRDC\" FROM \"@ATEICFG\" a  WHERE \"Code\" ='01' ") == "Y")
+            {
+                string lstr = " SELECT \"" + clsModule.DelishipCol + "\" ,\"" + clsModule.DelivendorCol + "\" ,\"" + clsModule.Deliwhse + "\"  FROM ODLN WHERE \"DocEntry\" = '" + Docentry + "'";
+                SAPbobsCOM.Recordset rsv = clsModule.objaddon.objglobalmethods.GetmultipleRS(lstr);
+
+                if (rsv.RecordCount > 0)
+                {
+                    if (!(string.IsNullOrEmpty(rsv.Fields.Item(clsModule.DelivendorCol).Value.ToString()) || string.IsNullOrEmpty(rsv.Fields.Item(clsModule.DelishipCol).Value.ToString())))
+                    {
+                        retstring += " LEFT JOIN OCRD RDCVen ON RDCVen.\"CardCode\"=a.\"" + clsModule.DelivendorCol + "\" ";
+                        retstring += " LEFT JOIN CRD1 RDCTo on RDCVen.\"CardCode\" = RDCTo.\"CardCode\"  and  RDCTo.\"Address\" =a.\"" + clsModule.DelishipCol + "\" and RDCTo.\"AdresType\" ='S' ";
+                        retstring += " LEFT JOIN OCST RDCst on RDCst.\"Code\"=RDCTo.\"State\" and RDCst.\"Country\"=RDCTo.\"Country\" ";
+                    }
+
+                    else if (!string.IsNullOrEmpty(rsv.Fields.Item(clsModule.Deliwhse).Value.ToString()))
+                    {
+                        retstring += " LEFT JOIN OWHS RDCTo ON RDCTo.\"WhsCode\"=a.\"" + clsModule.Deliwhse + "\" ";
+                        retstring += " LEFT JOIN OLCT RDCloc ON RDCTo.\"Location\" =RDCloc.\"Code\"  ";
+                        retstring += " LEFT JOIN OCST RDCst on RDCst.\"Code\"=RDCTo.\"State\" and RDCst.\"Country\"=RDCTo.\"Country\" ";
+
+                    }
+                }
+            }
+
             retstring = retstring + " LEFT JOIN NNM1 nnm1 ON a.\"Series\" =nnm1.\"Series\"";
 
             retstring = retstring + " LEFT JOIN(SELECT \"BankName\" \"CBankName\",Y.\"BankCode\" \"CBankCode\",\"Branch\" \"CBranch\", \"Account\" \"CAccount\",\"AcctName\" \"CAcctName\",";

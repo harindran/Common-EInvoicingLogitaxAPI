@@ -80,15 +80,16 @@ namespace EInvoicing_Logitax_API.Business_Objects
         private void Button0_ClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
          
-            string docEntryString = oForm.DataSources.DBDataSources.Item(Table).GetValue("DocEntry", 0).Trim();
-
-           int DocEntry = int.Parse(docEntryString);
-
+         
            
             switch (Table)
             {
          
                 case "RIN26":
+                    string docEntryString = oForm.DataSources.DBDataSources.Item(Table).GetValue("DocEntry", 0).Trim();
+
+                    int DocEntry = int.Parse(docEntryString);
+
                     clsModule.objaddon.objglobalmethods.ExecuteQuery("update " + Table + " set  \"U_Dispatch_Eway\" = '" + Convert.ToString(((CheckBox0.Checked == true) ? 'Y' : 'N')) + "' WHERE \"DocEntry\" = " + DocEntry);
                     break;
               default:

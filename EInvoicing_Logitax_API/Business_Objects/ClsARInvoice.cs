@@ -2111,12 +2111,24 @@ namespace EInvoicing_Logitax_API.Business_Objects
                                 return false;
                             }
 
+                            string ServiceHSN = "";
+
+                            if (!string.IsNullOrEmpty(clsModule.HSNCol))
+                            {
+                                ServiceHSN = invrecordset.Fields.Item(clsModule.HSNCol).Value.ToString();
+                            }
+
+                            if (string.IsNullOrEmpty(ServiceHSN))
+                            {
+                                ServiceHSN = invrecordset.Fields.Item("HSN").Value.ToString();                              
+                            }
+
                             GenerateIRNGetJson.billLists[0].itemList.Add(new Generate_EWay.Ewayitemlist
                             {
                                 itemNo = clsModule.objaddon.objglobalmethods.Ctoint(invrecordset.Fields.Item("SINo").Value),
                                 productName = prdouctdesc,
                                 productDesc = prdouctdesc,
-                                hsnCode = invrecordset.Fields.Item("HSN").Value.ToString(),
+                                hsnCode = ServiceHSN,
                                 quantity = invrecordset.Fields.Item("Quantity").Value.ToString(),
                                 qtyUnit = AssignEwayunit,
                                 taxableAmount = invrecordset.Fields.Item("AssAmt").Value.ToString(),

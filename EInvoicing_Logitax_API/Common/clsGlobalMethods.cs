@@ -431,6 +431,7 @@ namespace EInvoicing_Logitax_API.Common
             }
             catch (Exception ex)
             {
+                WriteErrorLog(StrSQL);
                 clsModule.objaddon.objapplication.StatusBar.SetText(" Get Multiple Value Function Failed :  " + ex.Message + StrSQL, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
                 return dt;
             }
@@ -445,6 +446,7 @@ namespace EInvoicing_Logitax_API.Common
             }
             catch (Exception ex)
             {
+                WriteErrorLog(StrSQL);
                 clsModule.objaddon.objapplication.StatusBar.SetText(" Get Single Value Function Failed :  " + ex.Message + StrSQL, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
                 return rset;
             }
