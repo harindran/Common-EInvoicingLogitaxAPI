@@ -1939,7 +1939,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         int Calcdistance = 0;
                         strSQL = @"Select T1.""LineId"",T0.""U_UATUrl"",T1.""U_URLType"",T1.""U_Type"",Case when T0.""U_Live""='N' then CONCAT(T0.""U_UATUrl"",T1.""U_URL"") Else CONCAT(T0.""U_LIVEUrl"",T1.""U_URL"") End as URL";
                         strSQL += @" ,Case when T0.""U_Live""='N' then T0.""U_UATUrl"" Else T0.""U_LIVEUrl"" End as BaseURL,";
-                        strSQL += @" ""U_BlockEway"" " ;
+                        strSQL += @" ""U_BlockEway"",""U_BillToWare"",""U_GettrnShp"" ";
                         strSQL += @" from ""@ATEICFG"" T0 join ""@ATEICFG1"" T1 on T0.""Code""=T1.""Code"" where T0.""Code""='01' and T1.""U_URLType"" ='Generate IRN' and T1.""U_Type""='E-Way' Order by ""LineId"" Desc";
                         objRs.DoQuery(strSQL);
                         if (objRs.RecordCount == 0)
@@ -1997,6 +1997,11 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         string FRMAddress1 = "";
                         string FRMAddress2 = "";
 
+                        string fromPlace = "";
+                        string fromPincode = "";
+                        string fromStateCode = "";
+                        string actualFromStateCode = "";
+
                         string FRMconcatAddress = string.Concat(invrecordset.Fields.Item("FrmAddres1").Value.ToString(),
                                                             invrecordset.Fields.Item("FrmAddres2").Value.ToString());
                         List<string> FRMsubstrings = clsModule.objaddon.objglobalmethods.SplitByLength(FRMconcatAddress, 70);
@@ -2034,7 +2039,93 @@ namespace EInvoicing_Logitax_API.Business_Objects
                             }
                         }
 
+                        fromPlace = invrecordset.Fields.Item("FrmPlace").Value.ToString();
+                        fromPincode = invrecordset.Fields.Item("FrmZipCode").Value.ToString();
+                        fromStateCode = invrecordset.Fields.Item("FrmState").Value.ToString();
+                        actualFromStateCode = invrecordset.Fields.Item("ActFrmStat").Value.ToString();
 
+                        if (objRs.Fields.Item("U_BillToWare").Value.ToString() == "Y")
+                        {
+                            string Line1 = "";
+                            string Whscode = "";
+
+                            switch (TransType)
+                            {
+                                case "INV":
+                                    Line1 = "INV1";
+                                    Whscode = "WhsCode";
+                                    break;
+                                case "CRN":
+                                    Line1 = "RIN1";
+                                    Whscode = "WhsCode";
+                                    break;
+                                case "WTR":
+                                    Line1 = "WTR1";
+                                    Whscode = "FromWhsCod";
+                                    break;
+                                case "DLN":
+                                    Line1 = "DLN1";
+                                    Whscode = "WhsCode";
+                                    break;
+                                case "PCH":
+                                    Line1 = "PCH1";
+                                    Whscode = "WhsCode";
+                                    break;
+                                case "RPC":
+                                    Line1 = "RPC1";
+                                    Whscode = "WhsCode";
+                                    break;
+                                case "DPO":
+                                    Line1 = "DPO1";
+                                    Whscode = "WhsCode";
+                                    break;
+                                case "DPI":
+                                    Line1 = "DPI1";
+                                    Whscode = "WhsCode";
+                                    break;
+                            }
+                            
+                            string diswarequery = "SELECT \"Building\" ,\"Block\" ,\"Street\" ,\"Address2\" ,\"Address3\" , ";
+                            diswarequery += " \"City\" ,\"ZipCode\" , COALESCE(\"GSTCode\",'96') as \"Statecode\"  ";
+                            diswarequery += "FROM OWHS o ";
+                            diswarequery += " LEFT JOIN OCST st1 on st1.\"Code\"=o.\"State\" and st1.\"Country\"=o.\"Country\" ";
+                            diswarequery += " WHERE \"WhsCode\" IN(SELECT \"" + Whscode+ "\"  FROM " + Line1 + " WHERE  \"DocEntry\" = '" + DocEntry + "'); ";
+
+                            disRecset = clsModule.objaddon.objglobalmethods.GetmultipleRS(diswarequery);
+
+                            if (disRecset.RecordCount > 0)
+                            {
+                                string DisAddress1 = "";
+                                string DisAddress2 = "";
+                                string DisconcatAddress = string.Concat(disRecset.Fields.Item("Building").Value.ToString(), " ",
+                                                                    disRecset.Fields.Item("Block").Value.ToString(), " ",
+                                                                    disRecset.Fields.Item("Street").Value.ToString(), " ",
+                                                                    disRecset.Fields.Item("Address2").Value.ToString(), " ",
+                                                                    disRecset.Fields.Item("Address3").Value.ToString());
+                                List<string> Dissubstrings = clsModule.objaddon.objglobalmethods.SplitByLength(DisconcatAddress, 70);
+                                foreach (string substring in Dissubstrings)
+                                {
+                                    if (string.IsNullOrEmpty(DisAddress1))
+                                    {
+                                        DisAddress1 = substring;
+                                        continue;
+                                    }
+                                    if (string.IsNullOrEmpty(DisAddress2))
+                                    {
+                                        DisAddress2 = substring;
+                                        continue;
+                                    }
+                                }
+
+
+                                FRMAddress1 = DisAddress1;
+                                FRMAddress2 = DisAddress2;
+                                fromPlace = disRecset.Fields.Item("City").Value.ToString();
+                                fromPincode = disRecset.Fields.Item("ZipCode").Value.ToString();
+                                fromStateCode = disRecset.Fields.Item("Statecode").Value.ToString();
+                                actualFromStateCode = disRecset.Fields.Item("Statecode").Value.ToString();
+                            }
+                        }
 
                         GenerateIRNGetJson.billLists.Add(new Generate_EWay.EwayList
                         {
@@ -2053,10 +2144,11 @@ namespace EInvoicing_Logitax_API.Business_Objects
 
                             fromAddr1 = FRMAddress1,
                             fromAddr2 = FRMAddress2,
-                            fromPlace = invrecordset.Fields.Item("FrmPlace").Value.ToString(),
-                            fromPincode = invrecordset.Fields.Item("FrmZipCode").Value.ToString(),
-                            fromStateCode = invrecordset.Fields.Item("FrmState").Value.ToString(),
-                            actualFromStateCode = invrecordset.Fields.Item("ActFrmStat").Value.ToString(),
+                            fromPlace = fromPlace,
+                            fromPincode = fromPincode,
+                            fromStateCode = fromStateCode,
+                            actualFromStateCode = actualFromStateCode,
+
                             toGstin = invrecordset.Fields.Item("ToGSTN").Value.ToString(),
                             toTrdName = invrecordset.Fields.Item("ToTraName").Value.ToString(),
                             toAddr1 = TOAddress1,
