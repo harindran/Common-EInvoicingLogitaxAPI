@@ -2247,7 +2247,7 @@ namespace EInvoicing_Logitax_API.Business_Objects
                         {
 
 
-                            clsModule.objaddon.objapplication.StatusBar.SetText("Generate: " + msg, SAPbouiCOM.BoMessageTime.bmt_Medium, flag == "true" ? SAPbouiCOM.BoStatusBarMessageType.smt_Success: SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+                            clsModule.objaddon.objapplication.StatusBar.SetText("Generate: " + msg, SAPbouiCOM.BoMessageTime.bmt_Medium,SAPbouiCOM.BoStatusBarMessageType.smt_Warning);
                         }
                         else
                         {
